@@ -22,6 +22,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    - `enemies/shambler/shambler_model.tscn` and `shambler_*`: `tools/build_zombie.gd`
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
+   - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`: `tools/build_pickup.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.
@@ -36,6 +37,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no
@@ -43,8 +45,9 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    `xvfb-run -a godot --path . --rendering-method gl_compatibility --script res://tools/capture_knife.gd`
    (writes PNGs to `docs/previews/`). Then look at the images.
 5. **Palette only.** Colours come from `core/palette.gd` (9 colours). Don't
-   introduce new hues. Only light sources emit light. The one exception is the
-   Scuttler's glowing orange cap spots, which are deliberate bioluminescence.
+   introduce new hues. Only light sources emit light. The exceptions are the
+   Scuttler's glowing orange cap spots and the dropped mushroom pickups, which
+   are deliberate bioluminescence.
 6. **Respect licences.** The PSX FPS Arms Free pack is CC BY 4.0. Any use of it
    must keep its LICENSE file and the credit line in `CREDITS.md`.
 7. **Small, honest commits.** Say in the commit message what you changed and
@@ -58,6 +61,7 @@ core/            palette, ooze FX, window barricades, shared hitscan
 enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
+pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene
 tools/           build scripts, tests, capture/film scripts

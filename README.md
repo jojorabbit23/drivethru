@@ -199,6 +199,18 @@ Everything currently passes. Typical timeline: at the window at 10 s, boards gon
 
 It passed repeated runs. The clip `docs/video/scuttler_encounter.mp4` shows it in action.
 
+## Mushroom drops
+
+Every Shambler and Scuttler drops one glowing mushroom when it dies. The model is the same glowing-mushroom GLB the Scuttler is built from, shrunk to 0.34 m (`tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res` and its material).
+
+- **Drop:** 0.6 s after the kill it pops out of the body in a little arc and lands hovering 0.42 m above the floor, a step to one side. It never lands inside a wall.
+- **Look:** it spins (about one turn every 3.5 s) and bobs gently. The cap's orange spots glow, a thin amber halo outlines it (`pickup_glow.gdshader`, an additive rim pass), and a small amber light pulses on the floor beneath it.
+- **Pickup:** walk into it. Within 2.6 m, with nothing solid between you, it flies to you. Boards don't block it, so a mushroom dropped just outside a window can be pulled in from the repair spot; one under a sill rises over it first.
+- **Count:** `player.mushrooms` (signal `mushrooms_changed`), shown on the HUD as `MUSHROOMS n`. Nothing spends them yet.
+- **Script:** `pickups/mushroom/mushroom_pickup.gd` (`class_name MushroomPickup`). `main.drop_pickup(position)` drops one anywhere.
+
+`tools/pickup_test.gd` checks both enemy types drop exactly one, that it floats, spins, bobs and glows, that it stays put while you're far away, that walking up collects it and updates the HUD, that one dropped outside a window can be pulled in, and that four at once are all collected. `docs/video/pickup.mp4` shows two kills, a close-up of a mushroom, and the pickup.
+
 ## The knife
 
 `weapons/knife/` is built from your `knife_3d_model.glb`; the original is kept in `source/`.
@@ -263,7 +275,10 @@ godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
 ```
+
+To rebuild the mushroom pickup mesh, run `godot --headless --path . --script res://tools/build_pickup.gd` (after the Scuttler build, whose textures it uses).
 
 To rebuild the Scuttler after changing its bones, weights or clips, run `godot --headless --path . --script res://tools/build_scuttler.gd`.
 
@@ -277,7 +292,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Colours and materials
 
-`core/palette.gd` holds the nine palette colours and is the single source of truth. The builder writes one shared `StandardMaterial3D` per surface type into `materials/`. Only lamps, light panels, screens and the fridge glass emit light; painted teal never does. The interiors are lit warm by amber lights, and the exterior is cool moonlight with amber lane lamps.
+`core/palette.gd` holds the nine palette colours and is the single source of truth. The builder writes one shared `StandardMaterial3D` per surface type into `materials/`. Only lamps, light panels, screens and the fridge glass emit light; painted teal never does. The exceptions are the Scuttler's cap spots and the dropped mushrooms, which glow on purpose. The interiors are lit warm by amber lights, and the exterior is cool moonlight with amber lane lamps.
 
 `export/shop_greybox.glb` is the same geometry for Blender or other tools. It contains no gameplay nodes or collision.
 
@@ -288,7 +303,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Not done yet
 
-- No customers, deliveries, stock or economy. Zombies arrive on a steady 11 s clock rather than in escalating waves.
+- No customers, deliveries, stock or economy. Mushrooms are counted but nothing spends them yet. Zombies arrive on a steady 11 s clock rather than in escalating waves.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
 - The player is a plain capsule with a camera and an invisible placeholder pistol. The PSX arms pack hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.

@@ -3,12 +3,14 @@ extends Node3D
 
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
+const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
 @export var max_zombies := 12        # alive at once; a spawn is skipped while at the cap
 @export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
+@export var drop_delay := 0.6        # seconds after a kill before its mushroom pops out
 
 var _spawn_t := 0.0
 var _spawned := 0
@@ -29,6 +31,7 @@ func _ready() -> void:
 	player.health_changed.connect(func(_h, _m): _update_health())
 	player.hurt.connect(func(_a, _f): _flash_damage())
 	player.died.connect(_on_player_died)
+	player.mushrooms_changed.connect(func(_n): _update_health())
 	for w in player.weapons:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
@@ -87,8 +90,22 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	var spawn: Vector3 = window.lane_spawn()
 	z.global_position = spawn + Vector3(randf_range(-0.6, 0.6), 0.05, 0).rotated(Vector3.UP, window.rotation.y)
 	z.rotation.y = atan2(window.outward().x, window.outward().z)
-	z.died.connect(func(_z): _kills += 1; _update_health())
+	z.died.connect(func(_z): _kills += 1; _update_health(); _drop_later(_z))
 	return z
+
+# Every dead Shambler or Scuttler drops one glowing mushroom.
+func _drop_later(z: Node3D) -> void:
+	var at := z.global_position
+	get_tree().create_timer(drop_delay).timeout.connect(func():
+		if is_instance_valid(z):
+			at = z.global_position
+		drop_pickup(at))
+
+func drop_pickup(at: Vector3) -> Node3D:
+	var p: Node3D = PICKUP.new()
+	add_child(p)
+	p.drop(at, at.y)
+	return p
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -141,7 +158,7 @@ func _update_wave_hud() -> void:
 	_hud["wave"].text = "NEXT ZOMBIE IN %ds   ·   ZOMBIES %d" % [ceili(next_spawn_in()), alive]
 
 func _update_health() -> void:
-	_hud["health"].text = "HEALTH %d   ·   KILLS %d" % [int(player.health), _kills]
+	_hud["health"].text = "HEALTH %d   ·   KILLS %d   ·   MUSHROOMS %d" % [int(player.health), _kills, player.mushrooms]
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()

@@ -6,6 +6,7 @@ extends CharacterBody3D
 signal health_changed(health: float, max_health: float)
 signal hurt(amount: float, from: Node3D)
 signal died
+signal mushrooms_changed(count: int)
 
 @export var walk_speed := 4.2
 @export var sprint_speed := 6.5
@@ -21,6 +22,7 @@ signal died
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var health := 0.0
+var mushrooms := 0                 # glowing mushrooms picked up from dead enemies
 var repair_window: Node3D = null   # window currently in reach (for the HUD)
 var repair_progress := 0.0         # 0..1 toward the next board
 var _shake := 0.0
@@ -137,6 +139,10 @@ func take_damage(amount: float, from: Node3D = null) -> void:
 
 func is_dead() -> bool:
 	return health <= 0.0
+
+func add_mushrooms(n: int) -> void:
+	mushrooms += n
+	mushrooms_changed.emit(mushrooms)
 
 # ------------------------------------------------------------ repair ----
 func _update_repair(delta: float) -> void:
