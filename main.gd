@@ -5,7 +5,12 @@ const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
-@export var max_zombies := 12
+@export var spawn_interval := 11.0   # a new Shambler every this many seconds
+@export var max_zombies := 12        # alive at once; a spawn is skipped while at the cap
+
+var _spawn_t := 0.0
+var _spawned := 0
+var _last_sides: Array[String] = []  # recent lanes, to avoid long streaks on one side
 
 @onready var player: CharacterBody3D = $Player
 @onready var shop: Node3D = $ShopGreybox
@@ -28,8 +33,34 @@ func _ready() -> void:
 	player.weapon_changed.connect(func(_i, _w): _update_weapon())
 	_update_weapon()
 	_update_health()
-	if auto_spawn:
-		get_tree().create_timer(first_zombie_delay).timeout.connect(func(): spawn_zombie(shop.get_node("Windows/Window_A")))
+	_spawn_t = first_zombie_delay
+
+# Wave clock: first zombie after first_zombie_delay, then one every
+# spawn_interval seconds, on a random lane (never three in a row on the same
+# side). Stops when the player dies.
+func _physics_process(delta: float) -> void:
+	if not auto_spawn or player.is_dead():
+		return
+	_spawn_t -= delta
+	if _spawn_t <= 0.0:
+		_spawn_t += spawn_interval
+		spawn_zombie(_pick_window())
+
+func _pick_window() -> Node3D:
+	var windows := get_tree().get_nodes_in_group("windows")
+	var pick: Node3D = windows[randi() % windows.size()]
+	if _last_sides.size() >= 2 and _last_sides[-1] == _last_sides[-2] and _last_sides[-1] == pick.name:
+		for w in windows:
+			if w.name != pick.name:
+				pick = w
+				break
+	_last_sides.append(pick.name)
+	if _last_sides.size() > 2:
+		_last_sides.pop_front()
+	return pick
+
+func next_spawn_in() -> float:
+	return maxf(_spawn_t, 0.0)
 
 func spawn_zombie(window: Node3D = null) -> Node:
 	if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
@@ -37,6 +68,7 @@ func spawn_zombie(window: Node3D = null) -> Node:
 	var windows := get_tree().get_nodes_in_group("windows")
 	if window == null:
 		window = windows[randi() % windows.size()]
+	_spawned += 1
 	var z := SHAMBLER.instantiate()
 	z.setup(window, player)
 	add_child(z)
@@ -63,6 +95,7 @@ func _process(delta: float) -> void:
 	_hud["cross"].modulate = Color("#F3A34D") if _hitmark > 0.0 else Color("#E9E1D1")
 	_hud["cross"].scale = Vector2.ONE * (1.0 + _hitmark * 0.6)
 	_hud["vignette"].color.a = maxf(0.0, _hud["vignette"].color.a - delta * 1.5)
+	_update_wave_hud()
 	var prompt := ""
 	if player.repair_window and not player.is_dead():
 		var w = player.repair_window
@@ -85,6 +118,13 @@ func _on_player_died() -> void:
 func _update_weapon() -> void:
 	var names := ["1  PISTOL (placeholder)", "2  KNIFE"]
 	_hud["weapon"].text = names[player.weapon_index] if player.weapon_index < names.size() else ""
+
+func _update_wave_hud() -> void:
+	if not auto_spawn or player.is_dead():
+		_hud["wave"].text = ""
+		return
+	var alive := get_tree().get_nodes_in_group("zombies").size()
+	_hud["wave"].text = "NEXT ZOMBIE IN %ds   ·   ZOMBIES %d" % [ceili(next_spawn_in()), alive]
 
 func _update_health() -> void:
 	_hud["health"].text = "HEALTH %d   ·   KILLS %d" % [int(player.health), _kills]
@@ -149,4 +189,14 @@ func _build_hud() -> void:
 	weapon.position += Vector2(-316, -40)
 	weapon.size = Vector2(300, 30)
 	layer.add_child(weapon)
-	_hud = {"cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette, "weapon": weapon}
+	var wave := Label.new()
+	wave.add_theme_font_size_override("font_size", 16)
+	wave.add_theme_color_override("font_color", Color("#65C9C2"))
+	wave.add_theme_color_override("font_outline_color", Color("#101C2C"))
+	wave.add_theme_constant_override("outline_size", 6)
+	wave.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	wave.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	wave.position += Vector2(-336, 34)
+	wave.size = Vector2(320, 24)
+	layer.add_child(wave)
+	_hud = {"wave": wave, "cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette, "weapon": weapon}

@@ -33,6 +33,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no

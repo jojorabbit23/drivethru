@@ -4,7 +4,9 @@ Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the sho
 
 **Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a zombie · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
 
-The first Shambler comes down Window A's lane (east, kitchen side) three seconds after you start.
+Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new one every **11 seconds**. Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
+
+The settings are on the `Main` node in `main.tscn`, and are easy to tweak: `spawn_interval` (11), `first_zombie_delay` (3) and `max_zombies` (12).
 
 ## What's here
 
@@ -211,6 +213,7 @@ godot --headless --path . --fixed-fps 60 --script res://tools/movement_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
 ```
 
 To rebuild the zombie after changing bones, weights or animations in `tools/build_zombie.gd`, run `godot --headless --path . --script res://tools/build_zombie.gd`.
@@ -234,7 +237,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Not done yet
 
-- No customers, deliveries, stock, economy or waves. Zombies come one at a time on a timer or with the Z key.
+- No customers, deliveries, stock or economy. Zombies arrive on a steady 11 s clock rather than in escalating waves.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
 - The player is a plain capsule with a camera and an invisible placeholder pistol. The PSX arms pack hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.

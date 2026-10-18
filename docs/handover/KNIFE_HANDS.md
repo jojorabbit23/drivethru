@@ -141,7 +141,7 @@ actual files.
 - [ ] The hand closes on the handle. The knife doesn't float off the palm or
       pass through the fingers in any frame of draw, stab, slash or idle.
 - [ ] Nothing clips into a wall when you stand against one (shot `knife7_stab_into_wall`).
-- [ ] All six test commands in `AGENTS.md` pass. Update `knife_test.gd` only
+- [ ] All test commands in `AGENTS.md` pass. Update `knife_test.gd` only
       for intentional timing changes, and say so in the commit.
 - [ ] `CREDITS.md` has the CC BY credit, and the pack's LICENSE is in the repo.
 - [ ] `README.md`'s "The knife" section describes the arms and how they're set up.
