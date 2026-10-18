@@ -258,3 +258,5 @@ godot --path . --script res://tools/capture_previews.gd
 Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
 
 For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the shop, knife attacks and a 12-zombie/ooze stress case, then exits; a 15-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
+
+The reference knife grip now has continuous teal glove coverage and an 18-degree resting roll to show the curled fingers. The roll eases into the authored stab pose at contact and returns during recovery. The original hand-to-knife attachment and gameplay timing remain intact.

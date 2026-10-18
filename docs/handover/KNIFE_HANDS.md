@@ -249,3 +249,10 @@ At the user's request, the elbow direction now blends halfway between the author
 The supplied Cleatimus_Hand_Texture_Pack_HD.zip replaces the generated speckled textures: its original base-colour/roughness atlases and README are retained in weapons/knife/textures/cleatimus_hd/. The builder regenerates the active atlas/material/mesh; the pack's original PSX assets are untouched. The watch uses the supplied 4:20 tile. White procedural flecks have been removed.
 
 Fresh Compatibility captures and all 48 audit samples were inspected after the halfway adjustment. The updated viewmodel suite has 12 checks covering grip, length, moderated entry, upright hold and active HD materials, alongside the unchanged gameplay suites. The refreshed knife film is encoded to docs/video/knife_kill.mp4.
+
+
+### Follow-up: reference hand silhouette
+
+The supplied in-game reference is now used for the closed teal-gloved grip. The resting grip rolls 18 degrees about the weapon axis to reveal more of the curled fingers, while keeping the wrist location, moderated elbow entry and original finger-to-weapon transforms. The full hand and knife turn together; no independent blade offset or finger scaling was introduced. This adjustment uses the same smooth contact/recovery weight as the upright hold, so the authored stab orientation is restored at full extension. Slash and draw retain the closed grip.
+
+The builder maps distal fingers to the same teal leather as the glove, matching the continuous dark glove coverage in the reference. The HD fabric/leather textures, orange sleeve and cuff remain in place. This is an approximation using the existing low-poly mesh, rather than a new hand sculpt. Gameplay values and attack timing remain unchanged. Fresh Compatibility captures, 48 pose samples and the refreshed encoded film were reviewed; the required suites and 12 viewmodel checks pass.

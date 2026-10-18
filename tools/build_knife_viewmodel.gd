@@ -78,7 +78,7 @@ func build() -> void:
   if bone_name.begins_with("lowerarm"):
    kind = 1 if local.y > 0.35 else 0
   elif bone_name.contains("_02_") or bone_name.contains("_03_"):
-   kind = 3
+   kind = 2 # Reference grip has continuous teal glove coverage over the fingers.
   for corner in 3:
    var i: int = indices[face_index+corner]
    surface.set_normal(normals[i])
