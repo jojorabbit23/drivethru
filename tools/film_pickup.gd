@@ -70,10 +70,14 @@ func _tick() -> void:
 		var since := t - shot_t
 		if since > 1.4 and since < 5.4:
 			# close-up: circle slowly round the first mushroom
-			close.current = true
-			orbit += 0.012
 			var c := p.global_position
-			close.global_position = c + Vector3(cos(orbit) * 0.8, 0.55, sin(orbit) * 0.8)
+			if not close.current:
+				# start on the side away from the bodies so they don't block the view
+				var away := c - (foes[0] as Node3D).global_position if is_instance_valid(foes[0]) else Vector3.RIGHT
+				orbit = atan2(away.z, away.x)
+				close.current = true
+			orbit += 0.008
+			close.global_position = c + Vector3(cos(orbit) * 0.75, 0.18, sin(orbit) * 0.75)
 			close.look_at(c, Vector3.UP)
 		else:
 			cam.current = true

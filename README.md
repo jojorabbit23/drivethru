@@ -201,10 +201,10 @@ It passed repeated runs. The clip `docs/video/scuttler_encounter.mp4` shows it i
 
 ## Mushroom drops
 
-Every Shambler and Scuttler drops one glowing mushroom when it dies. The model is the same glowing-mushroom GLB the Scuttler is built from, shrunk to 0.34 m (`tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res` and its material).
+Every Shambler and Scuttler drops one glowing mushroom when it dies. The model is the owner's pixelated mushroom (`pickups/mushroom/source/pixelated_mushroom_3d_model.glb`), scaled to 0.34 m tall. `tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res`, its material and textures.
 
 - **Drop:** 0.6 s after the kill it pops out of the body in a little arc and lands hovering 0.42 m above the floor, a step to one side. It never lands inside a wall.
-- **Look:** it spins (about one turn every 3.5 s) and bobs gently. The cap's orange spots glow, a thin amber halo outlines it (`pickup_glow.gdshader`, an additive rim pass), and a small amber light pulses on the floor beneath it.
+- **Look:** it spins (about one turn every 3.5 s) and bobs gently. It has a faint warm self-glow, a thin amber halo outlines it (`pickup_glow.gdshader`, an additive rim pass), and a small amber light pulses on the floor beneath it.
 - **Pickup:** walk into it. Within 2.6 m, with nothing solid between you, it flies to you. Boards don't block it, so a mushroom dropped just outside a window can be pulled in from the repair spot; one under a sill rises over it first.
 - **Count:** `player.mushrooms` (signal `mushrooms_changed`), shown on the HUD as `MUSHROOMS n`. Nothing spends them yet.
 - **Script:** `pickups/mushroom/mushroom_pickup.gd` (`class_name MushroomPickup`). `main.drop_pickup(position)` drops one anywhere.
@@ -278,7 +278,7 @@ godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
 ```
 
-To rebuild the mushroom pickup mesh, run `godot --headless --path . --script res://tools/build_pickup.gd` (after the Scuttler build, whose textures it uses).
+To rebuild the mushroom pickup, run `godot --headless --path . --script res://tools/build_pickup.gd`. On a fresh checkout it first writes its textures; run `--import`, then run it again.
 
 To rebuild the Scuttler after changing its bones, weights or clips, run `godot --headless --path . --script res://tools/build_scuttler.gd`.
 

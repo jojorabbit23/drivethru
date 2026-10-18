@@ -8,5 +8,5 @@ _None committed yet._ When the PSX FPS Arms pack is added, credit it here:
 
 ## Project assets
 
-- Shambler, Scuttler (also the mushroom pickup) and survival knife models: supplied by the project owner (`enemies/*/source/`, `weapons/knife/source/`).
+- Shambler, Scuttler, mushroom pickup and survival knife models: supplied by the project owner (`enemies/*/source/`, `pickups/mushroom/source/`, `weapons/knife/source/`).
 - Shop, textures, rig, animations, ooze and tools: made for this project.
