@@ -3,6 +3,8 @@
 # Body shot 34, headshot x3 (one-shot kill on a Shambler).
 extends Node3D
 
+const Hitscan = preload("res://core/hitscan.gd")
+
 signal hit(target: Node, headshot: bool, killed: bool)
 signal fired
 
@@ -11,6 +13,11 @@ signal fired
 @export var reach := 60.0
 
 var _cooldown := 0.0
+var active := true
+
+func set_active(on: bool) -> void:
+	active = on
+	_cooldown = maxf(_cooldown, 0.25)  # brief draw delay
 @onready var camera: Camera3D = get_parent()
 var _flash: OmniLight3D
 
@@ -28,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	_flash.light_energy = maxf(0.0, _flash.light_energy - delta * 40.0)
 	_flash.visible = _flash.light_energy > 0.0
 	var player := owner as Node
-	if player and player.has_method("is_dead") and player.is_dead():
+	if not active or (player and player.has_method("is_dead") and player.is_dead()):
 		return
 	if Input.is_action_pressed("fire") and _cooldown <= 0.0 and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		shoot()
@@ -43,11 +50,10 @@ func shoot() -> Dictionary:
 	head.rotation.x = minf(head.rotation.x + deg_to_rad(1.2), deg_to_rad(85.0))
 	var from := camera.global_position
 	var to := from - camera.global_basis.z * reach
-	var q := PhysicsRayQueryParameters3D.create(from, to, 1 | 2 | 8)
-	q.collide_with_areas = true
+	var ex: Array[RID] = []
 	if owner is CollisionObject3D:
-		q.exclude = [(owner as CollisionObject3D).get_rid()]
-	var res := camera.get_world_3d().direct_space_state.intersect_ray(q)
+		ex.append((owner as CollisionObject3D).get_rid())
+	var res := Hitscan.cast(camera.get_world_3d().direct_space_state, from, to, ex)
 	if res.is_empty():
 		return {}
 	_spark(res["position"])

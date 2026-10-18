@@ -1,0 +1,28 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://weapons/knife/knife_albedo.png" id="1_n71po"]
+
+[sub_resource type="Shader" id="Shader_lppfr"]
+code = "shader_type spatial;
+render_mode cull_back, depth_draw_opaque;
+uniform sampler2D albedo_tex : source_color, filter_nearest_mipmap;
+uniform float viewmodel = 1.0;   // 0 = draw normally (world pickups)
+void vertex() {
+	vec4 view_pos = MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	view_pos.xyz *= mix(1.0, 0.1, viewmodel);
+	POSITION = PROJECTION_MATRIX * view_pos;
+}
+void fragment() {
+	vec4 c = texture(albedo_tex, UV);
+	ALBEDO = c.rgb;
+	ROUGHNESS = 0.55;
+	METALLIC = 0.0;
+	SPECULAR = 0.45;
+}
+"
+
+[resource]
+render_priority = 0
+shader = SubResource("Shader_lppfr")
+shader_parameter/viewmodel = null
+shader_parameter/albedo_tex = ExtResource("1_n71po")

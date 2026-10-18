@@ -36,7 +36,16 @@ const DEFAULT_BINDINGS := {
 	"jump": [KEY_SPACE],
 	"sprint": [KEY_SHIFT],
 	"interact": [KEY_E],
+	"weapon_1": [KEY_1],
+	"weapon_2": [KEY_2],
 }
+
+signal weapon_changed(index: int, weapon: Node)
+
+# Weapons are the children of Head/Camera3D that have set_active():
+# 0 = placeholder pistol, 1 = knife. 1/2 or the mouse wheel switch.
+var weapons: Array[Node] = []
+var weapon_index := 0
 
 func _ready() -> void:
 	add_to_group("player")
@@ -56,6 +65,11 @@ func _ready() -> void:
 		InputMap.action_add_event("fire", mb)
 	if DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	for c in camera.get_children():
+		if c.has_method("set_active"):
+			weapons.append(c)
+	for i in weapons.size():
+		weapons[i].set_active(i == weapon_index)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead():
@@ -64,6 +78,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
+	elif event.is_action_pressed("weapon_1"):
+		switch_weapon(0)
+	elif event.is_action_pressed("weapon_2"):
+		switch_weapon(1)
+	elif event is InputEventMouseButton and event.pressed and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
+		if not weapons.is_empty():
+			var step := 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1
+			switch_weapon(posmod(weapon_index + step, weapons.size()))
 	elif event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
@@ -88,6 +110,17 @@ func _physics_process(delta: float) -> void:
 		camera.rotation.z = sin(Time.get_ticks_msec() * 0.05) * _shake * 0.05
 	else:
 		camera.rotation.z = 0.0
+
+func switch_weapon(i: int) -> void:
+	if i == weapon_index or i < 0 or i >= weapons.size():
+		return
+	weapon_index = i
+	for k in weapons.size():
+		weapons[k].set_active(k == i)
+	weapon_changed.emit(i, weapons[i])
+
+func current_weapon() -> Node:
+	return weapons[weapon_index] if weapon_index < weapons.size() else null
 
 # ------------------------------------------------------------ health ----
 func take_damage(amount: float, from: Node3D = null) -> void:

@@ -22,9 +22,11 @@ func _ready() -> void:
 	player.health_changed.connect(func(_h, _m): _update_health())
 	player.hurt.connect(func(_a, _f): _flash_damage())
 	player.died.connect(_on_player_died)
-	var gun := player.get_node_or_null("Head/Camera3D/TestGun")
-	if gun:
-		gun.hit.connect(_on_hit)
+	for w in player.weapons:
+		if w.has_signal("hit"):
+			w.hit.connect(_on_hit)
+	player.weapon_changed.connect(func(_i, _w): _update_weapon())
+	_update_weapon()
 	_update_health()
 	if auto_spawn:
 		get_tree().create_timer(first_zombie_delay).timeout.connect(func(): spawn_zombie(shop.get_node("Windows/Window_A")))
@@ -80,6 +82,10 @@ func _flash_damage() -> void:
 func _on_player_died() -> void:
 	_hud["dead"].visible = true
 
+func _update_weapon() -> void:
+	var names := ["1  PISTOL (placeholder)", "2  KNIFE"]
+	_hud["weapon"].text = names[player.weapon_index] if player.weapon_index < names.size() else ""
+
 func _update_health() -> void:
 	_hud["health"].text = "HEALTH %d   ·   KILLS %d" % [int(player.health), _kills]
 
@@ -100,7 +106,7 @@ func _build_hud() -> void:
 	cross.pivot_offset = cross.size * 0.5
 	layer.add_child(cross)
 	var help := Label.new()
-	help.text = "WASD move · Shift sprint · Space jump · LMB shoot (test pistol) · hold E repair · Z spawn zombie · R restart · L labels · Esc mouse"
+	help.text = "WASD move · Shift sprint · Space jump · 1/2 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn zombie · R restart · L labels · Esc mouse"
 	help.add_theme_font_size_override("font_size", 13)
 	help.add_theme_color_override("font_color", Color("#E9E1D1", 0.6))
 	help.position = Vector2(16, 12)
@@ -133,4 +139,14 @@ func _build_hud() -> void:
 	dead.position += Vector2(-200, -60)
 	dead.size = Vector2(400, 120)
 	layer.add_child(dead)
-	_hud = {"cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette}
+	var weapon := Label.new()
+	weapon.add_theme_font_size_override("font_size", 18)
+	weapon.add_theme_color_override("font_color", Color("#F3A34D"))
+	weapon.add_theme_color_override("font_outline_color", Color("#101C2C"))
+	weapon.add_theme_constant_override("outline_size", 6)
+	weapon.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	weapon.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	weapon.position += Vector2(-316, -40)
+	weapon.size = Vector2(300, 30)
+	layer.add_child(weapon)
+	_hud = {"cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette, "weapon": weapon}

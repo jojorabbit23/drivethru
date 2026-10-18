@@ -2,7 +2,7 @@
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · LMB shoot (placeholder pistol) · hold E at a window to repair · Z spawn a zombie · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a zombie · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
 
 The first Shambler comes down Window A's lane (east, kitchen side) three seconds after you start.
 
@@ -149,6 +149,47 @@ The clips `docs/video/ooze_closeup.mp4` and `shambler_encounter.mp4` show it in 
 
 Everything currently passes. Typical timeline: at the window at 10 s, boards gone and climbing at 15.6 s, inside at 17 s.
 
+## The knife
+
+`weapons/knife/` is built from your `knife_3d_model.glb`; the original is kept in `source/`.
+
+**Model:** `tools/build_knife.gd` makes the weapon model:
+- It works out the knife's own axes from its shape. The long axis is the length. The tip is the thin end, since the handle is chunkier. The spine is the thicker long edge, since the cutting edge is ground thin.
+- It turns the knife tip-forward with the serrated spine up and scales it to 32 cm.
+- The origin sits on the grip, which is where a hand or the PSX arms' `weapon_r` bone will hold it later.
+- A `Tip` marker marks the point.
+- The texture is reduced to a 512 px nearest-filtered map.
+
+`docs/previews/knife_orthographic.png` has side, top and front views on a 1 cm grid.
+
+**In hand** (`weapon_r` style, no arms yet), `knife_weapon.gd`:
+- **Slash (LMB):** a quick sweep from right to left. It does 40 damage with a wide arc of about ±34° and lands 0.15 s into the swing.
+- **Stab (RMB):** a draw-back then a thrust in from the lower right. It does 75 damage in a narrow cone and lands at 0.24 s.
+- **Head stabs** use the zombie's headshot multiplier, so they kill. A slash that clips the head is a normal hit.
+- **Backstab:** a stab from behind kills outright.
+- **Reach:** 1.6 m. That's just over a Shambler's 1.5 m swing, so stepping in and striking first works.
+- **Buffering:** pressing an attack late in a swing queues the next one.
+- **Ooze:** follows the blade, sideways for a slash and forward for a stab.
+- **Walls and boards:** the blade clinks on them and never hits through them.
+- **Feel:** a draw animation, idle breathing, bob while walking and lag behind mouse look.
+
+The knife is drawn shrunk toward the eye (the same spot on screen at a tenth of the depth), so it never sinks into walls or zombies. That works in every renderer.
+
+**Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol and slot 2 is the knife; the HUD shows the current one, bottom right.
+
+**Shared hit test** (`core/hitscan.gd`): walls and boards block everything, then a head hitbox wins over a body. Both the pistol and the knife use it. It also fixes headshots against a hunched zombie, whose movement capsule wraps round its head.
+
+`tools/knife_test.gd` checks the following, all passing:
+- weapon switching, and no swinging mid-draw;
+- the exact hit frames, and that ooze sprays;
+- swing buffering;
+- the slash arc versus the stab cone, and reach;
+- body and head stabs;
+- backstabs, which only count from behind, not side-on;
+- no hits or ooze through walls.
+
+The clip `docs/video/knife_kill.mp4` shows it in action.
+
 ## Textures
 
 `tools/make_textures.gd` paints 23 small pixel textures into `textures/` using only palette colours. World-mapped surfaces use 64 px per 2 m.
@@ -169,6 +210,7 @@ godot --headless --path . --script res://tools/validate.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/movement_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
 ```
 
 To rebuild the zombie after changing bones, weights or animations in `tools/build_zombie.gd`, run `godot --headless --path . --script res://tools/build_zombie.gd`.
