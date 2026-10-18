@@ -44,6 +44,10 @@ func setup(zpos: Vector3, ppos: Vector3) -> Node:
 	player.global_position = ppos + Vector3(0, 0.05, 0)
 	player.rotation.y = atan2(to_player.x, to_player.z)
 	await wait(5)
+	# Reproducible particle trajectories: an unseeded one-shot sample could
+	# randomly reverse the small behind/front majority and fail this test.
+	var effect: Node = (load("res://core/ooze.gd") as GDScript).get_fx(main)
+	effect.rng.seed = 420
 	return z
 
 func fx() -> Node:

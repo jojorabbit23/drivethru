@@ -191,8 +191,8 @@ func _sample_clip(clip: String, time: float) -> void:
 	if _visual_clip != clip:
 		_arms_anim.play(clip, 0.0)
 		_visual_clip = clip
+	# seek(update=true) applies the tracks once; advance(0) repeats that work.
 	_arms_anim.seek(time, true)
-	_arms_anim.advance(0.0)
 
 # ------------------------------------------------------------- hitting ----
 func _strike() -> void:

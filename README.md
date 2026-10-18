@@ -249,3 +249,10 @@ godot --path . --script res://tools/capture_previews.gd
 - There's no monster truck at the hatch.
 - The Shambler's rig is automatic and its animations are hand-keyed in code. They read well at game distance, but an animator pass in Blender would add polish, especially to the death and climb. Because the normal arm and the shirt are one continuous surface, lifting that arm high still stretches the armpit a little, so the clips keep it below about 65°.
 - The previews were rendered with the Compatibility renderer under a virtual display. The project's default is Forward+, so lighting on your machine will look somewhat different (generally richer).
+
+
+## Desktop performance limits
+
+Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
+
+For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the shop, knife attacks and a 12-zombie/ooze stress case, then exits; a 15-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
