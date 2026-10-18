@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/psx_fps_arms/models/kitchen_knife_model.glb" id="1"]
+[ext_resource type="Script" path="res://addons/psx_fps_arms/pickup.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(0.0176, 0.0440, 0.3320)
+
+[node name="kitchen_knife" instance=ExtResource("1")]
+script = ExtResource("2")
+kind = "item"
+item = "kitchen_knife"
+title = "Kitchen Knife"
+text = "A chef's knife from a kitchen drawer. Sharp enough, still."
+
+[node name="Collision" type="StaticBody3D" parent="kitchen_knife"]
+
+[node name="Box" type="CollisionShape3D" parent="kitchen_knife/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.0100, 0.0840)
+shape = SubResource("box0")

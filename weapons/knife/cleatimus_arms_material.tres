@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://weapons/knife/arms_viewmodel.gdshader" id="1_udsu7"]
+[ext_resource type="Texture2D" path="res://weapons/knife/cleatimus_arms_atlas.res" id="2_n38e8"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_udsu7")
+shader_parameter/regions = true
+shader_parameter/watch_face = false
+shader_parameter/tint = Color(1, 1, 1, 1)
+shader_parameter/albedo_tex = ExtResource("2_n38e8")

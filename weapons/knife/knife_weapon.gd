@@ -1,4 +1,4 @@
-# First-person survival knife (no arms yet: the knife is held in view).
+# First-person survival knife with the PSX pack's corrected knife rig.
 #   LMB  slash  — quick right-to-left sweep, 40 damage, wide arc
 #   RMB  stab   — slower thrust, 75 damage; a stab to the head gets the
 #                 zombie's headshot multiplier; instant kill from behind
@@ -12,7 +12,9 @@ extends Node3D
 signal hit(target: Node, headshot: bool, killed: bool)
 signal swung(kind: String)
 
-const KNIFE_MODEL := preload("res://weapons/knife/knife_model.tscn")
+const VIEWMODEL := preload("res://weapons/knife/knife_viewmodel.tscn")
+const VIEW_OFFSET := Vector3(0.0, -0.015, -0.025)
+const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 
 @export var slash_damage := 40.0
@@ -46,6 +48,8 @@ const DRAW_TIME := 0.32
 
 var active := false
 var _pivot: Node3D
+var _arms_anim: AnimationPlayer
+var _visual_clip := ""
 var _attack: Dictionary = {}
 var _attack_t := 0.0
 var _attack_kind := ""
@@ -57,12 +61,12 @@ var _bob_t := 0.0
 @onready var camera: Camera3D = get_parent()
 
 func _ready() -> void:
-	_pivot = Node3D.new()
+	_pivot = VIEWMODEL.instantiate()
 	_pivot.name = "Pivot"
 	add_child(_pivot)
-	var model := KNIFE_MODEL.instantiate()
-	model.name = "Model"
-	_pivot.add_child(model)
+	_arms_anim = _pivot.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
 	visible = active
 	if not InputMap.has_action("alt_fire"):
@@ -78,6 +82,9 @@ func set_active(on: bool) -> void:
 	_queued = ""
 	if on:
 		_draw_t = DRAW_TIME
+		_sample_clip("kitchen_knife_draw", 0.0)
+	else:
+		_arms_anim.pause()
 
 func is_busy() -> bool:
 	return not _attack.is_empty() or _draw_t > 0.0
@@ -120,7 +127,8 @@ func _update(delta: float) -> void:
 		_draw_t = maxf(0.0, _draw_t - delta)
 		var k := 1.0 - _draw_t / DRAW_TIME
 		k = 1.0 - pow(1.0 - k, 3.0)
-		_set_pose(REST_POS + Vector3(0.08, -0.32, 0.12) * (1.0 - k), REST_ROT + Vector3(-50, 0, 30) * (1.0 - k))
+		_sample_clip("kitchen_knife_draw", (1.0 - _draw_t / DRAW_TIME) * (16.0 / 30.0))
+		_set_pose(REST_POS + Vector3(0, -0.05, 0) * (1.0 - k), REST_ROT)
 		return
 	if not _attack.is_empty():
 		_attack_t += delta
@@ -129,12 +137,25 @@ func _update(delta: float) -> void:
 			_strike()
 		if _attack_t >= _attack["length"]:
 			_attack = {}
+			_sample_clip("kitchen_knife_idle", 0.0)
+			_set_pose(REST_POS, REST_ROT)
 			if _queued != "":
 				var q := _queued
 				_queued = ""
 				_start(q)
 			return
-		_pose_at(_attack, _attack_t)
+		if _attack_kind == "stab":
+			# Frame 7 is full extension: preserve 0.24 s contact and 0.72 s recovery.
+			var source_time: float
+			if _attack_t <= 0.24:
+				source_time = (_attack_t / 0.24) * STAB_CONTACT
+			else:
+				source_time = lerpf(STAB_CONTACT, 14.0 / 30.0, (_attack_t - 0.24) / 0.48)
+			_sample_clip("kitchen_knife_stab", source_time)
+			_set_pose(REST_POS, REST_ROT)
+		else:
+			_sample_clip("kitchen_knife_idle", 0.0)
+			_pose_at(_attack, _attack_t)
 		return
 	# idle: breathe, bob with movement, lag behind mouse look
 	var player := owner as CharacterBody3D
@@ -142,6 +163,7 @@ func _update(delta: float) -> void:
 	if player:
 		speed = Vector2(player.velocity.x, player.velocity.z).length()
 	_bob_t += delta * (1.5 + speed * 1.6)
+	_sample_clip("kitchen_knife_idle", fmod(_bob_t * 0.4, 3.0))
 	var bob := Vector3(sin(_bob_t) * 0.006 * (0.3 + speed * 0.4), absf(cos(_bob_t)) * 0.008 * (0.2 + speed * 0.4), 0.0)
 	_sway = _sway.lerp(Vector2.ZERO, 1.0 - exp(-8.0 * delta))
 	var sway := Vector3(-_sway.x, _sway.y, 0.0).limit_length(0.04)
@@ -161,8 +183,16 @@ func _pose_at(anim: Dictionary, t: float) -> void:
 	_set_pose(last[1], last[2])
 
 func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
-	_pivot.position = pos
-	_pivot.rotation_degrees = rot_deg
+	# The rig already contains its authored hand/weapon pose. Add only root motion.
+	_pivot.position = VIEW_OFFSET + (pos - REST_POS) * 0.45
+	_pivot.rotation_degrees = (rot_deg - REST_ROT) * Vector3(0.45, 0.45, 0.40)
+
+func _sample_clip(clip: String, time: float) -> void:
+	if _visual_clip != clip:
+		_arms_anim.play(clip, 0.0)
+		_visual_clip = clip
+	_arms_anim.seek(time, true)
+	_arms_anim.advance(0.0)
 
 # ------------------------------------------------------------- hitting ----
 func _strike() -> void:
