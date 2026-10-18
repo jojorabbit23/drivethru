@@ -256,3 +256,55 @@ Fresh Compatibility captures and all 48 audit samples were inspected after the h
 The supplied in-game reference is now used for the closed teal-gloved grip. The resting grip rolls 18 degrees about the weapon axis to reveal more of the curled fingers, while keeping the wrist location, moderated elbow entry and original finger-to-weapon transforms. The full hand and knife turn together; no independent blade offset or finger scaling was introduced. This adjustment uses the same smooth contact/recovery weight as the upright hold, so the authored stab orientation is restored at full extension. Slash and draw retain the closed grip.
 
 The builder maps distal fingers to the same teal leather as the glove, matching the continuous dark glove coverage in the reference. The HD fabric/leather textures, orange sleeve and cuff remain in place. This is an approximation using the existing low-poly mesh, rather than a new hand sculpt. Gameplay values and attack timing remain unchanged. Fresh Compatibility captures, 48 pose samples and the refreshed encoded film were reviewed; the required suites and 12 viewmodel checks pass.
+
+
+### Follow-up: sculpted right hand from `reference_hand_with_dagger.glb`
+
+Brief: `Claude_Knife_Hand_Handoff.zip` / BRIEF.md. The reference shot is kept as `docs/handover/desired_hand_reference.png`. The supplied GLB is stored untouched at `weapons/knife/source/reference_hand_with_dagger.glb`. Everything below is derived at build time by `tools/knife_hand_mesh.gd`, called from `tools/build_knife_viewmodel.gd`.
+
+**What the source is.** It has one primitive: 5,787 vertices, 9,392 triangles, a single closed component, with embedded base-colour, roughness/metal and normal textures. It has no skeleton, skin or animation. The dagger is fused into the fist, so no node or material separates it. Two features of the sculpt matter here:
+- The handle is not collinear with the blade. The handle axis, from the teal neck under the guard to the teal pommel under the pinky, is 22° off the blade axis.
+- The fingers wrap a handle about 1.4 cm thick at the fitted scale, while ours is 2.6 × 4.8 cm.
+
+**Separation.** Each triangle is classified by the colour its UVs land on in the sculpt's own texture, matched to k-means prototypes for orange, brown, teal, skin and dark. It is also located by its position along the blade axis (s) and the handle axis. Removed: everything above the guard (s > -0.27: blade, guard), the orange ring by the guard, and the teal handle surface within 0.075 units of the handle axis (neck, strips between the fingers, pommel). That is 2,494 triangles removed and 6,898 kept. The openings left where the handle passed through the fist are filled by our knife's handle.
+
+**Fit to our knife.** These steps work in knife space.
+- The handle axis becomes the knife's -Z.
+- The roll about it is chosen so the side of the hand that faces the viewer in the sculpt's front view faces the camera at the corrected idle pose. This includes the existing 15° upright turn and -18° grip roll, which are read from `knife_weapon.gd`, so the two cannot drift apart.
+- Scale is 0.235 along the handle, which puts the finger stack about 9.4 cm long between our guard (z -0.048) and pommel (+0.052). Across the handle the scale is 0.30.
+- The grip channel is then opened to our elliptical handle cross-section, measured from `knife_mesh.res`. The finger layer between the old handle and 2.1 handle radii is remapped onto [our handle surface + 1.2 mm, 2.1 radii]. This keeps the outside of the fist and the vertex order, so no finger turns inside out. 1,734 vertices moved.
+- Our knife's geometry, scale and `GripOffset` are unchanged.
+
+**Sleeve and wrist.**
+- The cuff keeps its shape.
+- The sleeve beyond it is lengthened along the sculpt's forearm axis to 34 cm. The axis comes from the sleeve's cut end, averaging normals with y < -0.8.
+- The lengthened sleeve gets cylindrical UVs, so the HD fabric isn't smeared, and round normals.
+- The sleeve is then pre-bent about the sculpt wrist (the top of the cuff) to the forearm direction the runtime uses at idle. That turn is 33°, spread across the cuff like a bent tube rather than applied by linear-blend skinning.
+
+**Rigging.**
+- The derived mesh is a separate `RightHand` MeshInstance3D under the PSX `Skeleton3D`. It has its own `Skin` with two binds: `hand_r` at the authored idle pose and `lowerarm_r`, whose frame has its Y axis along the pre-bent sleeve and its origin 40 cm from the wrist pivot.
+- Weights run from hand → forearm with `smoothstep` across the cuff.
+- The PSX right-arm faces are dropped from `cleatimus_arms_mesh.res`. The left arm and the 4:20 watch are unchanged.
+- This is rigged to the existing skeleton, but the fingers are not individually skinned. That costs nothing here: in all knife clips the 15 right finger bones and `weapon_r` stay fixed relative to `hand_r` (0.02° / 0 mm), so a fist rigid on `hand_r` reproduces the source exactly and cannot separate from the handle.
+
+**Runtime changes (`knife_weapon.gd`, visual only).**
+- `_position_right_forearm()` now pivots the forearm about the sculpt wrist, read from the viewmodel's `hand_wrist` / `hand_forearm_bind` metadata, instead of about `hand_r`'s origin. It aims the same moderated direction as before: halfway between the authored elbow and eye-space (0.33, -0.18, 0.14). The forearm bone is the bind frame turned by the shortest arc, so it adds no twist.
+- `_sample_clip()` now resets `lowerarm_r` / `hand_r` before seeking. The clips key only rotations on these bones, so the previous frame's override used to feed back into the next sample.
+- `UPRIGHT_ANGLE` (15°) and `GRIP_ROLL` (-18°) are kept; they still ease out at stab contact.
+- No gameplay constant, timing, ray, damage, buffer or switching code changed.
+
+**Trade-offs and limits.**
+- The fingers are one rigid sculpt, so there's no finger animation. The source clips have none for the knife either.
+- The sculpt's skin fingertips are mapped to the teal glove tile to match the reference shot (`SKIN_AS_GLOVE`).
+- The lengthened sleeve is a straight tube; at full stab extension it reads as a long orange forearm running to the screen edge.
+- The derived hand adds about 6,900 triangles and one draw call to the viewmodel, against the roughly 650 PSX right-arm triangles it replaces. The bounded `performance_check.gd` couldn't produce comparable numbers on this container's software (llvmpipe) renderer, where it hit its 15-second watchdog. The 60/15 FPS caps are unchanged.
+- The open-handed `gloved_hands_3d_model.glb` the owner sent mid-task wasn't needed for the closed grip. Being in a neutral open pose, it would suit a future rig with animated fingers (left hand, unarmed or other weapons).
+
+**Verification.**
+- `knife_viewmodel_test.gd` now has 15 checks. Changed: forearm length is now measured from the sculpt wrist pivot, which is the new rig's pivot. Added:
+  - wrist bend stays under 30° over every native draw/idle/stab frame (measured: draw 0.2–26.1°, idle ≤ 0.4°, stab 0.2–22.4°, slash ≤ 15.4°);
+  - the sculpted hand replaces the PSX right arm;
+  - the dagger is absent.
+- All required suites pass (see the commit).
+- Compatibility captures `knife0`–`knife7` and all 48 `--audit` poses were rendered and inspected. The grip stays closed on our handle in every sample; the thumb sits under the guard and the pommel shows below the little finger. There are no visible wrist seams, and the stretched-sleeve smear was fixed before the final pass.
+- `docs/video/knife_kill.mp4` was re-filmed: 30 fps, libx264 crf 20, 5.73 s.
