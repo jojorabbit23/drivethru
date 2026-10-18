@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "ink"
+albedo_color = Color(0.0627451, 0.109804, 0.172549, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

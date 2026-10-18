@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "cheese"
+albedo_color = Color(0.935294, 0.748627, 0.534902, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

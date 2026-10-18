@@ -1,0 +1,8 @@
+# Godot 4 editor cache (regenerated on open)
+.godot/
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.tmp
+# raw movie-writer output (the encoded .mp4s in docs/video are kept)
+*.avi

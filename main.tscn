@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://levels/shop/generated/shop_greybox.tscn" id="2_shop"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="3_player"]
+
+[sub_resource type="Environment" id="Environment_night"]
+background_mode = 1
+background_color = Color(0.0627, 0.1098, 0.1725, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.1412, 0.2196, 0.2941, 1)
+ambient_light_energy = 1.2
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.0627, 0.1098, 0.1725, 1)
+fog_density = 0.025
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_night")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8192, -0.3531, 0.4520, 0.0000, 0.7880, 0.6157, -0.5736, -0.5043, 0.6455, 0, 20, 0)
+light_color = Color(0.62, 0.72, 0.82, 1)
+light_energy = 0.6
+shadow_enabled = true
+
+[node name="ShopGreybox" parent="." instance=ExtResource("2_shop")]
+
+[node name="Player" parent="." instance=ExtResource("3_player")]

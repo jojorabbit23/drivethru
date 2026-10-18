@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "trim"
+albedo_color = Color(0.156863, 0.494118, 0.513726, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "panel_light"
+albedo_color = Color(0.913725, 0.882353, 0.819608, 1)
+metallic_specular = 0.25
+roughness = 0.92
+emission_enabled = true
+emission = Color(0.92549, 0.809412, 0.664314, 1)
+emission_energy_multiplier = 1.8
+texture_filter = 2

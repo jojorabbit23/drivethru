@@ -1,0 +1,42 @@
+; Engine configuration file.
+; Godot 4.3+
+
+config_version=5
+
+[application]
+
+config/name="The Drive Thru"
+config/description="First-person drive-through siege game — greybox prototype."
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[layer_names]
+
+3d_physics/layer_1="world"
+3d_physics/layer_2="barricades"
+3d_physics/layer_3="player"
+3d_physics/layer_4="enemies"
+3d_physics/layer_5="player_clip"
+
+[navigation]
+
+3d/default_cell_size=0.05
+3d/default_cell_height=0.05
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+anti_aliasing/quality/msaa_3d=0
+
+[importer_defaults]
+
+texture={
+"compress/mode": 0,
+"detect_3d/compress_to": 0,
+"mipmaps/generate": true
+}

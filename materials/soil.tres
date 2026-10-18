@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "soil"
+albedo_color = Color(0.224, 0.180078, 0.158745, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

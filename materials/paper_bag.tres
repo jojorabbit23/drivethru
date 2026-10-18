@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "paper_bag"
+albedo_color = Color(0.831176, 0.739412, 0.621176, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

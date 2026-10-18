@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "fridge_glass"
+albedo_color = Color(0.141176, 0.219608, 0.294118, 1)
+metallic_specular = 0.25
+roughness = 0.92
+emission_enabled = true
+emission = Color(0.654902, 0.835294, 0.790196, 1)
+emission_energy_multiplier = 0.45
+texture_filter = 2

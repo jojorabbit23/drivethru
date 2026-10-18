@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "paint_line"
+albedo_color = Color(0.776667, 0.75, 0.696667, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2
