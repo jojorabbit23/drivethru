@@ -6,6 +6,8 @@ const OUT := "res://weapons/knife/"
 const HD_DIR := OUT + "textures/cleatimus_hd/"
 const SOURCE := "res://addons/psx_fps_arms/models/fp_arms_free_v7_model.glb"
 const HandMesh = preload("res://tools/knife_hand_mesh.gd")
+const BlockyMesh = preload("res://tools/blocky_mesh.gd")
+const HAND_KEEP := 0.5 # simplify the sculpted hand to about half its triangles
 const Weapon = preload("res://weapons/knife/knife_weapon.gd")
 const FOREARM_LENGTH := 0.4 # elbow to the sculpt's wrist pivot
 func _initialize() -> void:
@@ -239,6 +241,10 @@ func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: N
  arrays[Mesh.ARRAY_COLOR] = fit["colors"]
  arrays[Mesh.ARRAY_BONES] = bones
  arrays[Mesh.ARRAY_WEIGHTS] = weights
+ # a little blockier, to sit with the voxel Shambler: fewer triangles, faceted
+ var before := BlockyMesh.triangle_count(arrays)
+ arrays = BlockyMesh.flat(BlockyMesh.simplify(BlockyMesh.weld(arrays), HAND_KEEP))
+ print("Right hand blocky: %d -> %d triangles, flat shaded" % [before, BlockyMesh.triangle_count(arrays)])
  var mesh := ArrayMesh.new()
  mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
  mesh.surface_set_material(0, mat)

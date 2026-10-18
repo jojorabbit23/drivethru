@@ -308,3 +308,8 @@ Brief: `Claude_Knife_Hand_Handoff.zip` / BRIEF.md. The reference shot is kept as
 - All required suites pass (see the commit).
 - Compatibility captures `knife0`–`knife7` and all 48 `--audit` poses were rendered and inspected. The grip stays closed on our handle in every sample; the thumb sits under the guard and the pommel shows below the little finger. There are no visible wrist seams, and the stretched-sleeve smear was fixed before the final pass.
 - `docs/video/knife_kill.mp4` was re-filmed: 30 fps, libx264 crf 20, 5.73 s.
+
+
+### Follow-up: slightly blockier knife and hand
+
+At the owner's request both meshes are now a little lower-poly and faceted, to match the voxel Shambler. `tools/blocky_mesh.gd` welds per-corner data, simplifies with Godot's meshoptimizer LODs (`ImporterMesh.generate_lods`, taking the LOD closest to half the triangles) and flat-shades each triangle. LOD steps are coarse, so the knife landed at 3,264 of 9,680 triangles and the hand at 4,384 of 6,898. UVs and skin weights are untouched, since the LODs only drop vertices. The handle fit is measured from the simplified knife, so the grip still closes on it. Captures, all 48 audit poses and the re-filmed `knife_kill.mp4` were inspected, and all suites pass.

@@ -221,6 +221,7 @@ Every Shambler and Scuttler drops one glowing mushroom when it dies. The model i
 - The origin sits on the grip, which is where the PSX arms' `weapon_r` bone holds it.
 - A `Tip` marker marks the point.
 - The texture is reduced to a 512 px nearest-filtered map.
+- It is simplified to about a third of the source triangles (9,680 → 3,264) and flat shaded, so it reads a little blocky like the voxel zombies (`tools/blocky_mesh.gd`).
 
 `docs/previews/knife_orthographic.png` has side, top and front views on a 1 cm grid.
 
@@ -235,7 +236,7 @@ Every Shambler and Scuttler drops one glowing mushroom when it dies. The model i
 - **Walls and boards:** the blade clinks on them and never hits through them.
 - **Feel:** a draw animation, idle breathing, bob while walking and lag behind mouse look.
 
-**The right hand** is a sculpt, not the PSX hand. `tools/knife_hand_mesh.gd` derives it from the supplied `weapons/knife/source/reference_hand_with_dagger.glb` (left untouched): the fused dagger is cut away, the fist is fitted round *our* knife's handle, and the sleeve is lengthened to run off-screen. The viewmodel builder skins it to `hand_r` (fist) and `lowerarm_r` (sleeve), blended across the cuff, and drops the PSX right arm. The left arm and watch are still the PSX mesh. In every knife clip the PSX fingers and `weapon_r` never move relative to `hand_r`, so a fist that's rigid on the hand loses none of the source animation and can't drift off the handle.
+**The right hand** is a sculpt, not the PSX hand. `tools/knife_hand_mesh.gd` derives it from the supplied `weapons/knife/source/reference_hand_with_dagger.glb` (left untouched): the fused dagger is cut away, the fist is fitted round *our* knife's handle, and the sleeve is lengthened to run off-screen. The viewmodel builder skins it to `hand_r` (fist) and `lowerarm_r` (sleeve), blended across the cuff, and drops the PSX right arm. The left arm and watch are still the PSX mesh. Like the knife, the hand is simplified (6,898 → 4,384 triangles) and flat shaded to match the zombies' blocky look. In every knife clip the PSX fingers and `weapon_r` never move relative to `hand_r`, so a fist that's rigid on the hand loses none of the source animation and can't drift off the handle.
 
 The right forearm pivots about the sculpt's own wrist (the top of the cuff). It aims halfway between the authored elbow and the lower right of the view, 40 cm long. The sleeve is pre-bent at build time to that idle direction, so the skeleton adds at most about 26° of wrist bend (in the draw).
 

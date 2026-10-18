@@ -119,16 +119,16 @@ bind/35/name = &"thumb_03_l"
 bind/35/bone = -1
 bind/35/pose = Transform3D(0.158096, -0.930573, -0.330214, -0.330214, -0.364991, 0.870483, -0.930572, -0.0285786, -0.364991, 0.00872685, -0.351566, 0.235077)
 
-[sub_resource type="Skin" id="Skin_7lj3b"]
+[sub_resource type="Skin" id="Skin_7dxkg"]
 bind_count = 2
 bind/0/name = &"hand_r"
 bind/0/bone = -1
 bind/0/pose = Transform3D(0.101737, -0.767147, 0.633352, -0.341939, 0.570898, 0.746427, -0.934199, -0.292507, -0.204236, -0.244403, -0.130151, -0.0831074)
 bind/1/name = &"lowerarm_r"
 bind/1/bone = -1
-bind/1/pose = Transform3D(0.013653, -0.973693, 0.227452, 0.198467, 0.225587, 0.953793, -0.980012, 0.0321198, 0.196326, -0.212414, 0.198875, -0.235401)
+bind/1/pose = Transform3D(0.013653, -0.973693, 0.227452, 0.198467, 0.225587, 0.953793, -0.980012, 0.0321198, 0.196326, -0.212902, 0.198685, -0.23547)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_03xy8"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qifm0"]
 render_priority = 0
 shader = ExtResource("4_x4vc7")
 shader_parameter/regions = false
@@ -137,10 +137,10 @@ shader_parameter/tint = Color(0.152941, 0.176471, 0.196078, 1)
 shader_parameter/albedo_tex = ExtResource("5_djgrh")
 shader_parameter/roughness_tex = ExtResource("6_iy5hu")
 
-[sub_resource type="BoxMesh" id="BoxMesh_afa4b"]
+[sub_resource type="BoxMesh" id="BoxMesh_gdbdh"]
 size = Vector3(0.069, 0.026, 0.069)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lrq13"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6gei6"]
 render_priority = 0
 shader = ExtResource("4_x4vc7")
 shader_parameter/regions = false
@@ -149,10 +149,10 @@ shader_parameter/tint = Color(0.384314, 0.427451, 0.45098, 1)
 shader_parameter/albedo_tex = ExtResource("5_djgrh")
 shader_parameter/roughness_tex = ExtResource("6_iy5hu")
 
-[sub_resource type="BoxMesh" id="BoxMesh_28kja"]
+[sub_resource type="BoxMesh" id="BoxMesh_nacaj"]
 size = Vector3(0.051, 0.041, 0.012)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_i5r61"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h68cr"]
 render_priority = 0
 shader = ExtResource("4_x4vc7")
 shader_parameter/regions = false
@@ -161,7 +161,7 @@ shader_parameter/tint = Color(1, 1, 1, 1)
 shader_parameter/albedo_tex = ExtResource("5_djgrh")
 shader_parameter/roughness_tex = ExtResource("6_iy5hu")
 
-[sub_resource type="QuadMesh" id="QuadMesh_qrler"]
+[sub_resource type="QuadMesh" id="QuadMesh_py10j"]
 size = Vector2(0.044, 0.034)
 
 [sub_resource type="Animation" id="Animation_gaajv"]
@@ -3228,8 +3228,8 @@ _data = {
 }
 
 [node name="KnifeViewmodel" type="Node3D"]
-metadata/hand_wrist = Vector3(0.0359095, 0.0599817, 0.0789383)
-metadata/hand_forearm_bind = Transform3D(0.892413, 0.45122, -3.72529e-08, -0.390772, 0.77286, 0.499985, 0.225603, -0.446193, 0.866034, -0.144579, -0.249162, 0.257415)
+metadata/hand_wrist = Vector3(0.0364308, 0.0599725, 0.0790234)
+metadata/hand_forearm_bind = Transform3D(0.892413, 0.45122, -3.72529e-08, -0.390772, 0.77286, 0.499985, 0.225603, -0.446193, 0.866034, -0.144057, -0.249171, 0.257501)
 
 [node name="Arms" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
@@ -3514,7 +3514,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.26816)
 [node name="RightHand" type="MeshInstance3D" parent="Arms/fp_arms/Skeleton3D"]
 cast_shadow = 0
 mesh = ExtResource("3_hm0nj")
-skin = SubResource("Skin_7lj3b")
+skin = SubResource("Skin_7dxkg")
 
 [node name="LeftWatch" type="BoneAttachment3D" parent="Arms/fp_arms/Skeleton3D"]
 bone_name = "lowerarm_l"
@@ -3522,23 +3522,23 @@ bone_idx = 19
 
 [node name="Band" type="MeshInstance3D" parent="Arms/fp_arms/Skeleton3D/LeftWatch"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.352, 0)
-material_override = SubResource("ShaderMaterial_03xy8")
+material_override = SubResource("ShaderMaterial_qifm0")
 cast_shadow = 0
-mesh = SubResource("BoxMesh_afa4b")
+mesh = SubResource("BoxMesh_gdbdh")
 
 [node name="WatchCase" type="Node3D" parent="Arms/fp_arms/Skeleton3D/LeftWatch"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.039, 0.352, 0)
 
 [node name="Bezel" type="MeshInstance3D" parent="Arms/fp_arms/Skeleton3D/LeftWatch/WatchCase"]
-material_override = SubResource("ShaderMaterial_lrq13")
+material_override = SubResource("ShaderMaterial_6gei6")
 cast_shadow = 0
-mesh = SubResource("BoxMesh_28kja")
+mesh = SubResource("BoxMesh_nacaj")
 
 [node name="Display420" type="MeshInstance3D" parent="Arms/fp_arms/Skeleton3D/LeftWatch/WatchCase"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0062)
-material_override = SubResource("ShaderMaterial_i5r61")
+material_override = SubResource("ShaderMaterial_h68cr")
 cast_shadow = 0
-mesh = SubResource("QuadMesh_qrler")
+mesh = SubResource("QuadMesh_py10j")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Arms"]
 callback_mode_process = 2
