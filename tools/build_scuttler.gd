@@ -4,11 +4,13 @@
 #   godot --headless --path . --import          # first run only (new PNGs)
 #   godot --headless --path . --script res://tools/build_scuttler.gd
 #
-# The model was sculpted mid-stride (left boot planted forward, right boot
-# lifted behind). Legs are therefore animated with two-bone IK: each clip says
-# where the ankles go and how the boots are pitched, and the hip / knee / ankle
-# rotations are solved from that. Boots stay flat, the stance is symmetrical
-# even though the sculpt isn't, and feet don't slide or sink.
+# The model was sculpted mid-stride (left boot planted, right leg kicked back
+# with the boot toe-down). Bending that right leg to a standing pose sheared
+# it apart, so the build replaces it with a mirror image of the left leg (see
+# mirror_right_leg). Legs are animated with two-bone IK: each clip says where
+# the ankles go and how the boots are pitched, and the hip / knee / ankle
+# rotations are solved from that. Boots stay flat, the stance is symmetrical,
+# and feet don't slide or sink.
 #
 # Skeleton (final space: faces -Z, +Y up, its left side is -X):
 #   root ─ hips ─┬─ body ─ cap
@@ -34,9 +36,10 @@ const BONES := [
 	["thigh_l", "hips", Vector3(0.10, 0.32, 0.0), Vector3(0.16, 0.20, 0.03)],
 	["shin_l", "thigh_l", Vector3(0.16, 0.20, 0.03), Vector3(0.21, 0.11, 0.06)],
 	["foot_l", "shin_l", Vector3(0.21, 0.11, 0.06), Vector3(0.24, 0.03, 0.22)],
-	["thigh_r", "hips", Vector3(-0.11, 0.32, -0.02), Vector3(-0.18, 0.23, -0.12)],
-	["shin_r", "thigh_r", Vector3(-0.18, 0.23, -0.12), Vector3(-0.24, 0.15, -0.21)],
-	["foot_r", "shin_r", Vector3(-0.24, 0.15, -0.21), Vector3(-0.27, 0.02, -0.18)],
+	# the right leg is rebuilt as a mirror of the left (see mirror_right_leg)
+	["thigh_r", "hips", Vector3(-0.10, 0.32, 0.0), Vector3(-0.16, 0.20, 0.03)],
+	["shin_r", "thigh_r", Vector3(-0.16, 0.20, 0.03), Vector3(-0.21, 0.11, 0.06)],
+	["foot_r", "shin_r", Vector3(-0.21, 0.11, 0.06), Vector3(-0.24, 0.03, 0.22)],
 ]
 const RADII := {"hips": 0.13, "body": 0.16, "thigh_l": 0.075, "shin_l": 0.07, "foot_l": 0.085,
 	"thigh_r": 0.075, "shin_r": 0.07, "foot_r": 0.085}
@@ -63,6 +66,11 @@ func _initialize() -> void:
 	var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
 	var uv: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
 	var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+	var mirrored := mirror_right_leg(v, nrm, uv, idx)
+	v = mirrored[0]
+	nrm = mirrored[1]
+	uv = mirrored[2]
+	idx = mirrored[3]
 	var top := 0.0
 	for p in v:
 		top = maxf(top, p.y)
@@ -460,13 +468,298 @@ func stance(side: String) -> Vector3:
 	var x := -0.19 if side == "l" else 0.19   # its left is -X
 	return Vector3(x, 0.11, 0.0) * s
 
+# The sculpt has the right leg kicked back with the boot toe-down, which can't
+# be rotated to a standing pose without shearing the trousers and boot apart.
+# So the right leg is rebuilt as a mirror image of the planted left leg. Both
+# legs are separate pieces below JOIN_Y (they meet the belly just under it):
+#   1. the sculpted right leg below JOIN_Y is removed and the hole it leaves in
+#      the belly is capped;
+#   2. the left leg below JOIN_Y is copied with x flipped (winding reversed),
+#      its top ring nudged up into the belly and capped, so it is a closed
+#      piece that plugs into the body with no seam to see through.
+# The mesh stays watertight (asserted after this).
+const JOIN_Y := 0.31
+
+func mirror_right_leg(v: PackedVector3Array, nrm: PackedVector3Array, uv: PackedVector2Array, idx: PackedInt32Array) -> Array:
+	var weld := weld_ids(v)
+	# connected pieces made only of triangles below JOIN_Y
+	var par := {}
+	var low := []
+	for t in range(0, idx.size(), 3):
+		if maxf(v[idx[t]].y, maxf(v[idx[t + 1]].y, v[idx[t + 2]].y)) < JOIN_Y:
+			low.append(t)
+			var r0: int = uf_find(par, weld[idx[t]])
+			par[r0] = uf_find(par, weld[idx[t + 1]])
+			par[uf_find(par, weld[idx[t + 1]])] = uf_find(par, weld[idx[t + 2]])
+	var groups := {}
+	for t in low:
+		var r: int = uf_find(par, weld[idx[t]])
+		if not groups.has(r):
+			groups[r] = []
+		groups[r].append(t)
+	var left := []
+	var right := []
+	for r in groups:
+		var g: Array = groups[r]
+		var cx := 0.0
+		for t in g:
+			cx += v[idx[t]].x
+		cx /= g.size()
+		if cx > 0.1 and g.size() > left.size():
+			left = g
+		elif cx < -0.1 and g.size() > right.size():
+			right = g
+	var drop := {}
+	for t in right + left:
+		drop[t] = true
+	var nv := PackedVector3Array(v)
+	var nn := PackedVector3Array(nrm)
+	var nu := PackedVector2Array(uv)
+	var ni := PackedInt32Array()
+	for t in range(0, idx.size(), 3):
+		if not drop.has(t):
+			ni.append_array([idx[t], idx[t + 1], idx[t + 2]])
+	var m := [nv, nn, nu, ni]   # packed arrays are copied on write, so pass them boxed
+	cap_holes(m, 3, Vector3.ZERO)   # the holes both legs leave under the belly
+	nv = m[0]
+	nn = m[1]
+	nu = m[2]
+	ni = m[3]
+	var reshaped := symmetrise_right_hip(v, nv, nn, ni)
+	nv = reshaped[0]
+	nn = reshaped[1]
+	# both legs go back in as closed plugs: the left leg as sculpted, the
+	# right as its mirror image. Their top rings are tucked up into the belly
+	# and capped, so swinging a leg never opens a gap at the hip.
+	for flip in [1.0, -1.0]:
+		var first_new := ni.size()
+		var remap := {}
+		for t in left:
+			var out := []
+			for k in [idx[t], idx[t + 1], idx[t + 2]]:
+				if not remap.has(k):
+					remap[k] = nv.size()
+					var p := v[k]
+					p.y += 0.025 * smoothstep(0.26, 0.30, p.y)
+					nv.append(Vector3(p.x * flip, p.y, p.z))
+					nn.append(Vector3(nrm[k].x * flip, nrm[k].y, nrm[k].z))
+					nu.append(uv[k])
+				out.append(remap[k])
+			if flip > 0.0:
+				ni.append_array([out[0], out[1], out[2]])
+			else:
+				ni.append_array([out[0], out[2], out[1]])   # mirrored, so flip the winding
+		m = [nv, nn, nu, ni.slice(0, first_new), ni.slice(first_new)]
+		cap_holes(m, 4, Vector3(0, 0.01, 0))   # close the plug's top, inside the belly
+		nv = m[0]
+		nn = m[1]
+		nu = m[2]
+		ni = (m[3] as PackedInt32Array) + (m[4] as PackedInt32Array)
+	print("legs rebuilt: %d sculpted right-leg triangles replaced by a mirror of the left (%d)" % [right.size(), left.size()])
+	# drop the vertices the removed leg no longer uses
+	var keep := {}
+	var cv := PackedVector3Array()
+	var cn := PackedVector3Array()
+	var cu := PackedVector2Array()
+	for i in ni.size():
+		var k := ni[i]
+		if not keep.has(k):
+			keep[k] = cv.size()
+			cv.append(nv[k])
+			cn.append(nn[k])
+			cu.append(nu[k])
+		ni[i] = keep[k]
+	return [cv, cn, cu, ni]
+
+# What's left of the old right leg above JOIN_Y is a stub of trouser pointing
+# backwards, with ragged edges that stuck out as spikes. Each vertex in that
+# hip region is pulled toward the mirror image of the left hip (the nearest
+# mirrored left vertex), with the pull smoothed across neighbours and fading
+# out by HIP_TOP, so the surface just reshapes: no new seams, still closed.
+const HIP_TOP := 0.42
+
+func symmetrise_right_hip(src: PackedVector3Array, nv: PackedVector3Array, nn: PackedVector3Array, ni: PackedInt32Array) -> Array:
+	var targets := PackedVector3Array()
+	for p in src:
+		if p.x > 0.0 and p.y > 0.2 and p.y < HIP_TOP + 0.05:
+			targets.append(Vector3(-p.x, p.y, p.z))
+	var weld := weld_ids(nv)
+	var used := {}
+	for k in ni:
+		used[weld[k]] = true
+	var wgt := {}
+	var disp := {}
+	for k in used:
+		var p := nv[k]
+		var wv := smoothstep(-0.02, -0.07, p.x) * (1.0 - smoothstep(0.34, HIP_TOP, p.y)) * (1.0 if p.y > 0.2 else 0.0)
+		if wv <= 0.0:
+			continue
+		var best := Vector3.ZERO
+		var bd := INF
+		for q in targets:
+			var d := p.distance_squared_to(q)
+			if d < bd:
+				bd = d
+				best = q
+		wgt[k] = wv
+		disp[k] = best - p
+	# smooth the pull over the surface so neighbours move together
+	var nbr := {}
+	for t in range(0, ni.size(), 3):
+		for e in [[0, 1], [1, 2], [2, 0]]:
+			var a: int = weld[ni[t + e[0]]]
+			var b: int = weld[ni[t + e[1]]]
+			if not nbr.has(a):
+				nbr[a] = {}
+			if not nbr.has(b):
+				nbr[b] = {}
+			nbr[a][b] = true
+			nbr[b][a] = true
+	for it in 6:
+		var nd := {}
+		for k in disp:
+			var acc: Vector3 = disp[k]
+			var c := 1
+			for j in nbr[k]:
+				acc += disp.get(j, Vector3.ZERO)
+				c += 1
+			nd[k] = acc / c
+		disp = nd
+	var moved := 0
+	for i in nv.size():
+		var k := weld[i]
+		if disp.has(k):
+			nv[i] = nv[i] + (disp[k] as Vector3) * (wgt[k] as float)
+			moved += 1
+	# fresh normals where the surface moved
+	var acc_n := {}
+	for t in range(0, ni.size(), 3):
+		var a := nv[ni[t]]
+		var fnorm := (nv[ni[t + 1]] - a).cross(nv[ni[t + 2]] - a)
+		for j in 3:
+			var k := weld[ni[t + j]]
+			if disp.has(k):
+				acc_n[k] = acc_n.get(k, Vector3.ZERO) + fnorm
+	for i in nv.size():
+		var k := weld[i]
+		if acc_n.has(k) and (acc_n[k] as Vector3).length() > 1e-9:
+			var fresh: Vector3 = (acc_n[k] as Vector3).normalized()
+			if fresh.dot(nn[i]) < 0.0:
+				fresh = -fresh
+			nn[i] = nn[i].slerp(fresh, wgt[k]).normalized()
+	print("  right hip reshaped: %d vertices moved" % moved)
+	return [nv, nn]
+
+func weld_ids(v: PackedVector3Array) -> PackedInt32Array:
+	var key := {}
+	var w := PackedInt32Array()
+	w.resize(v.size())
+	for i in v.size():
+		var k := Vector3i(roundi(v[i].x * 1e4), roundi(v[i].y * 1e4), roundi(v[i].z * 1e4))
+		if not key.has(k):
+			key[k] = i
+		w[i] = key[k]
+	return w
+
+func uf_find(par: Dictionary, a: int) -> int:
+	while par.get(a, a) != a:
+		par[a] = par.get(par[a], par[a])
+		a = par[a]
+	return a
+
+# Fans every open edge of `tris` (a single hole) to the hole's centre, keeping
+# the winding consistent: an open edge a->b gets the triangle b, a, centre.
+# m = [vertices, normals, uvs, ...index arrays]; m[which] holds the hole.
+func cap_holes(m: Array, which: int, lift: Vector3) -> void:
+	var nv: PackedVector3Array = m[0]
+	var nn: PackedVector3Array = m[1]
+	var nu: PackedVector2Array = m[2]
+	var tris: PackedInt32Array = m[which]
+	var weld := weld_ids(nv)
+	var count := {}
+	for t in range(0, tris.size(), 3):
+		for e in [[0, 1], [1, 2], [2, 0]]:
+			var a := weld[tris[t + e[0]]]
+			var b := weld[tris[t + e[1]]]
+			var k := Vector2i(mini(a, b), maxi(a, b))
+			count[k] = count.get(k, 0) + 1
+	var open := []
+	for t in range(0, tris.size(), 3):
+		for e in [[0, 1], [1, 2], [2, 0]]:
+			var a := tris[t + e[0]]
+			var b := tris[t + e[1]]
+			if count[Vector2i(mini(weld[a], weld[b]), maxi(weld[a], weld[b]))] == 1:
+				open.append([a, b])
+	if open.is_empty():
+		return
+	# split the open edges into closed loops (a hole can pinch into a figure 8
+	# at one vertex, so peel off a loop whenever the walk revisits a vertex)
+	var out_edges := {}
+	for e in open:
+		var a: int = weld[e[0]]
+		if not out_edges.has(a):
+			out_edges[a] = []
+		out_edges[a].append(e)
+	var loops := []
+	while not out_edges.is_empty():
+		var start: int = out_edges.keys()[0]
+		var path := []          # edges walked
+		var at := {start: 0}    # welded vertex -> position in path
+		var cur := start
+		while true:
+			var list: Array = out_edges[cur]
+			var e: Array = list.pop_back()
+			if list.is_empty():
+				out_edges.erase(cur)
+			path.append(e)
+			cur = weld[e[1]]
+			if at.has(cur):
+				var from: int = at[cur]
+				loops.append(path.slice(from))
+				for i in range(from, path.size()):
+					at.erase(weld[path[i][0]])
+				path = path.slice(0, from)
+				if path.is_empty():
+					break
+				at[cur] = from
+			else:
+				at[cur] = path.size()
+			if not out_edges.has(cur):
+				break
+	for loop in loops:
+		var c := Vector3.ZERO
+		var n := Vector3.ZERO
+		for e in loop:
+			c += nv[e[0]]
+			n += nn[e[0]]
+		c = c / loop.size() + lift
+		var ci := nv.size()
+		nv.append(c)
+		nn.append(n.normalized() if n.length() > 0.001 else Vector3.DOWN)
+		nu.append(nu[loop[0][0]])
+		for e in loop:
+			tris.append_array([e[1], e[0], ci])
+	print("  capped %d hole loop(s): %s edges" % [loops.size(), str(loops.map(func(l: Array) -> int: return l.size()))])
+	m[0] = nv
+	m[1] = nn
+	m[2] = nu
+	m[which] = tris
+
+# Periodic Catmull-Rom through [phase, value] keys (phase 0..1, wraps).
+func loop_curve(keys: Array, ph: float) -> float:
+	var n := keys.size()
+	for i in n:
+		var t0: float = keys[i][0]
+		var t1: float = keys[(i + 1) % n][0] + (1.0 if i == n - 1 else 0.0)
+		var x := ph if ph >= t0 else ph + 1.0
+		if x >= t0 and x < t1:
+			var k := (x - t0) / (t1 - t0)
+			return cubic_interpolate(keys[i][1], keys[(i + 1) % n][1], keys[(i - 1 + n) % n][1], keys[(i + 2) % n][1], k)
+	return keys[0][1]
+
 func foot_flat(side: String) -> Quaternion:
-	# The planted left boot is the reference: it stays as sculpted. The lifted
-	# right boot is turned to match it, mirrored.
-	if side == "l":
-		return Quaternion.IDENTITY
-	var l: Vector3 = foot_axis["l"]
-	return arc(foot_axis["r"], Vector3(-l.x, l.y, l.z))
+	# both boots are now the planted, sculpted boot: no correction needed
+	return Quaternion.IDENTITY
 
 func principal_axis(pts: Array) -> Vector3:
 	var mean := Vector3.ZERO
@@ -580,31 +873,37 @@ func make_clips() -> Array:
 
 	# RUN 0.36 s per two steps: ankles trace a loop (plant -> push back ->
 	# lift -> swing forward); body leans in, bounces twice; cap lags behind.
-	var stride := 0.30 * M     # half-stride reach either side of the hip
-	var lift := 0.13 * M
+	var stride := 0.26 * M     # half-stride reach either side of the hip
+	var lift := 0.11 * M
+	# Every curve here is smooth through the whole loop: no velocity or angle
+	# jumps at plant / lift-off, which is what made the old run look jerky.
+	var pitch_keys := [[0.0, 8.0], [0.12, 0.0], [0.34, 0.0], [0.5, -22.0], [0.68, -16.0], [0.88, 10.0]]
 	var foot_path := func(ph: float, side: String) -> Dictionary:
-		# ph 0..1: 0-0.5 stance (moves back on the ground), 0.5-1 swing (lifted, forward)
+		# ph 0..1: 0-0.5 stance (moves back on the ground at constant speed, so
+		# it doesn't skate), 0.5-1 swing (lifted, carried forward)
 		var base: Vector3 = stance(side)
 		var z: float
 		var y: float = base.y
-		var pitch := 0.0
 		if ph < 0.5:
-			var k := ph / 0.5
-			z = lerpf(-stride, stride, k)        # forward (-Z) to back (+Z)
-			pitch = lerpf(0.0, -25.0, maxf(0.0, (k - 0.6) / 0.4))  # toe-off
+			z = lerpf(-stride, stride, ph / 0.5)
 		else:
 			var k := (ph - 0.5) / 0.5
-			z = lerpf(stride, -stride, ease_io(k))
-			y += lift * sin(PI * k)
-			pitch = lerpf(-25.0, 15.0, k)        # toe up before heel strike
-		return {"p": Vector3(base.x, y, z), "pitch": pitch}
+			# Hermite curve that leaves and lands with the stance speed
+			var k2 := k * k
+			var k3 := k2 * k
+			var m := 2.0 * stride
+			z = stride * (2.0 * k3 - 3.0 * k2 + 1.0) + m * (k3 - 2.0 * k2 + k) \
+				- stride * (-2.0 * k3 + 3.0 * k2) + m * (k3 - k2)
+			var sk := sin(PI * k)
+			y += lift * sk * sk
+		return {"p": Vector3(base.x, y, z), "pitch": loop_curve(pitch_keys, ph)}
 	clips.append(bake("run", 0.36, true, func(t: float):
 		var ph: float = t / 0.36
 		var fl: Dictionary = foot_path.call(fposmod(ph, 1.0), "l")
 		var fr: Dictionary = foot_path.call(fposmod(ph + 0.5, 1.0), "r")
-		var bounce := absf(sin(TAU * ph))
+		var bounce := 0.5 - 0.5 * cos(2.0 * TAU * ph)   # twice per loop, smooth at the bottom
 		return {
-			"hips_pos": Vector3(0, -0.03 * M + 0.035 * M * bounce, 0),
+			"hips_pos": Vector3(0, -0.015 * M + 0.03 * M * bounce, 0),
 			"hips_rot": Vector3(-14.0, 6.0 * sin(TAU * ph), 4.0 * sin(TAU * ph)),
 			"body_rot": Vector3(-6.0, 0, -3.0 * sin(TAU * ph - 0.6)),
 			"cap_rot": Vector3(8.0 - 4.0 * bounce, 0, -5.0 * sin(TAU * ph - 1.2)),

@@ -157,7 +157,8 @@ Everything currently passes. Typical timeline: at the window at 10 s, boards gon
 
 **Model:** `tools/build_scuttler.gd` builds it:
 - It's 1.05 m tall, with 10 bones: root, hips, body, cap, plus a thigh, shin and boot per leg. The legs hang off the hips, so the body and cap can squash and wobble without dragging them.
-- The legs use **inverse kinematics**. The sculpt is mid-stride (left boot planted, right boot lifted), so each clip says where the ankles go and how the boots pitch, and the hip, knee and ankle angles are solved from that. Boots stay flat, the stance is symmetrical, and feet don't slide or sink.
+- **The right leg is rebuilt.** The sculpt has the right leg kicked back with the boot toe-down, and bending it into a stride tore the trousers and boot into spikes. The build swaps it for a mirror image of the planted left leg and smooths the right hip to match. Both legs go in as closed pieces tucked up into the belly, so a swinging leg never opens a gap at the hip.
+- The legs use **inverse kinematics**. Each clip says where the ankles go and how the boots pitch, and the hip, knee and ankle angles are solved from that. Boots stay flat, the stance is symmetrical, and feet don't slide or sink.
 - Each boot's direction is measured from its own vertices, not guessed.
 - Skin weights: the cap is solid; the stalk bends smoothly from hips to body to cap; legs own only the trouser part, so the round belly never follows a swinging leg. A bone-colour render checks this.
 - The mesh is watertight (checked at build time) and double-sided.
@@ -166,7 +167,7 @@ Everything currently passes. Typical timeline: at the window at 10 s, boards gon
 
 **Animations:** 7 clips, authored in code and baked at 30 fps:
 - `idle`: weight shifts, with the cap swaying a beat behind;
-- `run`: a 0.36 s cycle with toe-off, heel strike and a bouncing, squashing body;
+- `run`: a 0.36 s cycle with toe-off, heel strike and a bouncing, squashing body. Every curve in it is smooth through the loop, so there are no pops at plant or lift-off;
 - `ram`: crouch, spring, and the cap smashes the board at 0.42 s;
 - `dive`: the cap flattens and the boots tuck;
 - `kick`: a hop-in dropkick, landing at 0.3 s;

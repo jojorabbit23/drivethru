@@ -38,7 +38,7 @@ const RAM_SPEED := 0.82    # ram clip playback: one ram per 1.1 s, just slower
 const RAM_STANDOFF := 0.55 # metres out from the wall where it rams from
 const KICK_HIT := 0.30     # seconds into "kick" when the boots connect
 const DIVE_TIME := 0.8
-const RUN_CLIP_SPEED := 3.55  # m/s the run clip's feet travel at speed_scale 1
+const RUN_CLIP_SPEED := 3.1  # m/s the run clip's feet travel at speed_scale 1
 
 var state := State.LANE
 var health := 0.0
