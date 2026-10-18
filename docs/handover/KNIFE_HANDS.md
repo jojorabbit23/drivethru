@@ -231,3 +231,12 @@ All six required commands completed successfully under Godot 4.3: import, valida
 `tools/capture_knife.gd` was rendered with Compatibility and the resulting **eight PNGs were opened and visually reviewed**: draw, idle, slash windup/contact, stab drawback/thrust, recovery and the close-wall stab. The arms and existing knife remain visible in the close-wall shot. A further **48-frame** audit covers all 17 source draw samples, 16 slash samples and 15 source stab samples. Its contact sheets were inspected for grip separation, blade orientation and motion; no visible grip detachment was found in those samples. This is sampled visual verification, not an exact continuous mesh-intersection proof.
 
 Capture/film tools now ignore desktop mouse steering for reproducibility. The knife kill film was re-recorded with Compatibility at 30 FPS and encoded with `libx264 -crf 20 -pix_fmt yuv420p` to `docs/video/knife_kill.mp4`. It contains 172 frames (5.73 seconds). A decoded MP4 frame was also inspected.
+
+
+### Follow-up: right-side forearm entry
+
+The original idle elbow was approximately `(-0.0475, -0.2855, +0.0880)` in eye space, behind the camera and left of centre, while the wrist was around `(0.0974, -0.1522, -0.2602)`. This made the arm appear to emerge from the chest.
+
+`_position_right_forearm()` now solves the elbow from the wrist using the eye-space direction `(0.33, -0.18, 0.14)`, normalized to the source forearm length of 0.4 m. It reorients `lowerarm_r` toward the wrist and restores the original global `hand_r` pose. Finger and `weapon_r` transforms consequently stay unchanged. There is no new knife offset, arm scaling, mesh edit, hit timing or gameplay change.
+
+The viewmodel suite now has ten passing checks. The added checks compare hand/socket transforms across native draw, idle and stab samples, confirm constant forearm length, and verify the resting elbow is to the right of the wrist and in front of the eye. All required gameplay suites pass. Updated Compatibility captures, the 48-frame audit sheets and the re-recorded knife video were reviewed. Offline captures were wall-limited to 30 rendered FPS; the existing 60/15 FPS play/background caps remain in place.

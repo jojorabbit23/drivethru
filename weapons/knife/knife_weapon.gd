@@ -14,6 +14,8 @@ signal swung(kind: String)
 
 const VIEWMODEL := preload("res://weapons/knife/knife_viewmodel.tscn")
 const VIEW_OFFSET := Vector3(0.0, -0.015, -0.025)
+# Keep the elbow outside the right edge while retaining the authored grip.
+const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 
@@ -50,6 +52,10 @@ var active := false
 var _pivot: Node3D
 var _arms_anim: AnimationPlayer
 var _visual_clip := ""
+var _skeleton: Skeleton3D
+var _right_forearm := -1
+var _right_hand := -1
+var _forearm_length := 0.4
 var _attack: Dictionary = {}
 var _attack_t := 0.0
 var _attack_kind := ""
@@ -65,6 +71,10 @@ func _ready() -> void:
 	_pivot.name = "Pivot"
 	add_child(_pivot)
 	_arms_anim = _pivot.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	_skeleton = _pivot.find_child("Skeleton3D", true, false) as Skeleton3D
+	_right_forearm = _skeleton.find_bone("lowerarm_r")
+	_right_hand = _skeleton.find_bone("hand_r")
+	_forearm_length = _skeleton.get_bone_rest(_right_hand).origin.length()
 	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
@@ -186,6 +196,23 @@ func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
 	# The rig already contains its authored hand/weapon pose. Add only root motion.
 	_pivot.position = VIEW_OFFSET + (pos - REST_POS) * 0.45
 	_pivot.rotation_degrees = (rot_deg - REST_ROT) * Vector3(0.45, 0.45, 0.40)
+	_position_right_forearm()
+
+func _position_right_forearm() -> void:
+	# The source elbow starts behind the eye and left of centre. Re-aim the
+	# forearm from the right; keep hand_r (and its weapon/fingers) unchanged.
+	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
+	var forearm: Transform3D = _skeleton.get_bone_global_pose(_right_forearm)
+	var eye_offset: Vector3 = RIGHT_ELBOW_DIRECTION.normalized() * _forearm_length
+	var offset: Vector3 = _skeleton.global_basis.inverse() * camera.global_basis * eye_offset
+	var elbow: Vector3 = hand.origin + offset
+	var y: Vector3 = (hand.origin - elbow).normalized()
+	var x: Vector3 = forearm.basis.x.slide(y).normalized()
+	if x.length_squared() < 0.001:
+		x = y.cross(Vector3.UP).normalized()
+	var z: Vector3 = x.cross(y).normalized()
+	_skeleton.set_bone_global_pose(_right_forearm, Transform3D(Basis(x, y, z).orthonormalized(), elbow))
+	_skeleton.set_bone_global_pose(_right_hand, hand)
 
 func _sample_clip(clip: String, time: float) -> void:
 	if _visual_clip != clip:

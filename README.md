@@ -173,6 +173,8 @@ Everything currently passes. Typical timeline: at the window at 10 s, boards gon
 - **Walls and boards:** the blade clinks on them and never hits through them.
 - **Feel:** a draw animation, idle breathing, bob while walking and lag behind mouse look.
 
+The right forearm is re-aimed from the lower-right side of the view. The source elbow sat slightly left of centre and behind the eye; the runtime adjustment moves that elbow while retaining the original 40 cm forearm length and preserving the animated hand, fingers and knife socket. The blade stays in the same grip during draw, slash and stab.
+
 The native `kitchen_knife_draw`, `kitchen_knife_idle` and `kitchen_knife_stab` clips animate the arms. There is no supplied slash clip: the existing procedural sweep moves the complete rig while retaining its closed knife grip. Source stab frame 7 (full extension) maps to the existing 0.24-second contact; recovery ends at the original 0.72 seconds. Gameplay damage, reach, buffering, head stabs, backstabs, switching, wall blocking and ooze are unchanged.
 
 `tools/build_knife_viewmodel.gd` generates `weapons/knife/knife_viewmodel.tscn`, its skinned recoloured mesh, material and a copy of the atlas. The arms rotate 180 degrees around Y; `GripOffset` cancels the imported socket rest axes and turns our -Z-facing knife into the pack's +Z convention. Original assets are preserved in `addons/psx_fps_arms/` with README, licence and credit in `CREDITS.md`. No pack knife or colliders are included in the active viewmodel.
