@@ -2,9 +2,9 @@
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a zombie · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
 
-Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new one every **11 seconds**. Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
+Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new zombie every **11 seconds**. Every third one is a **Scuttler** (set `scuttler_every`, or 0 to turn them off). Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
 
 The settings are on the `Main` node in `main.tscn`, and are easy to tweak: `spawn_interval` (11), `first_zombie_delay` (3) and `max_zombies` (12).
 
@@ -151,6 +151,53 @@ The clips `docs/video/ooze_closeup.mp4` and `shambler_encounter.mp4` show it in 
 
 Everything currently passes. Typical timeline: at the window at 10 s, boards gone and climbing at 15.6 s, inside at 17 s.
 
+## The Scuttler (second enemy)
+
+`enemies/scuttler/` is built from your `Mushroom_AllAround_Glow_1.glb`: the repainted cap colour plus the orange-spot glow map. The original is kept in `source/`. It's the brief's "fast small intruder": a mushroom on two boots.
+
+**Model:** `tools/build_scuttler.gd` builds it:
+- It's 1.05 m tall, with 10 bones: root, hips, body, cap, plus a thigh, shin and boot per leg. The legs hang off the hips, so the body and cap can squash and wobble without dragging them.
+- The legs use **inverse kinematics**. The sculpt is mid-stride (left boot planted, right boot lifted), so each clip says where the ankles go and how the boots pitch, and the hip, knee and ankle angles are solved from that. Boots stay flat, the stance is symmetrical, and feet don't slide or sink.
+- Each boot's direction is measured from its own vertices, not guessed.
+- Skin weights: the cap is solid; the stalk bends smoothly from hips to body to cap; legs own only the trouser part, so the round belly never follows a swinging leg. A bone-colour render checks this.
+- The mesh is watertight (checked at build time) and double-sided.
+- There are 5 LOD levels, from 9,338 triangles down to about 330 at range.
+- **Glow:** only your orange spots emit, using the glow map with multiply. Godot's default "add" mode made the whole creature glow white. These spots are the one deliberate exception to the "only light sources emit" rule: bioluminescent fungus.
+
+**Animations:** 7 clips, authored in code and baked at 30 fps:
+- `idle`: weight shifts, with the cap swaying a beat behind;
+- `run`: a 0.36 s cycle with toe-off, heel strike and a bouncing, squashing body;
+- `ram`: crouch, spring, and the cap smashes the board at 0.42 s;
+- `dive`: the cap flattens and the boots tuck;
+- `kick`: a hop-in dropkick, landing at 0.3 s;
+- `flinch`;
+- `death`: keels over sideways, kicks twice, goes still.
+
+`docs/previews/scuttler_animations.png` shows them all.
+
+**Behaviour** (`scuttler.gd`, same interface as the Shambler):
+- **Lane:** sprints down the lane at 3.2 m/s.
+- **Breach:** rams the boards with its cap, knocking them out **from the bottom**. A Shambler tears them from the top.
+- **Dive:** as soon as **two neighbouring boards are gone**, it dives through with its cap squashed flat. It doesn't need the whole window open. If a Shambler has already opened a gap at the top, it dives straight through that without ramming.
+- **Speed:** it's inside in about 5 s, against about 17 s for a Shambler.
+- **Repair counters it:** repairs go back bottom-up, so they close its gap first. One ram takes 1.1 s, just slower than a 0.9 s repair, so holding E keeps a lone Scuttler out.
+- **Hunt:** runs you down at 3.4 m/s, under your 6.5 m/s sprint.
+- **Attack:** hops in and dropkicks your shins for 8 damage.
+- **Health:** 55. The cap is the weak spot (×1.5 damage), and from eye height it covers the legs, so you'll usually hit it. Two pistol hits kill either way, as does a knife stab. A slash leaves it on 15. Every hit knocks it back.
+- **Death:** the glowing spots fade out, and an ooze puddle spreads.
+- **Size:** it's knee-high, so you aim down. A wide cap collision keeps the cap out of walls, and it steers round other zombies.
+
+`tools/scuttler_test.gd` covers:
+- both lanes to four hiding spots: ramming at 2.9 s, diving at 4.5 s, kicking you at 6 to 8 s;
+- bottom-up ramming, and diving with two boards left;
+- diving through a Shambler's top gap;
+- repair holding it off;
+- cap and body hits for the pistol and the knife, and knockback;
+- the glow fading and the corpse not blocking;
+- mixed crowds of 2 Scuttlers and 4 Shamblers at two spots.
+
+It passed repeated runs. The clip `docs/video/scuttler_encounter.mp4` shows it in action.
+
 ## The knife
 
 `weapons/knife/` is built from your `knife_3d_model.glb`; the original is kept in `source/`.
@@ -214,7 +261,10 @@ godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
 ```
+
+To rebuild the Scuttler after changing its bones, weights or clips, run `godot --headless --path . --script res://tools/build_scuttler.gd`.
 
 To rebuild the zombie after changing bones, weights or animations in `tools/build_zombie.gd`, run `godot --headless --path . --script res://tools/build_zombie.gd`.
 

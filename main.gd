@@ -2,11 +2,13 @@
 extends Node3D
 
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
+const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
 @export var max_zombies := 12        # alive at once; a spawn is skipped while at the cap
+@export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
 
 var _spawn_t := 0.0
 var _spawned := 0
@@ -44,7 +46,11 @@ func _physics_process(delta: float) -> void:
 	_spawn_t -= delta
 	if _spawn_t <= 0.0:
 		_spawn_t += spawn_interval
-		spawn_zombie(_pick_window())
+		var n := _spawned + 1
+		if scuttler_every > 0 and n % scuttler_every == 0:
+			spawn_scuttler(_pick_window())
+		else:
+			spawn_zombie(_pick_window())
 
 func _pick_window() -> Node3D:
 	var windows := get_tree().get_nodes_in_group("windows")
@@ -62,14 +68,20 @@ func _pick_window() -> Node3D:
 func next_spawn_in() -> float:
 	return maxf(_spawn_t, 0.0)
 
+func spawn_scuttler(window: Node3D = null) -> Node:
+	return spawn_enemy(SCUTTLER, window)
+
 func spawn_zombie(window: Node3D = null) -> Node:
+	return spawn_enemy(SHAMBLER, window)
+
+func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
 		return null
 	var windows := get_tree().get_nodes_in_group("windows")
 	if window == null:
 		window = windows[randi() % windows.size()]
 	_spawned += 1
-	var z := SHAMBLER.instantiate()
+	var z := scene.instantiate()
 	z.setup(window, player)
 	add_child(z)
 	var spawn: Vector3 = window.lane_spawn()
@@ -87,6 +99,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					labels.visible = not labels.visible
 			KEY_Z:
 				spawn_zombie()
+			KEY_X:
+				spawn_scuttler()
 			KEY_R:
 				get_tree().reload_current_scene()
 
@@ -146,7 +160,7 @@ func _build_hud() -> void:
 	cross.pivot_offset = cross.size * 0.5
 	layer.add_child(cross)
 	var help := Label.new()
-	help.text = "WASD move · Shift sprint · Space jump · 1/2 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn zombie · R restart · L labels · Esc mouse"
+	help.text = "WASD move · Shift sprint · Space jump · 1/2 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn Shambler · X spawn Scuttler · R restart · L labels · Esc mouse"
 	help.add_theme_font_size_override("font_size", 13)
 	help.add_theme_color_override("font_color", Color("#E9E1D1", 0.6))
 	help.position = Vector2(16, 12)

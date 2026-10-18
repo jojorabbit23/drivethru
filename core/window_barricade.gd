@@ -39,9 +39,11 @@ func lane_spawn() -> Vector3:
 func outward() -> Vector3:
 	return global_basis.z
 
-# Zombies pull boards top-down; the board tumbles out into the lane.
-func rip_board() -> bool:
-	for i in range(boards.size() - 1, -1, -1):
+# Shamblers pull boards top-down; Scuttlers ram them out from the bottom
+# (from_bottom). The board tumbles out into the lane.
+func rip_board(from_bottom := false) -> bool:
+	var order := range(boards.size()) if from_bottom else range(boards.size() - 1, -1, -1)
+	for i in order:
 		var b := boards[i]
 		if b.collision_layer == 0:
 			continue
@@ -53,6 +55,23 @@ func rip_board() -> bool:
 			breached.emit()
 		return true
 	return false
+
+# The lowest pair of neighbouring missing boards: a gap a Scuttler can dive
+# through. Returns the board index of the pair's lower board, or -1.
+func small_gap() -> int:
+	for i in boards.size() - 1:
+		if boards[i].collision_layer == 0 and boards[i + 1].collision_layer == 0:
+			return i
+	return -1
+
+# World height a diver passes through for small_gap() index i: the top of the
+# board below the gap, or the sill if the gap starts at the bottom.
+func gap_floor(i: int) -> float:
+	var open_h: float = (get_meta("opening_size") as Vector2).y
+	if i <= 0:
+		return global_position.y - open_h * 0.5
+	var below := boards[i - 1]
+	return below.global_position.y + 0.12
 
 # Player repairs bottom-up.
 func repair_board() -> bool:

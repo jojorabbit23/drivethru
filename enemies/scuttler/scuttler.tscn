@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://enemies/scuttler/scuttler.gd" id="1_logic"]
+[ext_resource type="PackedScene" path="res://enemies/scuttler/scuttler_model.tscn" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_legs"]
+radius = 0.24
+height = 0.62
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_cap"]
+height = 0.42
+radius = 0.42
+
+[node name="Scuttler" type="CharacterBody3D"]
+collision_layer = 8
+collision_mask = 15
+floor_snap_length = 0.3
+script = ExtResource("1_logic")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31, 0)
+shape = SubResource("CapsuleShape3D_legs")
+
+[node name="CapShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.82, 0)
+shape = SubResource("CylinderShape3D_cap")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.4
+target_desired_distance = 0.6
+height = 1.05
+radius = 0.45
