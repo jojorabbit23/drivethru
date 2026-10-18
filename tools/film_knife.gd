@@ -19,6 +19,9 @@ func _setup() -> void:
 	main.set("auto_spawn", false)
 	root.add_child(main)
 	player = main.get_node("Player")
+	# Deterministic captures: desktop mouse movement must not steer the camera.
+	player.set_process_unhandled_input(false)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	knife = player.get_node("Head/Camera3D/Knife")
 	player.global_position = Vector3(0.9, 0.05, -1.4)
 	player.rotation.y = -PI / 2.0

@@ -135,22 +135,99 @@ actual files.
 
 ## Done means
 
-- [ ] Arms are visible holding our knife in idle, draw, slash and stab, checked
+- [x] Arms are visible holding our knife in idle, draw, slash and stab, checked
       by rendering `tools/capture_knife.gd` (update its shots if needed) and
       looking at the images. Commit the PNGs to `docs/previews/`.
-- [ ] The hand closes on the handle. The knife doesn't float off the palm or
+- [x] The hand closes on the handle. The knife doesn't float off the palm or
       pass through the fingers in any frame of draw, stab, slash or idle.
-- [ ] Nothing clips into a wall when you stand against one (shot `knife7_stab_into_wall`).
-- [ ] All six test commands in `AGENTS.md` pass. Update `knife_test.gd` only
+- [x] Nothing clips into a wall when you stand against one (shot `knife7_stab_into_wall`).
+- [x] All six test commands in `AGENTS.md` pass. Update `knife_test.gd` only
       for intentional timing changes, and say so in the commit.
-- [ ] `CREDITS.md` has the CC BY credit, and the pack's LICENSE is in the repo.
-- [ ] `README.md`'s "The knife" section describes the arms and how they're set up.
-- [ ] Re-film the clip:
+- [x] `CREDITS.md` has the CC BY credit, and the pack's LICENSE is in the repo.
+- [x] `README.md`'s "The knife" section describes the arms and how they're set up.
+- [x] Re-film the clip:
       `xvfb-run -a godot --path . --rendering-method gl_compatibility --fixed-fps 30 --write-movie /tmp/knife.avi --script res://tools/film_knife.gd`,
       then encode it to `docs/video/knife_kill.mp4` with ffmpeg
       (`-c:v libx264 -crf 20 -pix_fmt yuv420p`).
 
 ## Findings
 
-_(Fill in after inspecting the pack: bone names, clip lengths, contact frame
-of the stab, the `weapon_r` offset you settled on.)_
+Implementation verified with **Godot 4.3 stable (77dcf97d8), Windows**, using the native display and `--rendering-method gl_compatibility` as the Windows equivalent of the brief's xvfb command.
+
+### Actual source and skeleton
+
+The original user-supplied PSX FPS Arms Free v1.0.2 addon is committed at `addons/psx_fps_arms/`, with its README and full CC BY 4.0 licence. The corrected knife rig is `models/fp_arms_free_v7_model.glb`. The active source GLB contains one skinned arms mesh and **no attached kitchen knife mesh**; the pack's separate kitchen knife scene is never instantiated. Only our existing `knife_model.tscn` is attached.
+
+The imported skeleton is `Arms/fp_arms/Skeleton3D`, with **36 bones**, in this order:
+
+```
+root
+lowerarm_r, hand_r
+index_01_r, index_02_r, index_03_r
+middle_01_r, middle_02_r, middle_03_r
+ring_01_r, ring_02_r, ring_03_r
+pinky_01_r, pinky_02_r, pinky_03_r
+thumb_01_r, thumb_02_r, thumb_03_r
+weapon_r
+lowerarm_l, hand_l
+index_01_l, index_02_l, index_03_l
+middle_01_l, middle_02_l, middle_03_l
+ring_01_l, ring_02_l, ring_03_l
+pinky_01_l, pinky_02_l, pinky_03_l
+thumb_01_l, thumb_02_l, thumb_03_l
+```
+
+`weapon_r` is bone 18. Its global rest transform, rounded:
+
+```
+X = (1, 0, 0)
+Y = (0, 0, -1)
+Z = (0, 1, 0)
+origin = (-0.093916, -0.155331, 0.392123)
+```
+
+The rig has **11** clips:
+
+| Clip | Seconds |
+|---|---:|
+| kitchen_knife_idle | 3.000000 |
+| kitchen_knife_draw | 0.533333 |
+| kitchen_knife_holster | 0.533333 |
+| kitchen_knife_stab | 0.466667 |
+| kitchen_knife_inspect | 3.200000 |
+| flashlight_idle | 3.000000 |
+| flashlight_draw | 0.533333 |
+| flashlight_holster | 0.533333 |
+| flashlight_swing | 0.533333 |
+| flashlight_switch | 0.600000 |
+| flashlight_inspect | 3.200000 |
+
+There is no knife slash clip. `tools/inspect_knife_arms.gd` reproduces these observations and prints the 30 Hz stab samples.
+
+### Attachment and animation timing
+
+The builder rotates the rig by PI on Y, following the pack README. `KnifeSocket` follows `weapon_r`; its `GripOffset` has zero positional offset and this basis:
+
+```gdscript
+skeleton.get_bone_global_rest(weapon_bone).basis.inverse() * Basis(Vector3.UP, PI)
+```
+
+The extra PI converts our knife's -Z tip direction into the pack's +Z weapon convention. The spine remains up relative to the grip. Our knife geometry, scale and grip-centred origin are unchanged. The complete viewmodel root sits at `(0, -0.015, -0.025)` relative to the camera before additive motion.
+
+Source stab **frame 7 at 7/30 = 0.233333 s** is the start of full extension; the socket's source-space position there is approximately `(-0.082268, -0.203117, 0.542888)`. Frames 7–9 form the extended part of the thrust. The controller manually samples frame 7 at the original gameplay **0.24 s** hit, then samples the rest of the source clip over the original recovery to **0.72 s**. Draw compresses the 0.533333-second source clip into the existing **0.32 s** draw gate. Idle is a native loop with existing bob/sway added to the root.
+
+Slash retains its original **0.15 s** hit, **0.5 s** duration and original keyframe times. It samples the closed native knife idle grip and applies the existing procedural sweep to the entire rig. Root translation is attenuated to 0.45 and angular motion to `(0.45, 0.45, 0.40)` so the hands remain more visible. No attack constants, hit rays, damage, reach, head/backstab rules, buffer window or gameplay tests were changed. Switching away hides the full rig immediately; no holster delay was added.
+
+### Recolour and rendering
+
+The builder edits a **copy** of the original atlas. Four new tiles use the existing palette for orange sleeves, charcoal cuffs, teal gloves and dirty exposed distal fingers. Face-level UV-region assignment avoids stretching a cuff transition over a large forearm triangle. Original bone weights and vertex shading are retained. A non-emissive watch is attached only to `lowerarm_l`; its seven-segment atlas face is fixed at 4:20. The Cleatimus hand texture pack and WRAD textures are not used.
+
+The arms/watch shader uses exactly the brief's `MODELVIEW_MATRIX` view-space shrink by 0.1, followed by `PROJECTION_MATRIX`. It does not write a renderer-specific depth value. All viewmodel meshes have shadow casting off and no colliders. The pack's original GLB and atlas are preserved. Generated viewmodels are flattened before packing; keeping both inherited instance state and explicit child ownership caused orphaned source nodes in Godot 4.3, which was corrected and checked with repeated instantiation/freeing.
+
+### Validation and visual review
+
+All six required commands completed successfully under Godot 4.3: import, validate, movement, zombie, ooze and knife. Each gameplay suite reported `0 failure(s)` or `problems: 0`. The unchanged `knife_test.gd` retains its original checks. The additional `knife_viewmodel_test.gd` passes seven checks covering the corrected rig, collider/shadow isolation, source stab/contact timing, slash grip and full-rig hiding. Every changed/new GDScript passes `--check-only`.
+
+`tools/capture_knife.gd` was rendered with Compatibility and the resulting **eight PNGs were opened and visually reviewed**: draw, idle, slash windup/contact, stab drawback/thrust, recovery and the close-wall stab. The arms and existing knife remain visible in the close-wall shot. A further **48-frame** audit covers all 17 source draw samples, 16 slash samples and 15 source stab samples. Its contact sheets were inspected for grip separation, blade orientation and motion; no visible grip detachment was found in those samples. This is sampled visual verification, not an exact continuous mesh-intersection proof.
+
+Capture/film tools now ignore desktop mouse steering for reproducibility. The knife kill film was re-recorded with Compatibility at 30 FPS and encoded with `libx264 -crf 20 -pix_fmt yuv420p` to `docs/video/knife_kill.mp4`. It contains 172 frames (5.73 seconds). A decoded MP4 frame was also inspected.
