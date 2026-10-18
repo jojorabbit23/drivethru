@@ -24,6 +24,8 @@ var _hitmark := 0.0
 var _kills := 0
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		Engine.max_fps = 0
 	var start := shop.get_node_or_null("Markers/PlayerStart") as Node3D
 	if start:
 		player.global_transform = start.global_transform
@@ -231,3 +233,13 @@ func _build_hud() -> void:
 	wave.size = Vector2(320, 24)
 	layer.add_child(wave)
 	_hud = {"wave": wave, "cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette, "weapon": weapon}
+
+# Keep the desktop responsive when this window is not being played.
+# Headless test simulations retain their normal unrestricted speed.
+func _notification(what: int) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		Engine.max_fps = 15
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		Engine.max_fps = int(ProjectSettings.get_setting("application/run/max_fps", 60))

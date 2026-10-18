@@ -1,0 +1,21 @@
+extends SceneTree
+func _initialize() -> void: run.call_deferred()
+func run() -> void:
+ var arms: Node3D = load("res://addons/psx_fps_arms/models/fp_arms_free_v7_model.glb").instantiate()
+ root.add_child(arms)
+ var sk: Skeleton3D = arms.find_child("Skeleton3D",true,false)
+ var ap: AnimationPlayer = arms.find_child("AnimationPlayer",true,false)
+ print("SKELETON ", sk.get_path()," bones ",sk.get_bone_count())
+ for i in sk.get_bone_count(): print(i," ",sk.get_bone_name(i))
+ var mi: MeshInstance3D = arms.find_child("fp_arms_mesh",true,false)
+ for i in mi.skin.get_bind_count(): print("BIND ", i," ",mi.skin.get_bind_bone(i)," ",mi.skin.get_bind_name(i))
+ var b: int = sk.find_bone("weapon_r")
+ print("WEAPON REST ",sk.get_bone_global_rest(b))
+ for clip in ap.get_animation_list(): print("CLIP ",clip," ",ap.get_animation(clip).length)
+ ap.play("kitchen_knife_stab")
+ for i in 15:
+  ap.seek(float(i)/30.0,true)
+  sk.force_update_all_bone_transforms()
+  print("STAB FRAME ",i," ",sk.get_bone_global_pose(b).origin)
+ arms.free()
+ quit()

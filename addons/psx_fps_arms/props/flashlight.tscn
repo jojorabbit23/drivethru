@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/psx_fps_arms/models/flashlight_model.glb" id="1"]
+[ext_resource type="Script" path="res://addons/psx_fps_arms/pickup.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(0.0540, 0.0514, 0.2800)
+
+[sub_resource type="BoxShape3D" id="box1"]
+size = Vector3(0.0480, 0.0456, 0.0050)
+
+[sub_resource type="BoxShape3D" id="box2"]
+size = Vector3(0.0080, 0.0050, 0.0160)
+
+[node name="flashlight" instance=ExtResource("1")]
+script = ExtResource("2")
+kind = "item"
+item = "flashlight"
+title = "Flashlight"
+text = "A long steel flashlight. Heavy enough to be more than a light."
+
+[node name="Collision" type="StaticBody3D" parent="flashlight"]
+
+[node name="Box" type="CollisionShape3D" parent="flashlight/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0100)
+shape = SubResource("box0")
+
+[node name="Collision" type="StaticBody3D" parent="flashlight/flashlight_lens"]
+
+[node name="Box" type="CollisionShape3D" parent="flashlight/flashlight_lens/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0005)
+shape = SubResource("box1")
+
+[node name="Collision" type="StaticBody3D" parent="flashlight/flashlight_switch"]
+
+[node name="Box" type="CollisionShape3D" parent="flashlight/flashlight_switch/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.0005, -0.0000)
+shape = SubResource("box2")
+
+[node name="Light" type="SpotLight3D" parent="flashlight"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0000, 0.0000, 0.1530)
+visible = false
+light_color = Color(1.000, 0.941, 0.816, 1)
+light_energy = 3.0
+spot_range = 16.0
+spot_angle = 22.0
+shadow_enabled = true

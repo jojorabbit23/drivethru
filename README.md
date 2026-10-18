@@ -218,13 +218,13 @@ Every Shambler and Scuttler drops one glowing mushroom when it dies. The model i
 **Model:** `tools/build_knife.gd` makes the weapon model:
 - It works out the knife's own axes from its shape. The long axis is the length. The tip is the thin end, since the handle is chunkier. The spine is the thicker long edge, since the cutting edge is ground thin.
 - It turns the knife tip-forward with the serrated spine up and scales it to 32 cm.
-- The origin sits on the grip, which is where a hand or the PSX arms' `weapon_r` bone will hold it later.
+- The origin sits on the grip, which is where the PSX arms' `weapon_r` bone holds it.
 - A `Tip` marker marks the point.
 - The texture is reduced to a 512 px nearest-filtered map.
 
 `docs/previews/knife_orthographic.png` has side, top and front views on a 1 cm grid.
 
-**In hand** (`weapon_r` style, no arms yet), `knife_weapon.gd`:
+**In hand**, `knife_weapon.gd` drives the corrected-v7 PSX FPS Arms Free skeleton with our existing knife attached to `weapon_r`:
 - **Slash (LMB):** a quick sweep from right to left. It does 40 damage with a wide arc of about ±34° and lands 0.15 s into the swing.
 - **Stab (RMB):** a draw-back then a thrust in from the lower right. It does 75 damage in a narrow cone and lands at 0.24 s.
 - **Head stabs** use the zombie's headshot multiplier, so they kill. A slash that clips the head is a normal hit.
@@ -235,7 +235,17 @@ Every Shambler and Scuttler drops one glowing mushroom when it dies. The model i
 - **Walls and boards:** the blade clinks on them and never hits through them.
 - **Feel:** a draw animation, idle breathing, bob while walking and lag behind mouse look.
 
-The knife is drawn shrunk toward the eye (the same spot on screen at a tenth of the depth), so it never sinks into walls or zombies. That works in every renderer.
+The right forearm is re-aimed from the lower-right side of the view. The source elbow sat slightly left of centre and behind the eye; the runtime adjustment moves that elbow while retaining the original 40 cm forearm length and preserving the wrist position and relative finger/knife attachment. The blade stays in the same grip during draw, slash and stab.
+
+The native `kitchen_knife_draw`, `kitchen_knife_idle` and `kitchen_knife_stab` clips animate the arms. There is no supplied slash clip: the existing procedural sweep moves the complete rig while retaining its closed knife grip. Source stab frame 7 (full extension) maps to the existing 0.24-second contact; recovery ends at the original 0.72 seconds. Gameplay damage, reach, buffering, head stabs, backstabs, switching, wall blocking and ooze are unchanged.
+
+`tools/build_knife_viewmodel.gd` generates `weapons/knife/knife_viewmodel.tscn`, its skinned recoloured mesh, material and a copy of the atlas. The arms rotate 180 degrees around Y; `GripOffset` cancels the imported socket rest axes and turns our -Z-facing knife into the pack's +Z convention. Original assets are preserved in `addons/psx_fps_arms/` with README, licence and credit in `CREDITS.md`. No pack knife or colliders are included in the active viewmodel.
+
+The optional character recolour uses the shared palette: orange sleeves, charcoal cuffs, teal fingerless gloves and dirty fingertips. A small watch follows the **left** forearm and always displays **4:20**. Its face reflects light rather than emitting it. The supplied Cleatimus HD base-colour and roughness atlases are now applied with mipmapped filtering. The older non-HD pack and WRAD textures remain unused. The elbow direction blends halfway between the original and outward poses; the resting grip is tilted 15 degrees more upright, easing to the native stab orientation at contact.
+
+Rebuild with `godot --headless --path . --script res://tools/build_knife_viewmodel.gd` after importing the source assets. `tools/inspect_knife_arms.gd` prints bones, clips and stab extension samples. `tools/knife_viewmodel_test.gd` checks the visual/gameplay interface alongside the unchanged `knife_test.gd`. Detailed transforms and validation are recorded in `docs/handover/KNIFE_HANDS.md`.
+
+The knife, arms and watch all use the same view-space depth shrink (same screen position at a tenth of the depth), with shadow casting off. The required Compatibility renders, including the close-wall stab, are in `docs/previews/knife0_draw.png` through `knife7_stab_into_wall.png`. Run `tools/capture_knife.gd` to refresh them. Its optional `-- --audit` captures every source frame of draw/stab and 30 Hz slash samples; set `KNIFE_AUDIT_DIR` to choose the output folder.
 
 **Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol and slot 2 is the knife; the HUD shows the current one, bottom right.
 
@@ -310,3 +320,12 @@ godot --path . --script res://tools/capture_previews.gd
 - There's no monster truck at the hatch.
 - The Shambler's rig is automatic and its animations are hand-keyed in code. They read well at game distance, but an animator pass in Blender would add polish, especially to the death and climb. Because the normal arm and the shirt are one continuous surface, lifting that arm high still stretches the armpit a little, so the clips keep it below about 65°.
 - The previews were rendered with the Compatibility renderer under a virtual display. The project's default is Forward+, so lighting on your machine will look somewhat different (generally richer).
+
+
+## Desktop performance limits
+
+Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
+
+For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the shop, knife attacks and a 12-zombie/ooze stress case, then exits; a 15-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
+
+The reference knife grip now has continuous teal glove coverage and an 18-degree resting roll to show the curled fingers. The roll eases into the authored stab pose at contact and returns during recovery. The original hand-to-knife attachment and gameplay timing remain intact.

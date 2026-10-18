@@ -21,6 +21,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    - `levels/shop/generated/*`, `materials/*.tres`: `tools/build_shop.gd`
    - `enemies/shambler/shambler_model.tscn` and `shambler_*`: `tools/build_zombie.gd`
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
+   - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`: `tools/build_knife_viewmodel.gd`
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
@@ -35,6 +36,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/knife_viewmodel_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
