@@ -14,8 +14,9 @@ signal swung(kind: String)
 
 const VIEWMODEL := preload("res://weapons/knife/knife_viewmodel.tscn")
 const VIEW_OFFSET := Vector3(0.0, -0.015, -0.025)
-# Keep the elbow outside the right edge while retaining the authored grip.
+# Blend the authored elbow halfway toward the right while retaining the grip.
 const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
+const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 
@@ -200,11 +201,19 @@ func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
 
 func _position_right_forearm() -> void:
 	# The source elbow starts behind the eye and left of centre. Re-aim the
-	# forearm from the right; keep hand_r (and its weapon/fingers) unchanged.
+	# forearm from the right. The upright wrist turn carries knife and fingers together.
 	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
+	var upright_weight := 1.0
+	if _visual_clip == "kitchen_knife_stab":
+		var t: float = _arms_anim.current_animation_position
+		upright_weight = 1.0 - smoothstep(4.0 / 30.0, 7.0 / 30.0, t) + smoothstep(10.0 / 30.0, 14.0 / 30.0, t)
+	var wrist_axis: Vector3 = (_skeleton.global_basis.inverse() * camera.global_basis.x).normalized()
+	hand.basis = Basis(wrist_axis, UPRIGHT_ANGLE * upright_weight) * hand.basis
 	var forearm: Transform3D = _skeleton.get_bone_global_pose(_right_forearm)
 	var eye_offset: Vector3 = RIGHT_ELBOW_DIRECTION.normalized() * _forearm_length
 	var offset: Vector3 = _skeleton.global_basis.inverse() * camera.global_basis * eye_offset
+	var authored_offset: Vector3 = (forearm.origin - hand.origin).normalized()
+	offset = authored_offset.slerp(offset.normalized(), 0.5) * _forearm_length
 	var elbow: Vector3 = hand.origin + offset
 	var y: Vector3 = (hand.origin - elbow).normalized()
 	var x: Vector3 = forearm.basis.x.slide(y).normalized()

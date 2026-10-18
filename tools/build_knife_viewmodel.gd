@@ -3,6 +3,7 @@
 extends SceneTree
 const P = preload("res://core/palette.gd")
 const OUT := "res://weapons/knife/"
+const HD_DIR := OUT + "textures/cleatimus_hd/"
 const SOURCE := "res://addons/psx_fps_arms/models/fp_arms_free_v7_model.glb"
 func _initialize() -> void:
  build.call_deferred()
@@ -10,44 +11,17 @@ func material(texture: Texture2D, regions: bool, tint: Color = Color.WHITE, face
  var result := ShaderMaterial.new()
  result.shader = load(OUT + "arms_viewmodel.gdshader")
  result.set_shader_parameter("albedo_tex", texture)
+ result.set_shader_parameter("roughness_tex", load(HD_DIR + "hands_roughness.png"))
  result.set_shader_parameter("regions", regions)
  result.set_shader_parameter("watch_face", face)
  result.set_shader_parameter("tint", tint)
  return result
 func painted_atlas() -> Image:
- var original: Texture2D = load("res://addons/psx_fps_arms/atlas.png")
+ # Use the supplied HD artwork directly; no procedural white speckle overlay.
+ var original: Texture2D = load(HD_DIR + "hands_basecolor.png")
  var image: Image = original.get_image().duplicate()
  image.convert(Image.FORMAT_RGBA8)
- var colours: Array[Color] = [P.BURNT_ORANGE, P.WET_CHARCOAL, P.OXIDISED_TEAL, P.WARM_CHALK]
- var rng := RandomNumberGenerator.new()
- rng.seed = 420
- for kind in 4:
-  for y in 64:
-   for x in 64:
-    var colour: Color = colours[kind]
-    var wear: float = rng.randf()
-    if kind == 3:
-     if wear < 0.28: colour = P.BURNT_ORANGE
-     elif wear < 0.30: colour = P.CONCRETE_GREY
-    elif wear < 0.04: colour = P.WARM_CHALK
-    elif wear < 0.055: colour = P.BLUE_SLATE
-    image.set_pixel(kind * 64 + x, 128 + y, colour)
- image.fill_rect(Rect2i(256,128,128,64), P.MIDNIGHT_TYNE)
- # Small seven-segment watch; reflective colour only, no emissive surface.
- digit(image, Vector2i(265,140), 4)
- image.fill_rect(Rect2i(290,149,4,4),P.AMBER_GLOW)
- image.fill_rect(Rect2i(290,164,4,4),P.AMBER_GLOW)
- digit(image, Vector2i(301,140), 2)
- digit(image, Vector2i(330,140), 0)
  return image
-func digit(image: Image, at: Vector2i, value: int) -> void:
- var segments: Array[String] = ["ab cdef".replace(" ",""), "bc", "abdeg", "abcdg", "bcfg"]
- var mask: String = segments[value]
- var rects := {"a":Rect2i(4,0,14,4),"b":Rect2i(18,4,4,13),"c":Rect2i(18,21,4,13),"d":Rect2i(4,34,14,4),"e":Rect2i(0,21,4,13),"f":Rect2i(0,4,4,13),"g":Rect2i(4,17,14,4)}
- for letter in mask:
-  var rect: Rect2i = rects[letter]
-  rect.position += at
-  image.fill_rect(rect,P.AMBER_GLOW)
 func box(parent: Node3D, label: String, size: Vector3, pos: Vector3, mat: Material) -> MeshInstance3D:
  var instance := MeshInstance3D.new()
  instance.name = label
@@ -66,6 +40,7 @@ func own(node: Node, scene: Node) -> void:
 func build() -> void:
  var image := painted_atlas()
  image.save_png(OUT + "cleatimus_arms_atlas.png")
+ image.generate_mipmaps()
  var texture := ImageTexture.create_from_image(image)
  ResourceSaver.save(texture,OUT + "cleatimus_arms_atlas.res")
  texture.take_over_path(OUT + "cleatimus_arms_atlas.res")

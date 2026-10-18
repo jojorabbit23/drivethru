@@ -220,7 +220,7 @@ Slash retains its original **0.15 s** hit, **0.5 s** duration and original keyfr
 
 ### Recolour and rendering
 
-The builder edits a **copy** of the original atlas. Four new tiles use the existing palette for orange sleeves, charcoal cuffs, teal gloves and dirty exposed distal fingers. Face-level UV-region assignment avoids stretching a cuff transition over a large forearm triangle. Original bone weights and vertex shading are retained. A non-emissive watch is attached only to `lowerarm_l`; its seven-segment atlas face is fixed at 4:20. The Cleatimus hand texture pack and WRAD textures are not used.
+The builder now copies the user-supplied Cleatimus HD base-colour atlas and assigns its orange fabric, charcoal cuff, teal leather and skin tiles. Face-level UV-region assignment avoids stretching a cuff transition over a large forearm triangle. Original bone weights and vertex shading are retained. A non-emissive watch is attached only to `lowerarm_l`; its seven-segment atlas face is fixed at 4:20. The HD roughness atlas is sampled too, with mipmapped filtering and inset tile UVs. The earlier non-HD pack and WRAD textures are not used.
 
 The arms/watch shader uses exactly the brief's `MODELVIEW_MATRIX` view-space shrink by 0.1, followed by `PROJECTION_MATRIX`. It does not write a renderer-specific depth value. All viewmodel meshes have shadow casting off and no colliders. The pack's original GLB and atlas are preserved. Generated viewmodels are flattened before packing; keeping both inherited instance state and explicit child ownership caused orphaned source nodes in Godot 4.3, which was corrected and checked with repeated instantiation/freeing.
 
@@ -240,3 +240,12 @@ The original idle elbow was approximately `(-0.0475, -0.2855, +0.0880)` in eye s
 `_position_right_forearm()` now solves the elbow from the wrist using the eye-space direction `(0.33, -0.18, 0.14)`, normalized to the source forearm length of 0.4 m. It reorients `lowerarm_r` toward the wrist and restores the original global `hand_r` pose. Finger and `weapon_r` transforms consequently stay unchanged. There is no new knife offset, arm scaling, mesh edit, hit timing or gameplay change.
 
 The viewmodel suite now has ten passing checks. The added checks compare hand/socket transforms across native draw, idle and stab samples, confirm constant forearm length, and verify the resting elbow is to the right of the wrist and in front of the eye. All required gameplay suites pass. Updated Compatibility captures, the 48-frame audit sheets and the re-recorded knife video were reviewed. Offline captures were wall-limited to 30 rendered FPS; the existing 60/15 FPS play/background caps remain in place.
+
+
+### Follow-up: moderated entry, upright hold and HD materials
+
+At the user's request, the elbow direction now blends halfway between the authored direction and the previous outward direction, then normalizes to retain the 0.4 m forearm length. This supersedes the full outward placement described above. Wrist position and hand-relative knife attachment remain fixed. A 15-degree wrist rotation lifts the resting blade; it eases away during stab extension and returns during recovery.
+
+The supplied Cleatimus_Hand_Texture_Pack_HD.zip replaces the generated speckled textures: its original base-colour/roughness atlases and README are retained in weapons/knife/textures/cleatimus_hd/. The builder regenerates the active atlas/material/mesh; the pack's original PSX assets are untouched. The watch uses the supplied 4:20 tile. White procedural flecks have been removed.
+
+Fresh Compatibility captures and all 48 audit samples were inspected after the halfway adjustment. The updated viewmodel suite has 12 checks covering grip, length, moderated entry, upright hold and active HD materials, alongside the unchanged gameplay suites. The refreshed knife film is encoded to docs/video/knife_kill.mp4.

@@ -1,12 +1,14 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
 
-[ext_resource type="Shader" path="res://weapons/knife/arms_viewmodel.gdshader" id="1_udsu7"]
-[ext_resource type="Texture2D" path="res://weapons/knife/cleatimus_arms_atlas.res" id="2_n38e8"]
+[ext_resource type="Shader" path="res://weapons/knife/arms_viewmodel.gdshader" id="1_yy0em"]
+[ext_resource type="Texture2D" path="res://weapons/knife/cleatimus_arms_atlas.res" id="2_cnsuw"]
+[ext_resource type="Texture2D" path="res://weapons/knife/textures/cleatimus_hd/hands_roughness.png" id="3_io1b7"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_udsu7")
+shader = ExtResource("1_yy0em")
 shader_parameter/regions = true
 shader_parameter/watch_face = false
 shader_parameter/tint = Color(1, 1, 1, 1)
-shader_parameter/albedo_tex = ExtResource("2_n38e8")
+shader_parameter/albedo_tex = ExtResource("2_cnsuw")
+shader_parameter/roughness_tex = ExtResource("3_io1b7")
