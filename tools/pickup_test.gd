@@ -75,7 +75,11 @@ func _run() -> void:
 			ys.append(p.global_position.y)
 		var turned := absf(wrapf(p.rotation.y - r0, -PI, PI))
 		check(turned > 1.0 and turned < 2.5, "it spins (%.1f rad in 1 s)" % turned)
-		check(ys.max() - ys.min() > 0.03, "and bobs (%.2f m)" % (ys.max() - ys.min()))
+		# Observe a full bob cycle (~2.86 s), independent of random phase.
+		for i in 120:
+			await physics_frame
+			ys.append(p.global_position.y)
+		check(ys.max() - ys.min() > float(p.bob) * 1.8, "and bobs (%.2f m)" % (ys.max() - ys.min()))
 		var light := p.get_node("Glow") as OmniLight3D
 		check(light != null and light.light_color.is_equal_approx(Palette.AMBER_GLOW) and light.light_energy > 0.3 and light.light_energy < 1.2, "with a soft orange glow (energy %.2f)" % (light.light_energy if light else 0.0))
 		var mi := p.get_node("Mesh") as MeshInstance3D
