@@ -149,7 +149,7 @@ func _on_player_died() -> void:
 	_hud["dead"].visible = true
 
 func _update_weapon() -> void:
-	var names := ["1  PISTOL (placeholder)", "2  KNIFE"]
+	var names := ["1  PISTOL (placeholder)", "2  KNIFE", "3  DAGGER (alt hand)"]
 	_hud["weapon"].text = names[player.weapon_index] if player.weapon_index < names.size() else ""
 
 func _update_wave_hud() -> void:
@@ -179,7 +179,7 @@ func _build_hud() -> void:
 	cross.pivot_offset = cross.size * 0.5
 	layer.add_child(cross)
 	var help := Label.new()
-	help.text = "WASD move · Shift sprint · Space jump · 1/2 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn Shambler · X spawn Scuttler · R restart · L labels · Esc mouse"
+	help.text = "WASD move · Shift sprint · Space jump · 1/2/3 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn Shambler · X spawn Scuttler · R restart · L labels · Esc mouse"
 	help.add_theme_font_size_override("font_size", 13)
 	help.add_theme_color_override("font_color", Color("#E9E1D1", 0.6))
 	help.position = Vector2(16, 12)

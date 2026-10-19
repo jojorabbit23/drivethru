@@ -3,6 +3,7 @@
 # Draw the knife, two slashes and a stab finish a Shambler in the kitchen.
 extends SceneTree
 
+var slot := 1
 var main: Node3D
 var player: CharacterBody3D
 var knife: Node
@@ -22,7 +23,10 @@ func _setup() -> void:
 	# Deterministic captures: desktop mouse movement must not steer the camera.
 	player.set_process_unhandled_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	knife = player.get_node("Head/Camera3D/Knife")
+	# -- --dagger films the alternative hand (slot 3)
+	var dagger := "--dagger" in OS.get_cmdline_user_args()
+	knife = player.get_node("Head/Camera3D/Dagger" if dagger else "Head/Camera3D/Knife")
+	slot = 2 if dagger else 1
 	player.global_position = Vector3(0.9, 0.05, -1.4)
 	player.rotation.y = -PI / 2.0
 	z = main.spawn_zombie(main.get_node("ShopGreybox/Windows/Window_A"))
@@ -49,7 +53,7 @@ func _tick() -> void:
 		var head: Node3D = player.get_node("Head")
 		head.rotation.x = lerpf(head.rotation.x, atan2(dir.y, Vector2(dir.x, dir.z).length()), 0.2)
 	if once("draw", 0.6):
-		player.switch_weapon(1)
+		player.switch_weapon(slot)
 	var close := z.global_position.distance_to(player.global_position) < 1.75
 	if close and not done.has("s1"):
 		done["s1"] = t

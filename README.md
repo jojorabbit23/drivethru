@@ -250,7 +250,9 @@ Rebuild with `godot --headless --path . --script res://tools/build_knife_viewmod
 
 The knife, arms and watch all use the same view-space depth shrink (same screen position at a tenth of the depth), with shadow casting off. The required Compatibility renders, including the close-wall stab, are in `docs/previews/knife0_draw.png` through `knife7_stab_into_wall.png`. Run `tools/capture_knife.gd` to refresh them. Its optional `-- --audit` captures every source frame of draw/stab and 30 Hz slash samples; set `KNIFE_AUDIT_DIR` to choose the output folder.
 
-**Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol and slot 2 is the knife; the HUD shows the current one, bottom right.
+**Alternative to compare (slot 3, key 3): DAGGER (alt hand).** This is the same knife gameplay script on a second viewmodel, `weapons/knife/dagger_viewmodel.tscn`. It keeps the sculpt's *own* dagger in its own hand: the fingers were sculpted round it, so nothing is cut or refitted, and the dagger keeps the sculpt's painted colours. The arm, sleeve, rig, wrist pre-bend and blocky treatment match the knife hand. Both are built by `tools/build_knife_viewmodel.gd`. Renders are `docs/previews/dagger*.png` (`capture_knife.gd -- --dagger`) and the film is `docs/video/dagger_kill.mp4` (`film_knife.gd -- --dagger`). To keep only one, delete the other node from `player/player.tscn`.
+
+**Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol, slot 2 is the knife and slot 3 is the dagger alternative; the HUD shows the current one, bottom right.
 
 **Shared hit test** (`core/hitscan.gd`): walls and boards block everything, then a head hitbox wins over a body. Both the pistol and the knife use it. It also fixes headshots against a hunched zombie, whose movement capsule wraps round its head.
 

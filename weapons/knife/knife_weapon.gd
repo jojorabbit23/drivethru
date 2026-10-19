@@ -12,7 +12,9 @@ extends Node3D
 signal hit(target: Node, headshot: bool, killed: bool)
 signal swung(kind: String)
 
-const VIEWMODEL := preload("res://weapons/knife/knife_viewmodel.tscn")
+# Which hand + blade to show. Same gameplay either way: knife_viewmodel.tscn
+# (our survival knife) or dagger_viewmodel.tscn (the sculpt's own dagger).
+@export var viewmodel: PackedScene = preload("res://weapons/knife/knife_viewmodel.tscn")
 const VIEW_OFFSET := Vector3(0.0, -0.015, -0.025)
 # Blend the authored elbow halfway toward the right while retaining the grip.
 const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
@@ -74,7 +76,7 @@ var _bob_t := 0.0
 @onready var camera: Camera3D = get_parent()
 
 func _ready() -> void:
-	_pivot = VIEWMODEL.instantiate()
+	_pivot = viewmodel.instantiate()
 	_pivot.name = "Pivot"
 	add_child(_pivot)
 	_arms_anim = _pivot.find_child("AnimationPlayer", true, false) as AnimationPlayer

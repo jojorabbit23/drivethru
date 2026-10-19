@@ -40,6 +40,7 @@ const DEFAULT_BINDINGS := {
 	"interact": [KEY_E],
 	"weapon_1": [KEY_1],
 	"weapon_2": [KEY_2],
+	"weapon_3": [KEY_3],
 }
 
 signal weapon_changed(index: int, weapon: Node)
@@ -84,6 +85,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		switch_weapon(0)
 	elif event.is_action_pressed("weapon_2"):
 		switch_weapon(1)
+	elif event.is_action_pressed("weapon_3"):
+		switch_weapon(2)
 	elif event is InputEventMouseButton and event.pressed and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
 		if not weapons.is_empty():
 			var step := 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1

@@ -52,8 +52,16 @@ func build() -> void:
  var mat := material(texture,true)
  ResourceSaver.save(mat,OUT + "cleatimus_arms_material.tres")
  mat.take_over_path(OUT + "cleatimus_arms_material.tres")
+ var error: Error = assemble(false, texture, mat)
+ if error == OK:
+  error = assemble(true, texture, mat)
+ quit(error)
+
+# keep_dagger = false: our survival knife in the derived hand -> knife_viewmodel.tscn
+# keep_dagger = true: the sculpt's own dagger in its own hand -> dagger_viewmodel.tscn
+func assemble(keep_dagger: bool, texture: Texture2D, mat: Material) -> Error:
  var scene := Node3D.new()
- scene.name = "KnifeViewmodel"
+ scene.name = "DaggerViewmodel" if keep_dagger else "KnifeViewmodel"
  var arms: Node3D = load(SOURCE).instantiate()
  arms.scene_file_path = "" # Flatten before packing; avoid duplicating inherited children.
  arms.name = "Arms"
@@ -97,8 +105,11 @@ func build() -> void:
    surface.add_vertex(vertices[i])
  var recoloured: ArrayMesh = surface.commit()
  recoloured.surface_set_material(0,mat)
- ResourceSaver.save(recoloured,OUT + "cleatimus_arms_mesh.res")
- recoloured.take_over_path(OUT + "cleatimus_arms_mesh.res")
+ if keep_dagger:
+  recoloured = load(OUT + "cleatimus_arms_mesh.res") # identical; share the knife build's copy
+ else:
+  ResourceSaver.save(recoloured,OUT + "cleatimus_arms_mesh.res")
+  recoloured.take_over_path(OUT + "cleatimus_arms_mesh.res")
  mesh.mesh = recoloured
  mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
  var socket := BoneAttachment3D.new()
@@ -115,7 +126,9 @@ func build() -> void:
  knife.scene_file_path = ""
  knife.name = "Model"
  grip.add_child(knife)
- var hand_info: Dictionary = build_right_hand(arms, skeleton, grip, knife, mat)
+ var hand_info: Dictionary = build_right_hand(arms, skeleton, grip, knife, mat, keep_dagger)
+ if keep_dagger:
+  knife.free() # only its frame was needed; the sculpt's dagger is the blade
  var watch := BoneAttachment3D.new()
  watch.name = "LeftWatch"
  skeleton.add_child(watch)
@@ -144,10 +157,11 @@ func build() -> void:
  own(scene,scene)
  var packed := PackedScene.new()
  packed.pack(scene)
- var error: Error = ResourceSaver.save(packed,OUT + "knife_viewmodel.tscn")
- print("Knife viewmodel saved: ",error,"; bones=",skeleton.get_bone_count(),"; supplied dagger removed; our knife only")
+ var out_path := OUT + ("dagger_viewmodel.tscn" if keep_dagger else "knife_viewmodel.tscn")
+ var error: Error = ResourceSaver.save(packed,out_path)
+ print(out_path, " saved: ",error,"; bones=",skeleton.get_bone_count(),"; ", "the sculpt's own dagger" if keep_dagger else "supplied dagger removed; our knife only")
  scene.free()
- quit(error)
+ return error
 
 # Handle cross-section of OUR knife, in knife space, between guard and pommel.
 func handle_profile(knife: Node3D) -> Array:
@@ -187,7 +201,7 @@ func handle_profile(knife: Node3D) -> Array:
 # Builds the sculpted right hand, skinned to hand_r (fist) and lowerarm_r
 # (sleeve), blended across the cuff. Returns metadata knife_weapon.gd uses to
 # place the forearm about the sculpt's own wrist.
-func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: Node3D, mat: Material) -> Dictionary:
+func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: Node3D, mat: Material, keep_dagger := false) -> Dictionary:
  var anim: AnimationPlayer = arms.find_child("AnimationPlayer", true, false)
  anim.play("kitchen_knife_idle", 0.0)
  anim.seek(0.0, true)
@@ -210,7 +224,7 @@ func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: N
  var idle_dir: Vector3 = (arm0.origin - hand0.origin).normalized().slerp(eye_dir, 0.5).normalized()
  # ...seen from the turned hand, then put back into the unturned bind pose
  var bind_dir: Vector3 = hand0.basis * ((turn * hand0.basis).inverse() * idle_dir)
- var fit: Dictionary = HandMesh.build(face_dir.normalized(), handle_profile(knife), knife0.basis.inverse() * bind_dir)
+ var fit: Dictionary = HandMesh.build(face_dir.normalized(), handle_profile(knife), knife0.basis.inverse() * bind_dir, keep_dagger)
  var wrist: Vector3 = knife0 * (fit["wrist"] as Vector3)
  var out_dir: Vector3 = (knife0.basis * (fit["forearm"] as Vector3)).normalized()
  # lowerarm bind frame: Y runs elbow -> wrist, no twist relative to the hand
@@ -248,8 +262,9 @@ func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: N
  var mesh := ArrayMesh.new()
  mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
  mesh.surface_set_material(0, mat)
- ResourceSaver.save(mesh, OUT + "cleatimus_right_hand_mesh.res")
- mesh.take_over_path(OUT + "cleatimus_right_hand_mesh.res")
+ var mesh_path := OUT + ("cleatimus_dagger_hand_mesh.res" if keep_dagger else "cleatimus_right_hand_mesh.res")
+ ResourceSaver.save(mesh, mesh_path)
+ mesh.take_over_path(mesh_path)
  var skin := Skin.new()
  skin.add_named_bind("hand_r", hand0.affine_inverse())
  skin.add_named_bind("lowerarm_r", arm_bind.affine_inverse())

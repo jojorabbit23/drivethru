@@ -21,7 +21,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    - `levels/shop/generated/*`, `materials/*.tres`: `tools/build_shop.gd`
    - `enemies/shambler/shambler_model.tscn` and `shambler_*`: `tools/build_zombie.gd`
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
-   - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`, `cleatimus_right_hand_mesh.res`: `tools/build_knife_viewmodel.gd` (hand fit in `tools/knife_hand_mesh.gd`)
+   - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`, `cleatimus_right_hand_mesh.res`, `dagger_viewmodel.tscn`, `cleatimus_dagger_hand_mesh.res`: `tools/build_knife_viewmodel.gd` (hand fit in `tools/knife_hand_mesh.gd`)
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
@@ -75,4 +75,4 @@ head hitboxes) · 5 player_clip.
 
 Weapons are children of `Player/Head/Camera3D` that implement
 `set_active(on: bool)`. The player collects them in order (slot 1 = pistol,
-slot 2 = knife).
+slot 2 = knife, slot 3 = dagger alternative using the same knife script).

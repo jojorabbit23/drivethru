@@ -12,7 +12,8 @@ void vertex() {
 }
 void fragment() {
  vec2 uv = UV;
- if (regions) {
+ bool native = regions && floor(UV2.x + 0.5) > 3.5; // vertex colour is the albedo
+ if (regions && !native) {
   float kind = floor(UV2.x + 0.5);
   // Mesh regions: sleeve / cuff / glove / skin. HD atlas: glove / sleeve / cuff / skin.
   float tile = kind < 0.5 ? 1.0 : (kind < 1.5 ? 2.0 : (kind < 2.5 ? 0.0 : 3.0));
@@ -21,7 +22,7 @@ void fragment() {
  } else if (watch_face) {
   uv = vec2(0.75, 0.5) + UV * vec2(0.25, 0.5);
  }
- bool textured = regions || watch_face;
+ bool textured = (regions && !native) || watch_face;
  vec3 base = textured ? texture(albedo_tex, uv).rgb : vec3(1.0);
  ALBEDO = base * COLOR.rgb * tint.rgb;
  ROUGHNESS = textured ? texture(roughness_tex, uv).r : 0.88;

@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://player/test_gun.gd" id="2_gun"]
 [ext_resource type="Script" path="res://weapons/knife/knife_weapon.gd" id="3_knife"]
+[ext_resource type="PackedScene" path="res://weapons/knife/dagger_viewmodel.tscn" id="4_dagger"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.35
@@ -32,3 +33,7 @@ script = ExtResource("2_gun")
 
 [node name="Knife" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("3_knife")
+
+[node name="Dagger" type="Node3D" parent="Head/Camera3D"]
+script = ExtResource("3_knife")
+viewmodel = ExtResource("4_dagger")

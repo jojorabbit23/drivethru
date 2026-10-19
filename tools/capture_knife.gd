@@ -6,6 +6,7 @@ const OUT := "res://docs/previews/"
 var main: Node3D
 var player: CharacterBody3D
 var knife: Node
+var prefix := "knife"
 
 func _initialize() -> void:
 	_run.call_deferred()
@@ -16,7 +17,7 @@ func wait(frames: int) -> void:
 
 func snap(name: String) -> void:
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path(OUT + name + ".png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path(OUT + name.replace("knife", prefix) + ".png"))
 	print("saved ", name)
 
 func _run() -> void:
@@ -28,11 +29,14 @@ func _run() -> void:
 	# Deterministic captures: desktop mouse movement must not steer the camera.
 	player.set_process_unhandled_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	knife = player.get_node("Head/Camera3D/Knife")
+	# -- --dagger renders the alternative hand (slot 3) as dagger*.png
+	var dagger := "--dagger" in OS.get_cmdline_user_args()
+	knife = player.get_node("Head/Camera3D/Dagger" if dagger else "Head/Camera3D/Knife")
+	prefix = "dagger" if dagger else "knife"
 	await wait(5)
 	player.global_position = Vector3(1.4, 0.05, -1.4)
 	player.rotation.y = -PI / 2.0
-	player.switch_weapon(1)
+	player.switch_weapon(2 if dagger else 1)
 	await wait(12)
 	await snap("knife0_draw")
 	await wait(18)
@@ -92,5 +96,5 @@ func audit_grip() -> void:
 				knife._sample_clip("kitchen_knife_" + clip,time)
 				knife._set_pose(knife.REST_POS,knife.REST_ROT)
 			await RenderingServer.frame_post_draw
-			root.get_texture().get_image().save_png(directory.path_join("%s_%02d.png" % [clip,i]))
+			root.get_texture().get_image().save_png(directory.path_join("%s_%s_%02d.png" % [prefix,clip,i]))
 	print("Grip audit saved to ",directory)

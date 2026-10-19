@@ -313,3 +313,12 @@ Brief: `Claude_Knife_Hand_Handoff.zip` / BRIEF.md. The reference shot is kept as
 ### Follow-up: slightly blockier knife and hand
 
 At the owner's request both meshes are now a little lower-poly and faceted, to match the voxel Shambler. `tools/blocky_mesh.gd` welds per-corner data, simplifies with Godot's meshoptimizer LODs (`ImporterMesh.generate_lods`, taking the LOD closest to half the triangles) and flat-shades each triangle. LOD steps are coarse, so the knife landed at 3,264 of 9,680 triangles and the hand at 4,384 of 6,898. UVs and skin weights are untouched, since the LODs only drop vertices. The handle fit is measured from the simplified knife, so the grip still closes on it. Captures, all 48 audit poses and the re-filmed `knife_kill.mp4` were inspected, and all suites pass.
+
+
+### Follow-up: dagger alternative for comparison
+
+The owner re-sent `knife_3d_model.glb` and `dagger_3d_model.glb`. They are byte-identical (MD5) to the existing `weapons/knife/source/knife_3d_model.glb` and `reference_hand_with_dagger.glb`. The meaningful alternative is therefore to keep the sculpt's own dagger rather than fit our knife.
+
+`knife_hand_mesh.build(..., keep_dagger = true)` cuts nothing and opens no channel. It maps the blade axis (not the 22°-off handle axis) to the weapon's -Z, with the fist centre (s = -0.46) on the grip, at a uniform scale of 0.29 (dagger about 26 cm). The dagger triangles get region 4 (NATIVE): the arms shader uses their vertex colour, sampled from the sculpt texture and linearised, as albedo. Everything else matches the knife hand: sleeve, pre-bend (42° here), skinning and blocky simplification (9,392 → 4,776 triangles).
+
+The result is `dagger_viewmodel.tscn`, slot 3 ("3 DAGGER (alt hand)"). It uses the same `knife_weapon.gd`, with `viewmodel` now an export. Its wrist bend over all native frames is the same as the knife's, because both are pre-bent to the same idle direction. All 48 audit poses were inspected, and `knife_viewmodel_test.gd` checks the alternative keeps its own blade and uses the knife script. All suites pass.
