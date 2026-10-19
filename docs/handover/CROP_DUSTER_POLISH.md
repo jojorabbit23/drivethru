@@ -16,3 +16,9 @@ Animation corrections:
 Verification: all required import/game suites plus pistol/knife viewmodel checks pass. The Crop Duster suite now has 27 passing checks, including queued recovery timing, preserving an unfired shell, both palm-to-shell contacts and interrupted holster continuity. New/edited GDScript passes check-only.
 
 Fresh Compatibility captures and the 9.5-second paced shotgun film were rendered and inspected. crop_bulk_comparison.png compares the previous geometry with the thicker version. docs/video/crop_duster.mp4 is the current detailed shotgun demonstration; the earlier combined loadout video predates this polish. Visual checks are sampled rather than a proof of every continuous mesh intersection.
+
+## Video reference follow-up
+
+Used the supplied videoplayback.mp4 as a handling reference: lower ready position, restrained breathing, a fixed stock-hand pose during reload, and an eased turn to expose the action. The pump pack's bottom-fed reload wrist motion is no longer sampled for this break-action weapon; the existing mechanical clip and palm-anchored shell path are retained. The left arm leaves the fore-end earlier and returns later, with a stronger lower-left elbow constraint. The reload turn eases in over 0.55 s and returns over the final 0.60 s. Ammo transfers (1.9/2.4 s), reload duration, firing and partial reload rules remain unchanged.
+
+Verified import, script parse, validate, movement, zombie, ooze, knife, knife viewmodel, pistol and 27 shotgun checks: all pass. Rendered and inspected ready/reload poses and a decoded frame of the refreshed 9.5 s crop_duster.mp4; also rendered the knife capture. This adapts the reference's handling to our existing rig and sequential shell clip, rather than reproducing its paired-shell hand pose exactly.

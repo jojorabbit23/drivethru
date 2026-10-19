@@ -228,8 +228,10 @@ func _pose(_delta: float) -> void:
   clip="draw"
   sample=clampf(clock/DRAW_TIME,0.0,1.0)*_arms_anim.get_animation(clip).length
  elif state=="reload":
-  clip="reload"
-  sample=clampf(clock/RELOAD_TIME,0.0,1.0)*2.0
+  # The reference keeps the stock hand planted throughout the break-action reload.
+  # The pack reload is for a bottom-fed pump gun; its wrist motion fights this gun.
+  clip="idle"
+  sample=0.0
  elif state=="inspect":
   clip="inspect"
   sample=clampf(clock/3.2,0.0,1.0)*3.2
@@ -241,9 +243,13 @@ func _pose(_delta: float) -> void:
  _left_forearm.transform=Transform3D.IDENTITY
  _arms_anim.play(clip,0.0)
  _arms_anim.seek(sample,true)
- var reload_weight: float=smoothstep(0.0,0.4,reload_t)*(1.0-smoothstep(2.95,3.4,reload_t))
- _pivot.position=Vector3(-sway.x,sway.y-0.075,-0.10)+Vector3(-0.02,-0.02,0.0)*reload_weight
- _pivot.rotation=Vector3(0.25,0.40,-0.10)*reload_weight
+ var reload_weight: float=smoothstep(0.0,0.55,reload_t)*(1.0-smoothstep(2.80,3.4,reload_t))
+ # Lower ready pose leaves more of the centre clear, as in the video.
+ var settle: float=(1.0-reload_weight)*(1.0-aim_weight)*clampf(1.0-recoil,0.0,1.0)
+ var breath: float=sin(idle_time*1.7)*0.0015*settle
+ _pivot.position=Vector3(-sway.x,sway.y-0.115+breath,-0.10)+Vector3(-0.035,0.015,0.015)*reload_weight
+ # Roll the breech towards the player while keeping the right wrist fixed to the stock.
+ _pivot.rotation=Vector3(0.12,0.62,-0.30)*reload_weight
  var anchor:=Vector3(0.20,-0.20,-0.50)
  _pivot.position+=anchor-_pivot.basis*anchor+Vector3(0,0.02,0)*reload_weight
  _gun_anim.play("reload_empty" if state=="reload" else "idle",0.0)
@@ -267,7 +273,7 @@ func _pose(_delta: float) -> void:
   var shell_r: Vector3=_shell_grip_point(1)
   if not _reload_plan[0]: shell_l=Vector3(-0.12,-0.10,-0.12)
   if not _reload_plan[1]: shell_r=moving
-  var keys: Array=[ [0.0,moving],[0.45,moving],[0.85,Vector3(-0.13,0.11,-0.08)],[1.35,Vector3(-0.12,-0.10,-0.12)],[1.75,shell_l],[1.95,shell_l],[2.12,Vector3(-0.12,-0.10,-0.12)],[2.28,shell_r],[2.45,shell_r],[2.7,moving],[3.4,moving] ]
+  var keys: Array=[ [0.0,moving],[0.30,moving],[0.70,Vector3(-0.13,0.11,-0.08)],[1.25,Vector3(-0.12,-0.10,-0.12)],[1.75,shell_l],[1.95,shell_l],[2.12,Vector3(-0.12,-0.10,-0.12)],[2.28,shell_r],[2.45,shell_r],[2.85,moving],[3.4,moving] ]
   for i in keys.size()-1:
    if reload_t<=float(keys[i+1][0]):
     var u: float=smoothstep(float(keys[i][0]),float(keys[i+1][0]),reload_t)
@@ -277,10 +283,10 @@ func _pose(_delta: float) -> void:
  _left_hand.global_basis=_gun.global_basis.orthonormalized()*(hinge.basis*rest.basis.inverse()).orthonormalized()*_support_basis_in_gun
  _left_hand.global_position=_gun.to_global(left_point)-_left_hand.global_basis*_grip_in_hand
  # Keep the sleeve coming from below-left instead of following the barrel's full tilt.
- var elbow: Vector3=camera.to_global(Vector3(-0.36,-0.50,0.05))
+ var elbow: Vector3=camera.to_global(Vector3(-0.48,-0.55,0.05))
  var direction: Vector3=_left_hand.global_basis.inverse()*(elbow-_left_hand.global_position).normalized()
  var turn:=Quaternion(_forearm_direction,direction.normalized())
- _left_forearm.quaternion=Quaternion.IDENTITY.slerp(turn,0.65)
+ _left_forearm.quaternion=Quaternion.IDENTITY.slerp(turn,0.90)
  var sight: Vector3=camera.to_local(_gun.to_global(Vector3(0,0.36,-0.02)))
  _pivot.position+=Vector3(-sight.x,-sight.y-0.015,0)*aim_weight
  _update_shell_visibility()
