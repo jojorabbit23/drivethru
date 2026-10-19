@@ -1,39 +1,39 @@
-[gd_scene load_steps=91 format=4]
+[gd_scene load_steps=92 format=4]
 
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Receiver_albedo.png" id="1_xq37m"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_ReceiverTop_albedo.png" id="2_6j78t"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_EjectionPort_albedo.png" id="3_lhkgr"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_LoadingPort_albedo.png" id="4_17quq"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Barrel_albedo.png" id="5_qjhd2"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Muzzle_albedo.png" id="6_0ebn6"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_MagTube_albedo.png" id="7_uu26i"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_MagCap_albedo.png" id="8_13bqp"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_BarrelBand_albedo.png" id="9_whcug"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Bead_albedo.png" id="10_o71gc"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_TriggerGuard_albedo.png" id="11_jn213"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_TriggerGuardFront_albedo.png" id="12_isckh"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Trigger_albedo.png" id="13_7tq60"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Grip_albedo.png" id="14_ecu5x"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Stock_albedo.png" id="15_ge1lr"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_ButtPad_albedo.png" id="16_opk0i"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Fore_albedo.png" id="17_di7uf"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib0_albedo.png" id="18_ph0cv"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib1_albedo.png" id="19_gai0w"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib2_albedo.png" id="20_u4qas"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib3_albedo.png" id="21_g2d2v"]
-[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib4_albedo.png" id="22_l4vu3"]
-[ext_resource type="ArrayMesh" path="res://weapons/shotgun/shotgun_hand_l.res" id="23_0q875"]
-[ext_resource type="ArrayMesh" path="res://weapons/shotgun/shotgun_hand_r.res" id="24_smpb0"]
+[ext_resource type="Shader" path="res://weapons/shotgun/viewmodel.gdshader" id="1_xmg1r"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Receiver_albedo.png" id="2_vilko"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_ReceiverTop_albedo.png" id="3_eq0li"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_EjectionPort_albedo.png" id="4_8isve"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_LoadingPort_albedo.png" id="5_vhx8r"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Barrel_albedo.png" id="6_xe6fn"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Muzzle_albedo.png" id="7_j32bm"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_MagTube_albedo.png" id="8_5dmgg"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_MagCap_albedo.png" id="9_ju0ao"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_BarrelBand_albedo.png" id="10_b3c88"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Bead_albedo.png" id="11_1ijm0"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_TriggerGuard_albedo.png" id="12_ia3iv"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_TriggerGuardFront_albedo.png" id="13_l28hs"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Trigger_albedo.png" id="14_q7g76"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Grip_albedo.png" id="15_ud8ej"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Stock_albedo.png" id="16_bnu5q"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_ButtPad_albedo.png" id="17_vqygd"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Fore_albedo.png" id="18_rckuv"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib0_albedo.png" id="19_1bpbc"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib1_albedo.png" id="20_68syq"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib2_albedo.png" id="21_strra"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib3_albedo.png" id="22_fh0c7"]
+[ext_resource type="Texture2D" path="res://weapons/shotgun/source/Shotgun_Survivor_Skin_Rib4_albedo.png" id="23_8s5dh"]
+[ext_resource type="ArrayMesh" path="res://weapons/shotgun/shotgun_hand_l.res" id="24_64lx6"]
+[ext_resource type="ArrayMesh" path="res://weapons/shotgun/shotgun_hand_r.res" id="25_xwh6c"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_36yqa"]
-resource_name = "Receiver_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("1_xq37m")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lli7i"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("2_vilko")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_wdwe8"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_r0g3b"]
 _surfaces = [{
 "aabb": AABB(-0.026, -0.037, -0.115, 0.052, 0.074, 0.23),
 "format": 34896613377,
@@ -47,7 +47,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_ciim4"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_tt3fp"]
 resource_name = "Shotgun_Survivor_Skin_mesh"
 _surfaces = [{
 "aabb": AABB(-0.026, -0.037, -0.115, 0.052, 0.074, 0.23),
@@ -55,7 +55,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_36yqa"),
+"material": SubResource("ShaderMaterial_lli7i"),
 "name": "Receiver_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -63,17 +63,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_wdwe8")
+shadow_mesh = SubResource("ArrayMesh_r0g3b")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cfg8o"]
-resource_name = "ReceiverTop_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("2_6j78t")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mtbaq"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("3_eq0li")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_p51vr"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_ktu50"]
 _surfaces = [{
 "aabb": AABB(-0.02, -0.005, -0.105, 0.04, 0.01, 0.21),
 "format": 34896613377,
@@ -87,7 +86,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_x31wq"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_ksraq"]
 resource_name = "Shotgun_Survivor_Skin_mesh2"
 _surfaces = [{
 "aabb": AABB(-0.02, -0.005, -0.105, 0.04, 0.01, 0.21),
@@ -95,7 +94,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_cfg8o"),
+"material": SubResource("ShaderMaterial_mtbaq"),
 "name": "ReceiverTop_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -103,17 +102,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_p51vr")
+shadow_mesh = SubResource("ArrayMesh_ktu50")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2wlr4"]
-resource_name = "EjectionPort_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("3_lhkgr")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_npfne"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("4_8isve")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_qs41b"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_rt31r"]
 _surfaces = [{
 "aabb": AABB(-0.002, -0.013, -0.035, 0.004, 0.026, 0.07),
 "format": 34896613377,
@@ -127,7 +125,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_033p6"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_a7uub"]
 resource_name = "Shotgun_Survivor_Skin_mesh3"
 _surfaces = [{
 "aabb": AABB(-0.002, -0.013, -0.035, 0.004, 0.026, 0.07),
@@ -135,7 +133,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_2wlr4"),
+"material": SubResource("ShaderMaterial_npfne"),
 "name": "EjectionPort_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -143,17 +141,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_qs41b")
+shadow_mesh = SubResource("ArrayMesh_rt31r")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n7ckm"]
-resource_name = "LoadingPort_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("4_17quq")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u4juf"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("5_vhx8r")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_lntsx"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_yvm4d"]
 _surfaces = [{
 "aabb": AABB(-0.017, -0.002, -0.04, 0.034, 0.004, 0.08),
 "format": 34896613377,
@@ -167,7 +164,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1knkm"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_yyxrr"]
 resource_name = "Shotgun_Survivor_Skin_mesh4"
 _surfaces = [{
 "aabb": AABB(-0.017, -0.002, -0.04, 0.034, 0.004, 0.08),
@@ -175,7 +172,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_n7ckm"),
+"material": SubResource("ShaderMaterial_u4juf"),
 "name": "LoadingPort_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -183,17 +180,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_lntsx")
+shadow_mesh = SubResource("ArrayMesh_yvm4d")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pslxc"]
-resource_name = "Barrel_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("5_qjhd2")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_26l76"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("6_xe6fn")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_31xqp"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_3rrw1"]
 _surfaces = [{
 "aabb": AABB(-0.0155, -0.26, -0.0155, 0.031, 0.52, 0.031),
 "format": 34896613377,
@@ -208,7 +204,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_gk4ta"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_lm1p8"]
 resource_name = "Shotgun_Survivor_Skin_mesh5"
 _surfaces = [{
 "aabb": AABB(-0.0155, -0.26, -0.0155, 0.031, 0.52, 0.031),
@@ -217,7 +213,7 @@ _surfaces = [{
 "index_count": 144,
 "index_data": PackedByteArray("CQAAAAEACQABAAoACgABAAIACgACAAsACwACAAMACwADAAwADAADAAQADAAEAA0ADQAEAAUADQAFAA4ADgAFAAYADgAGAA8ADwAGAAcADwAHABAAEAAHAAgAEAAIABEAEgAJAAoAEgAKABMAEwAKAAsAEwALABQAFAALAAwAFAAMABUAFQAMAA0AFQANABYAFgANAA4AFgAOABcAFwAOAA8AFwAPABgAGAAPABAAGAAQABkAGQAQABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAJwAlACYAKAAlACcAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"),
 "lods": [0.00424957, PackedByteArray("CQAAAAEAEgAJAAEAEgABABQAFAABAAIAFAACAAMAFAADABUAFQADAAQAFQAEABYAFgAEAAUAFgAFABcAFwAFAAYAFwAGABgAGAAGAAcAGAAHABkAGQAHABEABwAIABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAKAAlACYAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"), 0.0145495, PackedByteArray("CQAAAAMAEgAJAAMAEgADABQAFAADABYAFgADAAUAFgAFABgAGAAFABEABQAIABEAGAARABoAHAAbAB8AHwAbACEAIQAbACQAKAAlACYAKgAlACgALAAlACoALgAlACwA")],
-"material": SubResource("StandardMaterial3D_pslxc"),
+"material": SubResource("ShaderMaterial_26l76"),
 "name": "Barrel_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -225,17 +221,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("/3//////AICB2v//gdr/n///////f/+/gdr//30l/9//f///AAD//30l//99Jf/fAAD///9//799Jf//gdr/n/9//////wCA/3//f///AICB2v9/gdr/n////3//f/+/gdr/f30l/9//f/9/AAD//30l/399Jf/fAAD/f/9//799Jf9/gdr/n/9//3///wCA/38AAP//AICB2gAAgdr/n///AAD/f/+/gdoAAH0l/9//fwAAAAD//30lAAB9Jf/fAAAAAP9//799JQAAgdr/n/9/AAD//wCA/3////9//7//f///////v4Ha//+B2v+///////9//7+B2v//fSX/v/9///8AAP+/fSX//30l/78AAP///3//v30l//+B2v+//3///////7//fwAA/3//v/9/AAD///+/gdoAAIHa/7///wAA/3//v4HaAAB9Jf+//38AAAAA/799JQAAfSX/vwAAAAD/f/+/fSUAAIHa/7//fwAA////vwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/f/7//3/+//9//v//f/7//3/+//9//v//f/7//3/+//9//v//f/7//38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_31xqp")
+shadow_mesh = SubResource("ArrayMesh_3rrw1")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_675ml"]
-resource_name = "Muzzle_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("6_0ebn6")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0dvmp"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("7_j32bm")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_jidfh"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_yjddj"]
 _surfaces = [{
 "aabb": AABB(-0.018, -0.015, -0.018, 0.036, 0.03, 0.036),
 "format": 34896613377,
@@ -250,7 +245,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_cp8aj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_vs06n"]
 resource_name = "Shotgun_Survivor_Skin_mesh6"
 _surfaces = [{
 "aabb": AABB(-0.018, -0.015, -0.018, 0.036, 0.03, 0.036),
@@ -259,7 +254,7 @@ _surfaces = [{
 "index_count": 144,
 "index_data": PackedByteArray("CQAAAAEACQABAAoACgABAAIACgACAAsACwACAAMACwADAAwADAADAAQADAAEAA0ADQAEAAUADQAFAA4ADgAFAAYADgAGAA8ADwAGAAcADwAHABAAEAAHAAgAEAAIABEAEgAJAAoAEgAKABMAEwAKAAsAEwALABQAFAALAAwAFAAMABUAFQAMAA0AFQANABYAFgANAA4AFgAOABcAFwAOAA8AFwAPABgAGAAPABAAGAAQABkAGQAQABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAJwAlACYAKAAlACcAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"),
 "lods": [0.00367603, PackedByteArray("CQAAAAEAEgAJAAEAEgABABQAFAABAAIAFAACAAMAFAADABUAFQADAAQAFQAEABYAFgAEAAUAFgAFABcAFwAFAAYAFwAGABgAGAAGAAcAGAAHABkAGQAHABEABwAIABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAKAAlACYAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"), 0.0159378, PackedByteArray("CQAAAAMAEgAJAAMAEgADABQAFAADABYAFgADAAUAFgAFABgAGAAFABEABQAIABEAGAARABoAHAAbAB8AHwAbACEAIQAbACQAKAAlACYAKgAlACgALAAlACoALgAlACwA")],
-"material": SubResource("StandardMaterial3D_675ml"),
+"material": SubResource("ShaderMaterial_0dvmp"),
 "name": "Muzzle_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -267,17 +262,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("/3//////AICB2v//gdr/n///////f/+/gdr//30l/9//f///AAD//30l//99Jf/fAAD///9//799Jf//gdr/n/9//////wCA/3//f///AICB2v9/gdr/n////3//f/+/gdr/f30l/9//f/9/AAD//30l/399Jf/fAAD/f/9//799Jf9/gdr/n/9//3///wCA/38AAP//AICB2gAAgdr/n///AAD/f/+/gdoAAH0l/9//fwAAAAD//30lAAB9Jf/fAAAAAP9//799JQAAgdr/n/9/AAD//wCA/3////9//7//f///////v4Ha//+B2v+///////9//7+B2v//fSX/v/9///8AAP+/fSX//30l/78AAP///3//v30l//+B2v+//3///////7//fwAA/3//v/9/AAD///+/gdoAAIHa/7///wAA/3//v4HaAAB9Jf+//38AAAAA/799JQAAfSX/vwAAAAD/f/+/fSUAAIHa/7//fwAA////vwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/f/7//3/+//9//v//f/7//3/+//9//v//f/7//3/+//9//v//f/7//38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_jidfh")
+shadow_mesh = SubResource("ArrayMesh_yjddj")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwxeh"]
-resource_name = "MagTube_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("7_uu26i")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ic3nr"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("8_5dmgg")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_7r0yf"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_dnu7l"]
 _surfaces = [{
 "aabb": AABB(-0.013, -0.23, -0.013, 0.026, 0.46, 0.026),
 "format": 34896613377,
@@ -292,7 +286,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_ajvjj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_gyq07"]
 resource_name = "Shotgun_Survivor_Skin_mesh7"
 _surfaces = [{
 "aabb": AABB(-0.013, -0.23, -0.013, 0.026, 0.46, 0.026),
@@ -301,7 +295,7 @@ _surfaces = [{
 "index_count": 144,
 "index_data": PackedByteArray("CQAAAAEACQABAAoACgABAAIACgACAAsACwACAAMACwADAAwADAADAAQADAAEAA0ADQAEAAUADQAFAA4ADgAFAAYADgAGAA8ADwAGAAcADwAHABAAEAAHAAgAEAAIABEAEgAJAAoAEgAKABMAEwAKAAsAEwALABQAFAALAAwAFAAMABUAFQAMAA0AFQANABYAFgANAA4AFgAOABcAFwAOAA8AFwAPABgAGAAPABAAGAAQABkAGQAQABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAJwAlACYAKAAlACcAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"),
 "lods": [0.00357499, PackedByteArray("CQAAAAEAEgAJAAEAEgABABQAFAABAAIAFAACAAMAFAADABUAFQADAAQAFQAEABYAFgAEAAUAFgAFABcAFwAFAAYAFwAGABgAGAAGAAcAGAAHABkAGQAHABEABwAIABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAKAAlACYAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"), 0.0122095, PackedByteArray("CQAAAAMAEgAJAAMAEgADABQAFAADABYAFgADAAUAFgAFABgAGAAFABEABQAIABEAGAARABoAHAAbAB8AHwAbACEAIQAbACQAKAAlACYAKgAlACgALAAlACoALgAlACwA")],
-"material": SubResource("StandardMaterial3D_uwxeh"),
+"material": SubResource("ShaderMaterial_ic3nr"),
 "name": "MagTube_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -309,17 +303,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("/3//////AICB2v//gdr/n///////f/+/gdr//30l/9//f///AAD//30l//99Jf/fAAD///9//799Jf//gdr/n/9//////wCA/3//f///AICB2v9/gdr/n////3//f/+/gdr/f30l/9//f/9/AAD//30l/399Jf/fAAD/f/9//799Jf9/gdr/n/9//3///wCA/38AAP//AICB2gAAgdr/n///AAD/f/+/gdoAAH0l/9//fwAAAAD//30lAAB9Jf/fAAAAAP9//799JQAAgdr/n/9/AAD//wCA/3////9//7//f///////v4Ha//+B2v+///////9//7+B2v//fSX/v/9///8AAP+/fSX//30l/78AAP///3//v30l//+B2v+//3///////7//fwAA/3//v/9/AAD///+/gdoAAIHa/7///wAA/3//v4HaAAB9Jf+//38AAAAA/799JQAAfSX/vwAAAAD/f/+/fSUAAIHa/7//fwAA////vwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/f/7//3/+//9//v//f/7//3/+//9//v//f/7//3/+//9//v//f/7//38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_7r0yf")
+shadow_mesh = SubResource("ArrayMesh_dnu7l")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fc1u5"]
-resource_name = "MagCap_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("8_13bqp")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pfyph"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("9_ju0ao")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_0hl78"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_acpbw"]
 _surfaces = [{
 "aabb": AABB(-0.016, -0.015, -0.016, 0.032, 0.03, 0.032),
 "format": 34896613377,
@@ -334,7 +327,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_5wq2a"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_e8sve"]
 resource_name = "Shotgun_Survivor_Skin_mesh8"
 _surfaces = [{
 "aabb": AABB(-0.016, -0.015, -0.016, 0.032, 0.03, 0.032),
@@ -343,7 +336,7 @@ _surfaces = [{
 "index_count": 144,
 "index_data": PackedByteArray("CQAAAAEACQABAAoACgABAAIACgACAAsACwACAAMACwADAAwADAADAAQADAAEAA0ADQAEAAUADQAFAA4ADgAFAAYADgAGAA8ADwAGAAcADwAHABAAEAAHAAgAEAAIABEAEgAJAAoAEgAKABMAEwAKAAsAEwALABQAFAALAAwAFAAMABUAFQAMAA0AFQANABYAFgANAA4AFgAOABcAFwAOAA8AFwAPABgAGAAPABAAGAAQABkAGQAQABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAJwAlACYAKAAlACcAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"),
 "lods": [0.00332245, PackedByteArray("CQAAAAEAEgAJAAEAEgABABQAFAABAAIAFAACAAMAFAADABUAFQADAAQAFQAEABYAFgAEAAUAFgAFABcAFwAFAAYAFwAGABgAGAAGAAcAGAAHABkAGQAHABEABwAIABEAGQARABoAHAAbAB0AHQAbAB4AHgAbAB8AHwAbACAAIAAbACEAIQAbACIAIgAbACMAIwAbACQAKAAlACYAKQAlACgAKgAlACkAKwAlACoALAAlACsALQAlACwALgAlAC0A"), 0.0142168, PackedByteArray("CQAAAAMAEgAJAAMAEgADABQAFAADABYAFgADAAUAFgAFABgAGAAFABEABQAIABEAGAARABoAHAAbAB8AHwAbACEAIQAbACQAKAAlACYAKgAlACgALAAlACoALgAlACwA")],
-"material": SubResource("StandardMaterial3D_fc1u5"),
+"material": SubResource("ShaderMaterial_pfyph"),
 "name": "MagCap_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -351,17 +344,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("/3//////AICB2v//gdr/n///////f/+/gdr//30l/9//f///AAD//30l//99Jf/fAAD///9//799Jf//gdr/n/9//////wCA/3//f///AICB2v9/gdr/n////3//f/+/gdr/f30l/9//f/9/AAD//30l/399Jf/fAAD/f/9//799Jf9/gdr/n/9//3///wCA/38AAP//AICB2gAAgdr/n///AAD/f/+/gdoAAH0l/9//fwAAAAD//30lAAB9Jf/fAAAAAP9//799JQAAgdr/n/9/AAD//wCA/3////9//7//f///////v4Ha//+B2v+///////9//7+B2v//fSX/v/9///8AAP+/fSX//30l/78AAP///3//v30l//+B2v+//3///////7//fwAA/3//v/9/AAD///+/gdoAAIHa/7///wAA/3//v4HaAAB9Jf+//38AAAAA/799JQAAfSX/vwAAAAD/f/+/fSUAAIHa/7//fwAA////vwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/fwAA/3/+fwEA/38AAP9/AAD/fwAA/3/+//9//v/+f/3/AAD/f/7//3/+//9//v//f/7//3/+//9//v//f/7//3/+//9//v//f/7//38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/38AAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_0hl78")
+shadow_mesh = SubResource("ArrayMesh_acpbw")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6bh6x"]
-resource_name = "BarrelBand_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("9_whcug")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyjdv"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("10_b3c88")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_720ti"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_0m1pk"]
 _surfaces = [{
 "aabb": AABB(-0.018, -0.03, -0.01, 0.036, 0.06, 0.02),
 "format": 34896613377,
@@ -375,7 +367,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_ma0dd"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_epk5f"]
 resource_name = "Shotgun_Survivor_Skin_mesh9"
 _surfaces = [{
 "aabb": AABB(-0.018, -0.03, -0.01, 0.036, 0.06, 0.02),
@@ -383,7 +375,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_6bh6x"),
+"material": SubResource("ShaderMaterial_cyjdv"),
 "name": "BarrelBand_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -391,17 +383,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_720ti")
+shadow_mesh = SubResource("ArrayMesh_0m1pk")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lp4km"]
-resource_name = "Bead_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("10_o71gc")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nx6gd"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("11_1ijm0")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_je4jx"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_8s877"]
 _surfaces = [{
 "aabb": AABB(-0.0035, -0.006, -0.006, 0.007, 0.012, 0.012),
 "format": 34896613377,
@@ -415,7 +406,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_l5h4e"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_62fpl"]
 resource_name = "Shotgun_Survivor_Skin_mesh10"
 _surfaces = [{
 "aabb": AABB(-0.0035, -0.006, -0.006, 0.007, 0.012, 0.012),
@@ -423,7 +414,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_lp4km"),
+"material": SubResource("ShaderMaterial_nx6gd"),
 "name": "Bead_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -431,17 +422,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_je4jx")
+shadow_mesh = SubResource("ArrayMesh_8s877")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5o4e"]
-resource_name = "TriggerGuard_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("11_jn213")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2t2wx"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("12_ia3iv")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_08yo1"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_mhr1e"]
 _surfaces = [{
 "aabb": AABB(-0.006, -0.004, -0.035, 0.012, 0.008, 0.07),
 "format": 34896613377,
@@ -455,7 +445,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_v0jwj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_m1184"]
 resource_name = "Shotgun_Survivor_Skin_mesh11"
 _surfaces = [{
 "aabb": AABB(-0.006, -0.004, -0.035, 0.012, 0.008, 0.07),
@@ -463,7 +453,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_i5o4e"),
+"material": SubResource("ShaderMaterial_2t2wx"),
 "name": "TriggerGuard_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -471,17 +461,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_08yo1")
+shadow_mesh = SubResource("ArrayMesh_mhr1e")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8fkkk"]
-resource_name = "TriggerGuardFront_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("12_isckh")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xg4l2"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("13_l28hs")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_6nhg3"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_biahh"]
 _surfaces = [{
 "aabb": AABB(-0.006, -0.015, -0.004, 0.012, 0.03, 0.008),
 "format": 34896613377,
@@ -495,7 +484,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_aidux"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_m84we"]
 resource_name = "Shotgun_Survivor_Skin_mesh12"
 _surfaces = [{
 "aabb": AABB(-0.006, -0.015, -0.004, 0.012, 0.03, 0.008),
@@ -503,7 +492,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_8fkkk"),
+"material": SubResource("ShaderMaterial_xg4l2"),
 "name": "TriggerGuardFront_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -511,17 +500,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_6nhg3")
+shadow_mesh = SubResource("ArrayMesh_biahh")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rdd46"]
-resource_name = "Trigger_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("13_7tq60")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_udkw3"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("14_q7g76")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_rgona"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_rent2"]
 _surfaces = [{
 "aabb": AABB(-0.003, -0.013, -0.004, 0.006, 0.026, 0.008),
 "format": 34896613377,
@@ -535,7 +523,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_a6nea"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_gripj"]
 resource_name = "Shotgun_Survivor_Skin_mesh13"
 _surfaces = [{
 "aabb": AABB(-0.003, -0.013, -0.004, 0.006, 0.026, 0.008),
@@ -543,7 +531,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_rdd46"),
+"material": SubResource("ShaderMaterial_udkw3"),
 "name": "Trigger_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -551,17 +539,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_rgona")
+shadow_mesh = SubResource("ArrayMesh_rent2")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqva3"]
-resource_name = "Grip_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("14_ecu5x")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y1mmk"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("15_ud8ej")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_tpteu"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_aocwk"]
 _surfaces = [{
 "aabb": AABB(-0.018, -0.055, -0.025, 0.036, 0.11, 0.05),
 "format": 34896613377,
@@ -575,7 +562,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_gieaf"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_ddkjs"]
 resource_name = "Shotgun_Survivor_Skin_mesh14"
 _surfaces = [{
 "aabb": AABB(-0.018, -0.055, -0.025, 0.036, 0.11, 0.05),
@@ -583,7 +570,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_xqva3"),
+"material": SubResource("ShaderMaterial_y1mmk"),
 "name": "Grip_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -591,17 +578,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_tpteu")
+shadow_mesh = SubResource("ArrayMesh_aocwk")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x2wn0"]
-resource_name = "Stock_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("15_ge1lr")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1lmxg"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("16_bnu5q")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_fie7d"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_32q50"]
 _surfaces = [{
 "aabb": AABB(-0.021, -0.036, -0.15, 0.042, 0.072, 0.3),
 "format": 34896613377,
@@ -615,7 +601,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_pk6oy"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_efr1a"]
 resource_name = "Shotgun_Survivor_Skin_mesh15"
 _surfaces = [{
 "aabb": AABB(-0.021, -0.036, -0.15, 0.042, 0.072, 0.3),
@@ -623,7 +609,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_x2wn0"),
+"material": SubResource("ShaderMaterial_1lmxg"),
 "name": "Stock_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -631,17 +617,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_fie7d")
+shadow_mesh = SubResource("ArrayMesh_32q50")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cxwyh"]
-resource_name = "ButtPad_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("16_opk0i")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yvpub"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("17_vqygd")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_gc8uh"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_su6ex"]
 _surfaces = [{
 "aabb": AABB(-0.023, -0.045, -0.01, 0.046, 0.09, 0.02),
 "format": 34896613377,
@@ -655,7 +640,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1363r"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_imo5h"]
 resource_name = "Shotgun_Survivor_Skin_mesh16"
 _surfaces = [{
 "aabb": AABB(-0.023, -0.045, -0.01, 0.046, 0.09, 0.02),
@@ -663,7 +648,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_cxwyh"),
+"material": SubResource("ShaderMaterial_yvpub"),
 "name": "ButtPad_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -671,17 +656,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_gc8uh")
+shadow_mesh = SubResource("ArrayMesh_su6ex")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_770k0"]
-resource_name = "Fore_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("17_di7uf")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6q2wm"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("18_rckuv")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_0avr4"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_bpxxc"]
 _surfaces = [{
 "aabb": AABB(-0.029, -0.025, -0.085, 0.058, 0.05, 0.17),
 "format": 34896613377,
@@ -695,7 +679,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_027et"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_1e8iu"]
 resource_name = "Shotgun_Survivor_Skin_mesh17"
 _surfaces = [{
 "aabb": AABB(-0.029, -0.025, -0.085, 0.058, 0.05, 0.17),
@@ -703,7 +687,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_770k0"),
+"material": SubResource("ShaderMaterial_6q2wm"),
 "name": "Fore_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -711,17 +695,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_0avr4")
+shadow_mesh = SubResource("ArrayMesh_bpxxc")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5bupa"]
-resource_name = "Rib0_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("18_ph0cv")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xuvlp"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("19_1bpbc")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_ewkxp"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_8nplh"]
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
 "format": 34896613377,
@@ -735,7 +718,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_bvfqu"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_am753"]
 resource_name = "Shotgun_Survivor_Skin_mesh18"
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
@@ -743,7 +726,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_5bupa"),
+"material": SubResource("ShaderMaterial_xuvlp"),
 "name": "Rib0_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -751,17 +734,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_ewkxp")
+shadow_mesh = SubResource("ArrayMesh_8nplh")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6wv4f"]
-resource_name = "Rib1_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("19_gai0w")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a1mev"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("20_68syq")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_txp8x"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_svakj"]
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
 "format": 34896613377,
@@ -775,7 +757,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_wwkmw"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_06j7j"]
 resource_name = "Shotgun_Survivor_Skin_mesh19"
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
@@ -783,7 +765,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_6wv4f"),
+"material": SubResource("ShaderMaterial_a1mev"),
 "name": "Rib1_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -791,17 +773,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_txp8x")
+shadow_mesh = SubResource("ArrayMesh_svakj")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vtt5v"]
-resource_name = "Rib2_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("20_u4qas")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t3iek"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("21_strra")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_lefkh"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_vwpqb"]
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
 "format": 34896613377,
@@ -815,7 +796,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1sj1m"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_pki43"]
 resource_name = "Shotgun_Survivor_Skin_mesh20"
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
@@ -823,7 +804,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_vtt5v"),
+"material": SubResource("ShaderMaterial_t3iek"),
 "name": "Rib2_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -831,17 +812,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_lefkh")
+shadow_mesh = SubResource("ArrayMesh_vwpqb")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2rlej"]
-resource_name = "Rib3_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("21_g2d2v")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_m8nmu"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("22_fh0c7")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_lkcn8"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_vr071"]
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
 "format": 34896613377,
@@ -855,7 +835,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_isv2p"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_dq74f"]
 resource_name = "Shotgun_Survivor_Skin_mesh21"
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
@@ -863,7 +843,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_2rlej"),
+"material": SubResource("ShaderMaterial_m8nmu"),
 "name": "Rib3_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -871,17 +851,16 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_lkcn8")
+shadow_mesh = SubResource("ArrayMesh_vr071")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m3pyp"]
-resource_name = "Rib4_SurvivorFinish"
-albedo_color = Color(1, 1, 1, 1)
-albedo_texture = ExtResource("22_l4vu3")
-roughness = 0.85
-texture_filter = 0
-texture_repeat = false
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_adl27"]
+render_priority = 0
+shader = ExtResource("1_xmg1r")
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/textured = true
+shader_parameter/albedo_tex = ExtResource("23_8s5dh")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_p470c"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_whsa2"]
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
 "format": 34896613377,
@@ -895,7 +874,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_pw4pp"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_jqv7d"]
 resource_name = "Shotgun_Survivor_Skin_mesh22"
 _surfaces = [{
 "aabb": AABB(-0.03, -0.003, -0.004, 0.06, 0.006, 0.008),
@@ -903,7 +882,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 36,
 "index_data": PackedByteArray("BAAAAAIABAACAAYABQABAAMABQADAAcADAAIAAoADAAKAA4ADQAJAAsADQALAA8AFAAQABIAFAASABYAFQARABMAFQATABcA"),
-"material": SubResource("StandardMaterial3D_m3pyp"),
+"material": SubResource("ShaderMaterial_adl27"),
 "name": "Rib4_SurvivorFinish",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -911,136 +890,133 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD/////AID/////AAD//////////wCAAAD//wAA//8AAAAA//8AgP//AAAAAP////8AAP//AIAAAAAAAAD///////////+/AAD//wAA/7//////AAD/vwAA//////+///8AAP///78AAAAAAAD/v///AAAAAP+/AAAAAP///7///////////wAAAAD///+/AAD//////////wAA////v/////8AAP//AAAAAAAA/78AAP//AAD/////AAAAAP+/AAD/f/9/AAAAAP9//38AAAAA/3//fwAAAAD/f/9/AAD/fwAA/3/+//9/AAD/f/7//38AAP9//v//fwAA/3/+//+/AAAAAP9//78AAAAA/3//vwAAAAD/f/+/AAAAAP9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_p470c")
+shadow_mesh = SubResource("ArrayMesh_whsa2")
 
 [node name="ShotgunModel" type="Node3D"]
 
 [node name="Receiver" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.075)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_ciim4")
+mesh = SubResource("ArrayMesh_tt3fp")
 
 [node name="ReceiverTop" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.091, -0.075)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_x31wq")
+mesh = SubResource("ArrayMesh_ksraq")
 
 [node name="EjectionPort" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.027, 0.062, -0.07)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_033p6")
+mesh = SubResource("ArrayMesh_a7uub")
 
 [node name="LoadingPort" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -0.085)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_1knkm")
+mesh = SubResource("ArrayMesh_yyxrr")
 
 [node name="Barrel" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.072, -0.45)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_gk4ta")
+mesh = SubResource("ArrayMesh_lm1p8")
 
 [node name="Muzzle" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.072, -0.7)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_cp8aj")
+mesh = SubResource("ArrayMesh_vs06n")
 
 [node name="MagTube" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.034, -0.41)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_ajvjj")
+mesh = SubResource("ArrayMesh_gyq07")
 
 [node name="MagCap" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.034, -0.64)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_5wq2a")
+mesh = SubResource("ArrayMesh_e8sve")
 
 [node name="BarrelBand" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.053, -0.6)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_ma0dd")
+mesh = SubResource("ArrayMesh_epk5f")
 
 [node name="Bead" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.093, -0.69)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_l5h4e")
+mesh = SubResource("ArrayMesh_62fpl")
 
 [node name="TriggerGuard" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, -0.03)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_v0jwj")
+mesh = SubResource("ArrayMesh_m1184")
 
 [node name="TriggerGuardFront" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.064)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_aidux")
+mesh = SubResource("ArrayMesh_m84we")
 
 [node name="Trigger" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.002, -0.032)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_a6nea")
+mesh = SubResource("ArrayMesh_gripj")
 
 [node name="Grip" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, -0.04, 0.035)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_gieaf")
+mesh = SubResource("ArrayMesh_ddkjs")
 
 [node name="Stock" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.992546, -0.121869, 0, 0.121869, 0.992546, 0, 0, 0.21)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_pk6oy")
+mesh = SubResource("ArrayMesh_efr1a")
 
 [node name="ButtPad" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, 0.36)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_1363r")
+mesh = SubResource("ArrayMesh_imo5h")
 
 [node name="Pump" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.034, -0.37)
 
 [node name="Fore" type="MeshInstance3D" parent="Pump"]
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_027et")
+mesh = SubResource("ArrayMesh_1e8iu")
 
 [node name="Rib0" type="MeshInstance3D" parent="Pump"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, -0.06)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_bvfqu")
+mesh = SubResource("ArrayMesh_am753")
 
 [node name="Rib1" type="MeshInstance3D" parent="Pump"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, -0.03)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_wwkmw")
+mesh = SubResource("ArrayMesh_06j7j")
 
 [node name="Rib2" type="MeshInstance3D" parent="Pump"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_1sj1m")
+mesh = SubResource("ArrayMesh_pki43")
 
 [node name="Rib3" type="MeshInstance3D" parent="Pump"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.03)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_isv2p")
+mesh = SubResource("ArrayMesh_dq74f")
 
 [node name="Rib4" type="MeshInstance3D" parent="Pump"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.06)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_pw4pp")
+mesh = SubResource("ArrayMesh_jqv7d")
 
 [node name="PumpSocket" type="Node3D" parent="Pump"]
-transform = Transform3D(0.990268, 0, -0.139173, 0, 1, 0, 0.139173, 0, 0.990268, 0, 0, -0.07)
 
 [node name="LeftHand" type="MeshInstance3D" parent="Pump/PumpSocket"]
-transform = Transform3D(0.469472, -0.882948, 0, 0.882948, 0.469472, 0, 0, 0, 1, 0, 0, 0)
 cast_shadow = 0
-mesh = ExtResource("23_0q875")
+mesh = ExtResource("24_64lx6")
 
 [node name="GripSocket" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.34202, -0.939693, 0, 0.939693, 0.34202, 0, 0.01, 0.015)
 
 [node name="RightHand" type="MeshInstance3D" parent="GripSocket"]
 cast_shadow = 0
-mesh = ExtResource("24_smpb0")
+mesh = ExtResource("25_xwh6c")
 
 [node name="MuzzleTip" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.072, -0.72)

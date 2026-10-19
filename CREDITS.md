@@ -8,9 +8,25 @@ The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Pro
 
 ## Project assets
 
-- Shotgun survivor skin (`weapons/shotgun/source/Shotgun_Survivor_Skin.glb` and its textures): supplied by the project owner.
-- Pixel lettering sheet (`fonts/pixel/source/lettering_sheet.png`), the source of the game font: supplied by the project owner.
-- Shambler, Scuttler, Lancer (`stylized_creature.glb`), armoured school bus and armoured truck (`vehicles/*/source/`), mushroom pickup, survival knife and knife-hand (`reference_hand_with_dagger.glb`, its dagger removed at build time) models: supplied by the project owner (`enemies/*/source/`, `pickups/mushroom/source/`, `weapons/knife/source/`).
+- Survivor pump-shotgun skin, Lancer, armoured truck and pixel lettering sheet: supplied by the project owner. Pump hands also adapt PSX Firearms Free, credited below.
+
+- Shambler zombie and survival knife models: supplied by the project owner (`enemies/shambler/source/`, `weapons/knife/source/`).
 - Shop, textures, rig, animations, ooze and tools: made for this project.
 
 - Cleatimus HD hand material atlas and roughness: supplied by the project owner; mapped onto the PSX arms, sleeves and watch. Source images and pack README retained under weapons/knife/textures/cleatimus_hd/.
+
+PSX Firearms Free by heyheythere - https://heyheythere.itch.io/psx-firearms-free - CC BY 4.0
+
+The supplied pack and full licence are retained in addons/psx_firearms/. Adaptations use its pistol/shotgun hands and animation hierarchy, remove its weapon geometry, apply the project HD glove/sleeve textures, and fit the project owner's custom pistol and Crop Duster. Crop Duster breech textures and 1024px game-view texture copies are derived from the owner-supplied model; its source remains intact. The custom pistol and synthetic audio are restored from the earlier project FPS prototype.
+
+- Main menu lettering and zombie/burger intro clips: supplied by the project owner. Menu uses cropped atlas regions of the supplied overlay; video editing/alignment and final-frame hovering loop prepared for this project.
+
+- Scuttler, mushroom pickup, armoured school bus and sculpted knife/dagger hand: owner-supplied models; latest source and build tools integrated from GitHub main fefcb797.
+
+- Serving-room reference and material/poster/packaging atlas: supplied by the project owner, kept in art/serving_room/. UV cell extraction, room construction and integration prepared for this game.
+
+- Serving_Room_Texture_Pack.zip: owner-supplied individual PNG textures; source README and native images retained in art/serving_room/pack/.
+
+- Kitchen_Texture_Pack.zip and two kitchen references: supplied by the project owner, kept in art/kitchen/. All 16 base-colour textures are used directly; kitchen layout/material integration prepared for this game.
+
+Current pistol integration: the original textured pistol mesh is fitted to the newer sculpt-derived hands and wrist sockets from OpenCode, using PSX FPS Arms Free animated pistol nodes. Source models and licences remain intact.

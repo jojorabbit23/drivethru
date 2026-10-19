@@ -79,9 +79,7 @@ func _begin(n: int) -> void:
 			_place(Vector3(3.0, 0, -0.9), Vector3(3.0, 1.2, 1.0))
 			path = [Vector3(3.0, 0, 0.6), Vector3(1.8, 0, 1.4)]
 		2: # grill
-			main.economy.store_mushrooms(1, "brown")
-			main.economy.store_mushrooms(1, "blue")
-			main.hatch.next_order = "blue"
+			main.economy.store_mushrooms(1)
 			_place(Vector3(2.1, 0, -3.2), main.grill.global_position + Vector3(0, 0.05, 0))
 			car = main.hatch.spawn_customer()
 		3: # the hatch: the car is waiting
@@ -118,17 +116,17 @@ func _tick() -> void:
 			if seg_t > 0.8 and seg_t < 0.9:
 				player.use_focus()           # open the menu
 			if seg_t > 2.2 and seg_t < 2.3:
-				player.choose(1)             # key 2: blue patty
+				player.use_focus()           # common patty
 			if seg_t > 2.6 and seg_t < 2.7:
-				main.grill.add_patty("brown")   # and a common one
+				main.grill.add_patty()       # and a second one
 			# fast-forward the cooking (x3) so the clip stays short
 			for s in main.grill.slots:
 				if s["state"] == "raw" or s["state"] == "cooking":
 					s["t"] = (s["t"] as float) + dt * 2.0
 			if seg_t > 7.6 and seg_t < 7.7:
-				_place(Vector3(0.8, 0, -3.3), main.bench.global_position + Vector3(0, 0.1, 0))
+				player.use_focus()
 			if seg_t > 9.0 and seg_t < 9.1:
-				player.use_focus()           # bag at the prep bench
+				player.use_focus()           # bag
 			if seg_t > 10.5:
 				_begin(3)
 		3:

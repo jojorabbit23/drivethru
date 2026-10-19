@@ -1,0 +1,11 @@
+# Main menu — 19 October 2026
+
+The default startup scene is ui/menu/menu.tscn. The aligned zombie → burger → mushroom departure sequence plays full-frame, centred with its original 16:9 proportions; after it finishes, bread_loop.ogv repeats a six-second gentle camera hover. Resizing letterboxes the video instead of moving it to the right or stretching it. Video streams are Godot-native Ogg Theora encodes of the approved MP4 edits; the original edits remain in the sibling DriveThru_Intro output directory.
+
+The left menu uses AtlasTexture regions from the owner's menu reference. A shader recolours the selected label orange, other enabled labels cream, and unavailable Continue grey; the teal arrow follows mouse hover or keyboard arrows. Enter/click activates. No slogan or red writing is added. Start Cooking hides the menu, plays the owner-supplied eight-second bus-crushing-bread clip once, then opens main.tscn with pistol, knife and Crop Duster. The bread loop waits indefinitely until selection. Input is locked during the cinematic so repeated activation cannot skip it or start a second load. Continue remains disabled until saves exist; its future resume path should use the same cinematic gate. How to Play and Credits open dismissible panels. Settings exposes master volume and fullscreen for the current session. Continue stays disabled because persistent saves have not been implemented. Esc closes a menu panel; gameplay's existing Esc mouse-release behaviour is unchanged.
+
+The menu is capped at 30 FPS while focused and 15 in the background. Starting gameplay restores its 60 FPS cap. Gameplay is loaded only after Start Cooking, so zombies and physics do not run behind the menu.
+
+Validation: 13 menu checks including Start Cooking loading the real game and all three weapon nodes, plus script parse checks and the full validate/movement/zombie/ooze/knife/knife-viewmodel/pistol/Crop Duster suites pass. Native video intro-to-loop handoff was checked in a bounded rendered run; menu and knife screenshots were inspected. Preview: docs/previews/menu.png.
+
+Bus follow-up: rendered and inspected menu_bus.png and verified that natural video completion enters the game. Menu checks cover hidden UI, one-shot playback, repeated-click gating and the three-weapon handoff.

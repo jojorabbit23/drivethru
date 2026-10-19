@@ -297,7 +297,11 @@ const GRID := [
 	Vector2(-1, 0), Vector2(-0.5, 0), Vector2(0.5, 0), Vector2(1, 0),
 	Vector2(-1, 0.5), Vector2(-0.5, 0.5), Vector2(0, 0.5), Vector2(0.5, 0.5), Vector2(1, 0.5),
 	Vector2(-1, 1), Vector2(-0.5, 1), Vector2(0, 1), Vector2(0.5, 1), Vector2(1, 1),
-]  # 5x5 probe grid (centre is the impact point itself) — catches gaps between boards
+	# Probe the visible 60% corners explicitly too: a narrow gap can fall
+	# between the regular grid's 35% and 70% samples on a window frame.
+	Vector2(-6.0 / 7.0, -6.0 / 7.0), Vector2(6.0 / 7.0, -6.0 / 7.0),
+	Vector2(-6.0 / 7.0, 6.0 / 7.0), Vector2(6.0 / 7.0, 6.0 / 7.0), Vector2.ZERO,
+]  # regular grid plus the exact visible corners and impact centre
 
 func _fit(pos: Vector3, normal: Vector3, x_axis: Vector3, y_axis: Vector3, hx: float, hy: float) -> float:
 	var space := get_world_3d().direct_space_state

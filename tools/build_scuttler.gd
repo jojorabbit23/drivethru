@@ -156,7 +156,7 @@ func _initialize() -> void:
 	mat.emission_texture = load(glow)
 	mat.emission = Color.WHITE
 	mat.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY  # default ADD would glow white everywhere
-	mat.emission_energy_multiplier = 1.8
+	mat.emission_energy_multiplier = 1.0
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	mat.roughness = 0.85
 	mat.metallic_specular = 0.25

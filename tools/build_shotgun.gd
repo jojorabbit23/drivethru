@@ -1,23 +1,14 @@
-# Builds the pump shotgun's first-person model:
-#
-#   godot --headless --path . --script res://tools/build_shotgun.gd
-#
-# Writes res://weapons/shotgun/:
-#   shotgun_hand_r.res / shotgun_hand_l.res  Cleatimus's sculpted glove (the
-#       knife hand, already fitted round a handle) moved into handle space, and
-#       a mirrored copy for the left hand on the pump
-#   shotgun_model.tscn  the gun: blocky boxes and 8-sided tubes in palette
-#       colours, with a sliding Pump, the hands on GripSocket / PumpSocket,
-#       and Muzzle / LoadPort markers for shotgun_weapon.gd
-# Handle space is the knife's: the handle runs along +Z from the origin and the
-# thumb points down -Z (where the knife's blade went).
+# Rebuild the new pump shotgun, preserving its node paths and Survivor skin.
+# Native PSX pump gloves are fitted independently around the two handles;
+# cuffs and sleeves use the same Cleatimus HD materials as the other weapons.
+# Generated: weapons/shotgun/shotgun_hand_[lr].res and shotgun_model.tscn.
 extends SceneTree
 
 const Palette = preload("res://core/palette.gd")
 const OUT := "res://weapons/shotgun/"
-const KNIFE_VM := "res://weapons/knife/knife_viewmodel.tscn"
+const ARMS := "res://addons/psx_firearms/models/fp_pump_shotgun_model.glb"
+const HAND_MATERIAL := "res://weapons/knife/cleatimus_arms_material.tres"
 const SKIN := "res://weapons/shotgun/source/Shotgun_Survivor_Skin.glb"
-const CUT := 0.14              # along the forearm: keep the glove and cuff up to here
 const SLEEVE_R0 := 0.045       # new sleeve radius at the cuff ...
 const SLEEVE_R1 := 0.058       # ... and at the elbow
 const SLEEVE_LEN := 0.62
@@ -25,109 +16,104 @@ const SLEEVE_UV := Vector2(0.0, 0.2)   # the sleeve fabric on the arms atlas
 
 # Hand sockets on the gun: position, and rotation in degrees (applied Y, X, Z).
 # The right hand's thumb runs up the pistol grip; the left hand's along the pump.
-const GRIP_SOCKET := [Vector3(0.0, 0.01, 0.015), Vector3(70.0, 0.0, 0.0), 0.0]   # pos, rot (x, y, z), roll about the handle
-const PUMP_SOCKET := [Vector3(0.0, 0.0, -0.07), Vector3(0.0, -8.0, 0.0), 62.0]
+const GRIP_SOCKET := [Vector3.ZERO, Vector3.ZERO, 0.0]   # pos, rot (x, y, z), roll about the handle
+const PUMP_SOCKET := [Vector3.ZERO, Vector3.ZERO, 0.0]
 
 var metal := StandardMaterial3D.new()
 var dark := StandardMaterial3D.new()
 var wood := StandardMaterial3D.new()
 var steel := StandardMaterial3D.new()
 
-func _init() -> void:
+func _initialize() -> void:
+	build.call_deferred()
+
+func build() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
 	var hands := build_hands()
 	build_model(hands[0], hands[1])
+	for i in 3:await process_frame
 	quit()
 
 # ------------------------------------------------------------- hands ----
 func build_hands() -> Array:
-	var vm: Node3D = (load(KNIFE_VM) as PackedScene).instantiate()
-	root.add_child(vm)
-	var anim: AnimationPlayer = vm.find_child("AnimationPlayer", true, false)
-	anim.play("kitchen_knife_idle", 0.0)
-	anim.seek(0.0, true)
-	var skel: Skeleton3D = vm.find_child("Skeleton3D", true, false)
-	var grip: Node3D = vm.find_child("GripOffset", true, false)
-	var model: Node3D = grip.get_node("Model")
-	var knife0: Transform3D = skel.get_bone_global_pose(skel.find_bone("weapon_r")) * grip.transform * model.transform
-	var src: ArrayMesh = (vm.find_child("RightHand", true, false) as MeshInstance3D).mesh
-	var inv := knife0.affine_inverse()
-	var out := []
-	for mirror in [false, true]:
-		var a := _unindexed(src.surface_get_arrays(0))
-		var v: PackedVector3Array = a[Mesh.ARRAY_VERTEX]
-		var n: PackedVector3Array = a[Mesh.ARRAY_NORMAL]
-		for i in v.size():
-			v[i] = inv * v[i]
-			n[i] = (inv.basis * n[i]).normalized()
-			if mirror:
-				v[i].x = -v[i].x
-				n[i].x = -n[i].x
-		# The knife hand's sleeve is a short cone that tapers to a point. Keep
-		# the glove and its cuff (up to CUT along the forearm), drop the cone,
-		# and grow a proper sleeve out of the cuff instead.
-		var arm_dir := Vector3.ZERO
-		for q in v:
-			if q.z > 0.2:
-				arm_dir += q
-		arm_dir = arm_dir.normalized()
-		var cuff := Vector3.ZERO
-		var nc := 0
-		for q in v:
-			var t := q.dot(arm_dir)
-			if t > CUT - 0.03 and t < CUT:
-				cuff += q
-				nc += 1
-		cuff /= maxf(nc, 1)
-		var keep := PackedInt32Array()
-		for tri in range(0, v.size(), 3):
-			if v[tri].dot(arm_dir) <= CUT and v[tri + 1].dot(arm_dir) <= CUT and v[tri + 2].dot(arm_dir) <= CUT:
-				keep.append(tri)
-		a = _take_triangles(a, keep)
-		v = a[Mesh.ARRAY_VERTEX]
-		if mirror:
-			_flip_winding(a)
-		var m := ArrayMesh.new()
-		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, a)
-		m.surface_set_material(0, src.surface_get_material(0))
-		# the sleeve starts tucked inside the cuff, so there's no seam to see
-		var start := cuff - arm_dir * 0.02
-		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _sleeve(start, arm_dir, a))
-		m.surface_set_material(1, src.surface_get_material(0))
-		var path := OUT + ("shotgun_hand_l.res" if mirror else "shotgun_hand_r.res")
-		ResourceSaver.save(m, path)
-		m.take_over_path(path)
-		print("hand %s: %d glove vertices kept, sleeve from %s along %s" % ["left" if mirror else "right", v.size(), start, arm_dir])
-		out.append(m)
-	vm.queue_free()
+	var arms: Node3D = (load(ARMS) as PackedScene).instantiate()
+	root.add_child(arms)
+	var anim: AnimationPlayer = arms.get_node("AnimationPlayer")
+	anim.play("idle",0.0)
+	anim.seek(0.0,true)
+	var held: Node3D = arms.find_child("fp_pump_shotgun_held",true,false)
+	var out: Array = []
+	var turn := Transform3D(Basis(Vector3.UP,PI),Vector3.ZERO)
+	for left in [false,true]:
+		var source: MeshInstance3D = arms.find_child("fp_pump_shotgun_hand_l" if left else "fp_pump_shotgun_hand_r",true,false)
+		var transform: Transform3D = turn * held.global_transform.affine_inverse() * source.global_transform
+		# Native hands are rigid meshes, so their actual gripping pose is preserved.
+		# New left vertices are in PumpSocket space; right vertices in GripSocket space.
+		var offset: Vector3 = Vector3(0,0,0.455) if left else Vector3(0,-0.035,0.055)
+		var a: Array = _unindexed(source.mesh.surface_get_arrays(0))
+		var vertices: PackedVector3Array = a[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = a[Mesh.ARRAY_NORMAL]
+		var tags := PackedVector2Array()
+		tags.resize(vertices.size())
+		var grip := Transform3D.IDENTITY if left else Transform3D(Basis(Vector3.RIGHT,deg_to_rad(-20)),Vector3(0,-0.04,0.035))
+		var half: Vector3 = Vector3(0.029,0.025,0.085) if left else Vector3(0.018,0.055,0.025)
+		var swivel := Basis(Vector3.BACK,deg_to_rad(-35)) if left else Basis(Vector3.UP,deg_to_rad(-35))
+		var posed: Transform3D = grip * Transform3D(swivel,Vector3.ZERO) * grip.affine_inverse()
+		var moved: int = 0
+		for i in vertices.size():
+			vertices[i] = posed * (transform * vertices[i] + offset)
+			normals[i] = (posed.basis * transform.basis * normals[i]).normalized()
+			tags[i] = Vector2(2,0) # same fully gloved teal material as the other weapons
+			var local: Vector3 = grip.affine_inverse() * vertices[i]
+			var radial := Vector2(local.x,local.y if left else local.z)
+			var radii := Vector2(half.x+0.0015,(half.y if left else half.z)+0.0015)
+			var axial: float = local.z if left else local.y
+			var extent: float = half.z if left else half.y
+			var metric: float = maxf(absf(radial.x)/radii.x,absf(radial.y)/radii.y)
+			if absf(axial)<extent+0.002 and metric>0.01 and metric<1.0:
+				radial/=metric
+				if left:local=Vector3(radial.x,radial.y,local.z)
+				else:local=Vector3(radial.x,local.y,radial.y)
+				vertices[i]=grip*local
+				moved+=1
+		a[Mesh.ARRAY_VERTEX]=vertices
+		a[Mesh.ARRAY_NORMAL]=normals
+		a[Mesh.ARRAY_TEX_UV2]=tags
+		var mesh := ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,a)
+		mesh.surface_set_material(0,load(HAND_MATERIAL))
+		# Each sleeve exits toward its own lower screen corner, away from the stock.
+		var wrist: Vector3 = transform * (Vector3(-0.03129,0.02742,0.01415) if left else Vector3(0.07736,0.009853,0.046568)) + offset
+		wrist=posed*wrist
+		var elbow := Vector3(-0.36,-0.34,0.48) if left else Vector3(0.35,-0.42,0.32)
+		var direction: Vector3 = (elbow-wrist).normalized()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,_sleeve(wrist-direction*0.012,direction,a,0.045,0.033,0.043,1))
+		mesh.surface_set_material(1,load(HAND_MATERIAL))
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,_sleeve(wrist+direction*0.025,direction,a,SLEEVE_LEN,0.042,0.064,0))
+		mesh.surface_set_material(2,load(HAND_MATERIAL))
+		var path: String = OUT+("shotgun_hand_l.res" if left else "shotgun_hand_r.res")
+		ResourceSaver.save(mesh,path)
+		mesh.take_over_path(path)
+		out.append(mesh)
+		print("Pump glove ","left" if left else "right",": ",vertices.size()," vertices, ",moved," fitted clear of the handle")
+	arms.free()
 	return out
 
 # An 8-sided sleeve: SLEEVE_R0 at the cuff widening to SLEEVE_R1 at the elbow,
 # SLEEVE_LEN long (well off the bottom of the screen). Its UVs sit in the
 # sleeve's fabric on the arms atlas; its vertex colour is the cuff's average.
-func _sleeve(start: Vector3, dir: Vector3, glove: Array) -> Array:
+func _sleeve(start: Vector3, dir: Vector3, glove: Array, length: float=SLEEVE_LEN, radius0: float=SLEEVE_R0, radius1: float=SLEEVE_R1, region: int=0) -> Array:
 	var side := dir.cross(Vector3.UP).normalized()
 	if side.length() < 0.1:
 		side = dir.cross(Vector3.RIGHT).normalized()
 	var up := side.cross(dir).normalized()
-	var col := Color(1, 1, 1)
-	if glove[Mesh.ARRAY_COLOR] != null:
-		var cs: PackedColorArray = glove[Mesh.ARRAY_COLOR]
-		var gv: PackedVector3Array = glove[Mesh.ARRAY_VERTEX]
-		var acc := Color(0, 0, 0, 0)
-		var k := 0
-		for i in gv.size():
-			if gv[i].dot(dir) > CUT - 0.04:
-				acc += cs[i]
-				k += 1
-		if k > 0:
-			col = acc / k
+	var col := Color.WHITE
 	var verts := PackedVector3Array()
 	var norms := PackedVector3Array()
 	var uvs := PackedVector2Array()
 	var cols := PackedColorArray()
 	const SEG := 8
-	var rings := [[0.0, SLEEVE_R0], [SLEEVE_LEN * 0.5, (SLEEVE_R0 + SLEEVE_R1) * 0.5], [SLEEVE_LEN, SLEEVE_R1]]
+	var rings := [[0.0, radius0], [length * 0.5, (radius0 + radius1) * 0.5], [length, radius1]]
 	for r in rings.size() - 1:
 		var a0: Array = rings[r]
 		var a1: Array = rings[r + 1]
@@ -137,7 +123,7 @@ func _sleeve(start: Vector3, dir: Vector3, glove: Array) -> Array:
 				var ring: Array = corner[0]
 				var ang: float = TAU * float(corner[1]) / SEG + PI / SEG
 				var radial: Vector3 = side * cos(ang) + up * sin(ang)
-				quad.append([start + dir * float(ring[0]) + radial * float(ring[1]), radial, Vector2(SLEEVE_UV.x + 0.08 * float(corner[1]) / SEG, SLEEVE_UV.y + 0.25 * float(ring[0]) / SLEEVE_LEN)])
+				quad.append([start + dir * float(ring[0]) + radial * float(ring[1]), radial, Vector2(SLEEVE_UV.x + 0.08 * float(corner[1]) / SEG, SLEEVE_UV.y + 0.25 * float(ring[0]) / length)])
 			for idx in [0, 2, 1, 0, 3, 2]:
 				var c: Array = quad[idx]
 				verts.append(c[0])
@@ -149,7 +135,10 @@ func _sleeve(start: Vector3, dir: Vector3, glove: Array) -> Array:
 	arr[Mesh.ARRAY_VERTEX] = verts
 	arr[Mesh.ARRAY_NORMAL] = norms
 	arr[Mesh.ARRAY_TEX_UV] = uvs
-	arr[Mesh.ARRAY_TEX_UV2] = uvs
+	var tags := PackedVector2Array()
+	tags.resize(verts.size())
+	tags.fill(Vector2(region,0))
+	arr[Mesh.ARRAY_TEX_UV2] = tags
 	arr[Mesh.ARRAY_COLOR] = cols
 	return arr
 
@@ -171,34 +160,6 @@ static func _unindexed(a: Array) -> Array:
 				dst.append(src[i])
 			out[k] = dst
 	return out
-
-static func _take_triangles(a: Array, starts: PackedInt32Array) -> Array:
-	var out := []
-	out.resize(Mesh.ARRAY_MAX)
-	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
-		if a[k] == null:
-			continue
-		var src = a[k]
-		var dst = src.duplicate()
-		dst.resize(0)
-		for s: int in starts:
-			dst.append(src[s])
-			dst.append(src[s + 1])
-			dst.append(src[s + 2])
-		out[k] = dst
-	return out
-
-# mirroring turns the triangles inside out: swap their winding
-static func _flip_winding(a: Array) -> void:
-	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
-		if a[k] == null:
-			continue
-		var arr = a[k]
-		for t in range(0, arr.size(), 3):
-			var tmp = arr[t + 1]
-			arr[t + 1] = arr[t + 2]
-			arr[t + 2] = tmp
-		a[k] = arr
 
 # ------------------------------------------------------------- model ----
 func build_model(hand_r: Mesh, hand_l: Mesh) -> void:
@@ -248,6 +209,7 @@ func build_model(hand_r: Mesh, hand_l: Mesh) -> void:
 	ps.pack(gun)
 	var err := ResourceSaver.save(ps, OUT + "shotgun_model.tscn")
 	print("saved shotgun_model.tscn err=%d" % err)
+	gun.free()
 
 # The owner's "survivor" skin (weapons/shotgun/source/Shotgun_Survivor_Skin.glb):
 # the same parts, re-UV'd and textured. Each part here takes the skin's mesh,
@@ -268,10 +230,11 @@ func apply_skin(gun: Node3D) -> void:
 		for si in mesh.get_surface_count():
 			var src_mat := mesh.surface_get_material(si) as BaseMaterial3D
 			if src_mat:
-				var mat := src_mat.duplicate() as BaseMaterial3D
-				mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-				mat.metallic = 0.0
-				mat.roughness = 0.85
+				var mat := ShaderMaterial.new()
+				mat.shader=load("res://weapons/shotgun/viewmodel.gdshader")
+				mat.set_shader_parameter("colour",src_mat.albedo_color)
+				mat.set_shader_parameter("albedo_tex",src_mat.albedo_texture)
+				mat.set_shader_parameter("textured",src_mat.albedo_texture!=null)
 				mesh.surface_set_material(si, mat)
 		dst.mesh = mesh
 		dst.material_override = null

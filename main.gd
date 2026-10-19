@@ -71,20 +71,19 @@ func _ready() -> void:
 	for w in player.weapons:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
+		if w.has_signal("ammo_changed"):
+			w.ammo_changed.connect(_on_ammo_changed)
 	player.weapon_changed.connect(func(_i, _w): _update_weapon())
 	player.weapon_added.connect(func(w: Node) -> void:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
 		if w.has_signal("ammo_changed"):
-			w.ammo_changed.connect(func(_m, _r): _update_weapon())
+			w.ammo_changed.connect(_on_ammo_changed)
 		_update_weapon())
 	_build_stations()
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
 	economy.changed.connect(_update_status)
-	var gun := player.get_node_or_null("Head/Camera3D/TestGun")
-	if gun:
-		gun.ammo_changed.connect(func(_m, _r): _update_weapon())
 	hatch.customer_arrived.connect(func(_c): _toast("CUSTOMER AT THE WINDOW", P.ELECTRIC_TEAL))
 	hatch.customer_served.connect(func(c: int, tip: int):
 		var q: String = hatch.last_quality
@@ -261,7 +260,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_C:
 				spawn_lancer()
 			KEY_R:
-				get_tree().reload_current_scene()
+				var weapon: Node = player.current_weapon()
+				if player.is_dead() or weapon == null or not weapon.has_method("reload"):
+					get_tree().reload_current_scene()
 			KEY_F2:
 				auto_collect = not auto_collect
 				MushroomPickupScript.auto_collect = auto_collect
@@ -299,8 +300,11 @@ func _flash_damage() -> void:
 func _on_player_died() -> void:
 	_hud["dead"].visible = true
 
+func _on_ammo_changed(_mag: int = 0, _reserve: int = 0) -> void:
+	_update_weapon()
+
 func _update_weapon() -> void:
-	var names := ["1  PISTOL (placeholder)", "2  KNIFE", "3  DAGGER (alt hand)"]
+	var names := ["1  PISTOL", "2  KNIFE", "3  CROP DUSTER", "4  DAGGER (alt hand)"]
 	var text: String = names[player.weapon_index] if player.weapon_index < names.size() else ""
 	var gun: Node = player.current_weapon()
 	if gun and gun.get("display_name") != null:

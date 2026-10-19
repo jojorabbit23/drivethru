@@ -1,0 +1,46 @@
+# Combined game check — 19 October 2026
+
+Current project: drivethru_knife/ (the folder name is historical). Play_DriveThru.cmd now opens this combined Godot 4.3 build, rather than the older separate FPS checkout. The previous launcher is retained as Play_Previous_FPS.cmd. All three weapons share one player/controller and renderer.
+
+## Findings and fixes
+
+- The knife checkout still had an invisible placeholder pistol, while the custom pistol lived in the earlier FPS project. Restored that custom model to slot 1 with the supplied PSX Firearms pistol hands, moving slide/magazine, finite ammo, reload, aim, inspect and draw/holster. Added a magazine body to its previous baseplate-only reload prop.
+- Pistol player input respects the draw, fire and reload gates. Its original low-level shoot() scripted API and damage/hitscan behaviour remain available to the existing zombie/ooze tests. Magazine transfer occurs at 1.45 s of a 2.1 s reload. Reload cancellation before insertion preserves both ammo counts; after insertion it retains the seated ammo. Empty pistols lock the slide back.
+- Crop Duster is slot 3. Its own mechanical reload is retained; the new pack's shotgun hand hierarchy is adapted to its fore-end and chambers. A procedural left-hand route follows the animated shell positions. Draw/fire/inspect use native pack clips; holster freezes and lowers the current pose. No pump cycle is added to a break-action weapon. Reload seats shells at 1.9/2.4 s and closes at 3.4 s. Full, partial, interrupted and low-reserve reloads are checked.
+- R now reloads firearms instead of restarting the live game. It still restarts after death. HUD shows weapon/ammunition and documents 1/2/3, LMB, RMB, R and F. The existing movement, repair, spawning and knife systems are retained.
+- All firearm viewmodels use the existing world renderer/depth approach, with no extra full-screen viewport, colliders or world shadow casting. Source pack weapon meshes are removed; only the custom pistol and Crop Duster are shown.
+- The source Crop Duster embeds 4K maps. Generated game-view albedo/ORM copies are 1024px, leaving its original GLB untouched. Measured video memory fell from about 174 MB to 54 MB in the same bounded check (about 120 MB saved). Shell visibility now uses an existing shader uniform instead of creating a separate discard shader during reload; the measured reload frame-time spike disappeared in the subsequent run.
+
+## Verification
+
+Godot 4.3 import, check-only for edited/new GDScript, validate, movement, zombie, ooze, unchanged knife tests and knife-viewmodel tests passed. Dedicated firearm tests passed: pistol 19 checks; Crop Duster 27 checks. These cover action gates, ammunition accounting, interruptions, empty behaviour, solid cover/pellet hits, death, colliders and shadows. Existing zombie tests retain one-headshot/three-body-shot pistol behaviour.
+
+Rendered and inspected pistol idle, aim, draw, fire, reload, inspect and empty poses; Crop Duster poses across its reload; and fresh knife captures/audit. docs/video/loadout_check.mp4 is a 16-second silent rendered demonstration of the three-weapon loadout; decoded pistol and shotgun frames were inspected as well. Capture/film tools pace themselves to avoid an uncapped offline render workload.
+
+The bounded Compatibility performance check profiles pistol/shop, knife attacks, Crop Duster reload and 12 zombies/ooze at a deliberate 30 FPS cap. It also verifies 60 focused / 15 background FPS limits. With normal shader-cache access, the repeat run had frame-time p95 around 35 ms across stages, and a stress maximum of about 41 ms. Typical rendering CPU/GPU times were a few milliseconds. Video memory was approximately 52–54 MB; these are video-memory measurements, not total process RAM. Raw repeat results are in loadout_performance.json.
+
+The restricted tool run could not write Godot's normal shader cache and showed first-use stress/compilation hitches. A cache-enabled first run and a fresh repeated launch were checked separately; the repeat was substantially smoother. This bounded 30 FPS test is not a claim of sustained uncapped/60 FPS performance on every machine.
+
+## Remaining scope
+
+These are adaptations of low-poly source hands with keyed rigid hand/forearm movement, not newly sculpted finger-by-finger animations. Reload poses were sampled and rendered, rather than proven free of every possible continuous mesh intersection. Reserve ammunition is finite; pickups/resupply are future gameplay work. The new static dagger-hand GLB from the separate Claude handoff is not integrated here.
+
+Follow-up: the Crop Duster now passes 27 checks and has thicker hands/sleeves plus revised reload/holster handling. See CROP_DUSTER_POLISH.md for the current details and dedicated shotgun video.
+
+## Refreshed playtest audit — 19 October 2026
+
+All 39 project-owned GDScript files passed Godot 4.3 check-only. Import plus validate, movement, zombie, ooze, knife, knife viewmodel, pistol (19 checks) and Crop Duster (27 checks) passed. Reviewed player/input/weapon switching, weapon state and ammo paths, shared hitscan, barricades, enemy setup, scene wiring and launch configuration. A literal resource-path audit across 131 text resources found no missing static asset references; the three reported prefixes are dynamically built capture filenames.
+
+Set Compatibility as the project default as well as the launcher override, so opening project.godot uses the same renderer. Updated stale top-level controls and refreshed the combined loadout video with the latest shotgun animation. Rendered capture_knife.gd and inspected its idle image; inspected decoded loadout frames. No new runtime gameplay errors were reported in the bounded startup.
+
+Repeated the bounded 30 FPS performance check with normal shader-cache access. Focus caps passed (60 foreground / 15 background); frame-time p95 was 34.8–35.5 ms, with a 62.5 ms maximum in the 12-zombie/ooze stress stage. VRAM was 51.9–54.3 MB. Restricted cache access produced a much larger first-use compilation hitch, so the normal-cache results above are the relevant comparison. These short checks do not prove sustained 60 FPS or that every possible animation intersection is eliminated.
+
+The next Play_DriveThru.cmd launch loads this combined project: slot 1 custom pistol, slot 2 knife, slot 3 Crop Duster, existing HD hand materials, thicker shotgun arms and video-reference handling. Unintegrated concept enemies and the separate static dagger-hand reference are not part of this playtest.
+
+## Claude feature integration — 19 October 2026
+
+Located the separate Claude-updated project at D:/zombys/versions/drivethru-main. The prior launcher had been opening the local firearm/menu branch, which lacked these changes. Imported Claude's Scuttler model, rig, behaviour and tests; recurring randomized-lane spawns and next-spawn HUD; mushroom drop/collection system and counter; Scuttler-specific barricade gaps; and the sculpt-derived knife grip/wrist fit with its builder and source. Source folders on D: were not modified.
+
+Merged main/player scripts while retaining the restored custom pistol, Crop Duster slot 3, reload input rules and ammo HUD, latest hand/shotgun handling, menu intro and bus cinematic. The default menu Start Cooking now enters the combined gameplay scene. X spawns a Scuttler; Z spawns a Shambler. Automatic spawns begin after 3 seconds, repeat every 11 seconds, and every third enemy is a Scuttler. Kills drop mushrooms, which are collected by proximity and counted on the HUD; nothing spends them yet.
+
+Verification: 52 owned scripts pass check-only. validate, movement, zombie, ooze, knife, revised knife-viewmodel, pistol, Crop Duster, spawn, Scuttler, pickup and menu tests pass. Rendered and inspected the revised knife and a combined Scuttler/pickup scene. New feature source assets and build scripts are included in DriveThru_Latest.zip.

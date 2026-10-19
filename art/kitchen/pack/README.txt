@@ -1,0 +1,2 @@
+KITCHEN SOURCE TEXTURE PACK
+16 PNG base-colour surfaces and graphics, approximately 313px each, cropped from generated artwork. Source textures only, not UV-fitted or seamless; no normal/roughness/metallic maps. Painted lighting and depth may be present. Use labels on flat jar planes and adjust UVs to crop proportions. Match mesh geometry separately. Use nearest filtering for pixel style. Repeat seams need checking before tiling large surfaces.

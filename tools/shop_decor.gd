@@ -326,92 +326,13 @@ func mat(g: String, x0: float, z0: float, x1: float, z1: float) -> void:
 	b.box(g, "rubber_mat", Vector3(x0, 0.0, z0), Vector3(x1, 0.008, z1), false)
 
 func shop_floor() -> void:
-	var g := "Props_Shop"
-	var IZ: float = b.IZ
-	var hx: float = b.HATCH["at"]
-	var hb: float = b.HATCH["bottom"]
-	# Long service counter: teal cabinet modules, steel top, shelf through the hatch.
-	var cz0 := -IZ
-	var cz1 := -IZ + 0.65
-	for i in 7:
-		var x0 := -5.6 + i * 0.8
-		var x1 := minf(x0 + 0.8, -0.075)
-		b.box(g, "cabinet", Vector3(x0, 0, cz0), Vector3(x1, hb - 0.07, cz1), false)
-	b.box(g, "steel", Vector3(-5.65, hb - 0.07, cz0), Vector3(-0.075, hb, cz1 + 0.05), false)
-	b.box(g, "paint_orange", Vector3(-5.65, hb - 0.1, cz1 + 0.05), Vector3(-0.075, hb - 0.07, cz1 + 0.07), false)
-	b.col(g, Vector3(-5.65, 0, cz0), Vector3(-0.075, hb, cz1 + 0.05))
-	b.clip(g, Vector3(-b.IX, 0, cz0), Vector3(-0.075, 2.4, cz1 + 0.05))
-	b.box(g, "steel", Vector3(hx - 0.88, hb, -b.HALF_D - 0.3), Vector3(hx + 0.88, hb + 0.04, cz0 + 0.2), false)
-	# Till, condiments, napkins, bags and cups on the counter.
-	var y := hb
-	b.box(g, "metal", Vector3(-4.65, y, -4.6), Vector3(-4.2, y + 0.1, -4.25), false)
-	rbox(g, "metal", T(Vector3(-4.42, y + 0.1, -4.5)), Vector3(0, 0.15, 0), Vector3(0.34, 0.26, 0.04), rotx(-15))
-	rbox(g, "screen", T(Vector3(-4.42, y + 0.1, -4.477)), Vector3(0, 0.15, 0), Vector3(0.28, 0.2, 0.01), rotx(-15))
-	b.prism(g, "metal", Vector3(-4.42, y + 0.1, -4.53), 0.02, 0.05, 6)
-	for i in 3:
-		b.prism(g, "paint_orange", Vector3(-2.0 + i * 0.09, y, -4.58), 0.035, 0.2, 8)
-		b.prism(g, "paint_amber", Vector3(-2.0 + i * 0.09, y, -4.48), 0.035, 0.18, 8)
-	b.box(g, "steel", Vector3(-1.72, y, -4.62), Vector3(-1.52, y + 0.16, -4.48), false)
-	for i in 2:
-		var bx := -1.3 + i * 0.27
-		b.box(g, "paper_bag", Vector3(bx, y, -4.55), Vector3(bx + 0.22, y + 0.3, -4.4), false)
-		b.box(g, "paint_orange", Vector3(bx + 0.07, y + 0.12, -4.395), Vector3(bx + 0.15, y + 0.2, -4.39), false)
-	for i in 3:
-		b.prism(g, "chalk", Vector3(-5.35, y + i * 0.06, -4.5), 0.05, 0.06, 8)
-	b.prism(g, "chalk", Vector3(-5.18, y, -4.5), 0.05, 0.12, 8)
-	mat(g, -4.6, cz1 + 0.1, -1.4, cz1 + 0.8)
-	# Stock shelving on the west wall.
-	shelf_unit(g, -b.IX, -b.IX + 0.48, -3.95, -1.85, 1.9, 4)
-	# Drinks fridge with a lit glass door.
-	b.box(g, "metal", Vector3(-5.6, 0, -0.95), Vector3(-4.7, 1.95, -0.1), true)
-	b.box(g, "fridge_glass", Vector3(-5.5, 0.2, -0.96), Vector3(-4.8, 1.8, -0.95), false)
-	for i in 4:
-		var sy := 0.55 + i * 0.35
-		b.box(g, "metal", Vector3(-5.5, sy, -0.965), Vector3(-4.8, sy + 0.02, -0.955), false)
-	b.box(g, "paint_orange", Vector3(-4.86, 0.8, -1.0), Vector3(-4.82, 1.3, -0.96), false)
-	b.box(g, "fascia", Vector3(-5.6, 1.95, -0.95), Vector3(-4.7, 2.15, -0.1), false) # top sign panel
-	# Bin by the kitchen door.
-	b.prism(g, "metal", Vector3(-0.33, 0, -0.33), 0.22, 0.75, 8, Basis.IDENTITY, true)
-	b.prism(g, "paint_orange", Vector3(-0.33, 0.75, -0.33), 0.23, 0.04, 8)
-	b.clip(g, Vector3(-0.6, 0, -0.6), Vector3(-0.075, 2.4, -0.075))
+	# Serving-room art is isolated from the gameplay station/collision layout.
+	var serving = preload("res://tools/serving_room.gd").new()
+	serving.build(self)
 
 func kitchen() -> void:
-	var g := "Props_Kitchen"
-	var IZ: float = b.IZ
-	var z0 := -IZ
-	var z1 := -IZ + 0.65
-	# Prep bench | flat-top griddle | twin fryer | prep bench, under one hood.
-	b.box(g, "steel", Vector3(0.075, 0, z0), Vector3(1.5, 0.92, z1), true)
-	b.clip(g, Vector3(0.075, 0, z0), Vector3(4.85, 2.4, z1))
-	b.clip(g, Vector3(5.4, 0, -3.95), Vector3(b.IX, 2.4, -3.37))
-	b.box(g, "wood", Vector3(0.45, 0.92, z0 + 0.15), Vector3(0.95, 0.95, z0 + 0.45), false) # chopping board
-	b.box(g, "steel", Vector3(1.5, 0, z0), Vector3(2.7, 0.85, z1), true)
-	b.box(g, "metal", Vector3(1.52, 0.85, z0 + 0.02), Vector3(2.68, 0.92, z1 - 0.02), true)
-	b.box(g, "steel", Vector3(1.5, 0.92, z0), Vector3(2.7, 1.15, z0 + 0.05), false)
-	# (the griddle starts empty: patties are cooked on it in play, game/grill.gd)
-	b.box(g, "steel", Vector3(2.7, 0, z0), Vector3(3.6, 0.92, z1), true)
-	for k in 2:
-		var fx := 2.78 + k * 0.42
-		b.box(g, "metal", Vector3(fx, 0.88, z0 + 0.1), Vector3(fx + 0.34, 0.925, z1 - 0.12), false)
-		b.box(g, "fries", Vector3(fx + 0.05, 0.9, z0 + 0.18), Vector3(fx + 0.29, 0.98, z1 - 0.2), false)
-		b.box(g, "metal", Vector3(fx + 0.15, 0.95, z1 - 0.2), Vector3(fx + 0.19, 0.98, z1 + 0.08), false)
-	b.box(g, "steel", Vector3(3.6, 0, z0), Vector3(4.4, 0.92, z1), true)
-	for i in 3:
-		for j in 2:
-			b.prism(g, "bun", Vector3(3.75 + i * 0.22, 0.92, z0 + 0.2 + j * 0.22), 0.08, 0.06, 6)
-	b.box(g, "steel", Vector3(1.35, 2.15, z0), Vector3(3.75, 2.55, z0 + 0.85), false) # hood
-	b.box(g, "steel", Vector3(1.35, 2.05, z0 + 0.8), Vector3(3.75, 2.15, z0 + 0.85), false)
-	b.box(g, "lamp", Vector3(1.5, 2.14, z0 + 0.6), Vector3(3.6, 2.15, z0 + 0.7), false)
-	b.box(g, "steel", Vector3(2.25, 2.55, -4.4), Vector3(2.85, 3.0, -4.0), false)  # duct
-	b.light("HoodLight", Vector3(2.55, 1.9, z0 + 0.5), P.AMBER_GLOW.lerp(P.WARM_CHALK, 0.4), 0.8, 3.0)
-	mat(g, 1.4, z1 + 0.05, 3.8, z1 + 0.7)
-	# Tall fridge in the corner.
-	b.box(g, "steel", Vector3(4.85, 0, -IZ + 0.05), Vector3(5.7, 2.0, -3.95), true)
-	b.box(g, "metal", Vector3(4.85, 1.25, -3.955), Vector3(5.7, 1.27, -3.945), false)
-	b.box(g, "metal", Vector3(4.92, 0.6, -3.95), Vector3(4.96, 1.15, -3.9), false)
-	b.box(g, "metal", Vector3(4.92, 1.4, -3.95), Vector3(4.96, 1.85, -3.9), false)
-	# Bun rack against the partition.
-	shelf_rack_buns(g, 0.35, 1.35, -0.62, -0.1)
+	var kitchen_room = preload("res://tools/kitchen_room.gd").new()
+	kitchen_room.build(self)
 
 func shelf_rack_buns(g: String, x0: float, x1: float, z0: float, z1: float) -> void:
 	for cx in [x0 + 0.02, x1 - 0.02]:

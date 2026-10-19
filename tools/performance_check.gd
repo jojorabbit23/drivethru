@@ -1,4 +1,4 @@
-# Bounded rendered check: 30 FPS, three short stages, then exits.
+# Bounded rendered check: 30 FPS, four short stages, then exits.
 # godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd
 extends SceneTree
 var main: Node3D
@@ -7,7 +7,7 @@ var viewport_rid: RID
 var results: Array[Dictionary] = []
 func _initialize() -> void:
 	Engine.max_fps = 30
-	create_timer(15.0).timeout.connect(_timeout)
+	create_timer(20.0).timeout.connect(_timeout)
 	run.call_deferred()
 func settle(frames: int) -> void:
 	for i in frames:
@@ -69,6 +69,13 @@ func run() -> void:
 	var preview: String = OS.get_environment("FPS_PROFILE_PREVIEW")
 	if not preview.is_empty():
 		root.get_texture().get_image().save_png(preview)
+	player.call("switch_weapon",2)
+	var crop: Node = player.get_node("Head/Camera3D/CropDuster")
+	await settle(20)
+	crop.loaded.fill(false)
+	crop.call("reload")
+	await measure("Crop Duster / reload")
+	player.call("switch_weapon",1)
 	for i in 12:
 		main.call("spawn_zombie")
 	var ooze: Node = load("res://core/ooze.gd").get_fx(main)
@@ -87,5 +94,5 @@ func run() -> void:
 	quit()
 
 func _timeout() -> void:
-	push_error("Performance check exceeded its 15-second time budget")
+	push_error("Performance check exceeded its 20-second time budget")
 	quit(1)

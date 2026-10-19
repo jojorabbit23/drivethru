@@ -9,6 +9,8 @@ const RATE := 22050
 static var _cache := {}
 
 static func stream(name: String) -> AudioStreamWAV:
+	if name == "pistol":
+		return preload("res://weapons/pistol/audio/shot.wav")
 	if _cache.has(name):
 		return _cache[name]
 	var s := _make(name)
@@ -16,6 +18,7 @@ static func stream(name: String) -> AudioStreamWAV:
 	return s
 
 static func play(node: Node, name: String, volume_db := -6.0) -> void:
+	if DisplayServer.get_name() == "headless": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer.new()
@@ -26,6 +29,7 @@ static func play(node: Node, name: String, volume_db := -6.0) -> void:
 	p.play()
 
 static func play_at(node: Node, name: String, at: Vector3, volume_db := 0.0) -> void:
+	if DisplayServer.get_name() == "headless": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer3D.new()

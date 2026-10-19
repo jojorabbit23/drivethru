@@ -8,29 +8,7 @@ A Godot **4.3** first-person zombie-siege game set in a roadside drive-through.
 The player is Cleatimus Maximus, a redneck mushroom farmer. Read `README.md`
 for the full tour; it describes every system that exists today.
 
-The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_DESIGN.md`. The burger loop is built; see README.
-
-## Who's working on what (two agents in parallel)
-
-To avoid stepping on each other, the owner has split the work:
-
-- **Claude:** the cooking system (`game/grill.gd`, `game/prep_bench.gd`, new
-  kitchen stations under `game/`, patty visuals), the shop terminal and
-  economy (`game/shop_terminal.gd`, `game/economy.gd`), and the shotgun
-  (`weapons/shotgun/`, slot 4, bought at the terminal).
-- **Codex:** quality-of-life improvements, audio (`game/sfx.gd` and any new
-  sounds), kitchen textures (calming the tiles; reuse the serving-room
-  ones), and tightening up the visuals of scenery and NPCs
-  (`tools/build_shop.gd`, `tools/shop_decor.gd`, `tools/make_textures.gd`,
-  `textures/`, enemy and vehicle looks).
-
-The shotgun asks game/sfx.gd for "shotgun", "pump" and "shell" sounds; sfx.gd
-plays silence for unknown names, so those are Codex's to add whenever.
-
-Shared files (`main.gd`, `player/player.gd`, README, this file): keep edits
-small, pull before you start, and commit often. If you need something in the
-other agent's area, make the smallest change that works and say so in the
-commit message.
+The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the burger loop) is built; see README.
 
 ## Hard rules
 
@@ -45,11 +23,8 @@ commit message.
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
    - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`, `cleatimus_right_hand_mesh.res`, `dagger_viewmodel.tscn`, `cleatimus_dagger_hand_mesh.res`: `tools/build_knife_viewmodel.gd` (hand fit in `tools/knife_hand_mesh.gd`)
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
-   - `enemies/lancer/lancer_model.tscn` and `lancer_*`: `tools/build_lancer.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
-   - `vehicles/*/` models, meshes, materials, albedos (school bus, armoured truck): `tools/build_vehicles.gd`
-   - `weapons/shotgun/shotgun_model.tscn`, `shotgun_hand_r.res`, `shotgun_hand_l.res`: `tools/build_shotgun.gd`
-   - `fonts/pixel/pixel_font.tres`, `ui_theme.tres`: `tools/build_font.gd` (from the editable `fonts/pixel/glyphs.txt`)
+   - `vehicles/school_bus/bus_model.tscn`, `bus_*`: `tools/build_bus.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.
@@ -67,8 +42,6 @@ commit message.
    godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
-   godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
-   godot --headless --path . --fixed-fps 60 --script res://tools/shotgun_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no
@@ -91,15 +64,12 @@ commit message.
 core/            palette, ooze FX, window barricades, shared hitscan
 enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
-enemies/lancer   lancer.gd (behaviour), built model + animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
-weapons/shotgun  shotgun_weapon.gd (gameplay + code-animated viewmodel), built model and hands
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
-vehicles/        customer vehicles (school bus, armoured truck) built from source GLBs
-game/            the burger loop: economy, stations (store, grill, prep bench, drive-thru, terminal), customers, pixel icons, synth sounds
+vehicles/        customer vehicles (school bus) built from source GLBs
+game/            the burger loop: economy, stations (store, grill, drive-thru, terminal), cars, pixel icons, synth sounds
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene
-fonts/pixel      the pixel font (project theme): glyph source, built font, owner's lettering sheet
 tools/           build scripts, tests, capture/film scripts
 docs/            previews, videos, handover briefs
 ```
@@ -109,5 +79,22 @@ head hitboxes) · 5 player_clip · 6 interact (station look-zones, Area3D with m
 
 Weapons are children of `Player/Head/Camera3D` that implement
 `set_active(on: bool)`. The player collects them in order (slot 1 = pistol,
-slot 2 = knife, slot 3 = dagger alternative using the same knife script).
-Bought weapons join later through `player.add_weapon()` (slot 4 = the shotgun).
+slot 2 = knife, slot 3 = Crop Duster, slot 4 = dagger alternative using the same knife script).
+
+## Integrated project (2026-10-19)
+
+The canonical project combines GitHub main's cooking/prep, purchases, vehicles and
+Lancer with the custom pistol, original Crop Duster, menu, room art and presentation.
+The purchased pump is appended as slot 5; use the wheel to select it. Never replace
+the Crop Duster or dagger when integrating it. The pistol combines OpenCode's new
+hand builder with the original textured pistol mesh; both pistol and pump emit
+two ammo_changed arguments. main.gd also accepts the older zero-argument signature.
+
+Rebuild room geometry/materials with tools/build_shop.gd. Keep its kitchen_room.gd
+and serving_room.gd delegates: using an older shop_decor.gd removes the owner art.
+Rebuild the pump model/hands with tools/build_shotgun.gd; keep the PSX Firearms licence.
+Also run every tools/*test.gd suite, including integration_test.gd, plus validate.gd.
+Render kitchen, serving room, pistol, knife and pump captures before shipping changes.
+Claude owns cooking/station rules; Codex owns presentation. Shared main/player changes
+must preserve both sets of APIs. Pull/merge before editing; do not replace whole files
+with a copy from another branch. Do not hand-edit generated scenes or materials.

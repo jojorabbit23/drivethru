@@ -73,7 +73,7 @@ func options(player: Node) -> Array:
 			if player.has_weapon("SHOTGUN"):
 				opts.append(_buy("%d shotgun shells  $%d" % [Economy.SHELL_PACK, Economy.SHELL_PRICE], Economy.SHELL_PRICE, "shells", buy_shells.bind(player)))
 			else:
-				opts.append(_buy("Pump shotgun (slot 4)  $%d" % Economy.SHOTGUN_PRICE, Economy.SHOTGUN_PRICE, "shotgun", buy_shotgun.bind(player)))
+				opts.append(_buy("Pump shotgun (wheel to equip)  $%d" % Economy.SHOTGUN_PRICE, Economy.SHOTGUN_PRICE, "shotgun", buy_shotgun.bind(player)))
 			opts.append(back)
 			return opts
 		"supplies":

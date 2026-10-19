@@ -1,12 +1,40 @@
+# Current combined recovery — 2026-10-19
+
+Use `../Play_DriveThru.cmd` to play this combined project. Restored kitchen/serving
+art, GitHub main's newer cooking/prep/pump/Lancer/vehicles, OpenCode movement and
+new pistol hands, and the original textured pistol are integrated here. Original
+slots 1–4 remain; the purchased pump is appended and selectable with the wheel.
+R reloads firearms; Esc pauses. See docs/handover/RECOVERY_2026_10_19.md for provenance
+and verification. Older sections below record earlier stages of development.
+
+
+---
+
+Historical notes below (superseded by the recovery above).
+
+# Current combined playtest — 19 October 2026
+
+Open Play_DriveThru.cmd in the parent outputs folder. The menu, intro and bus cinematic now load the same game containing cooking, customer service, economy, storage, grill, shop terminal, waves, Scuttlers and mushroom pickups, plus the animated custom pistol, Crop Duster and revised knife/dagger hands.
+
+E uses a station; 1–4 choose options while its menu is open. Otherwise 1 pistol, 2 knife, 3 Crop Duster, 4 dagger; mouse wheel also switches. R reloads firearms; F inspects. R restarts after death or while holding a knife. F2 toggles auto-collect. Z/X spawn Shambler/Scuttler. Kill → collect → store → cook → bag → serve → buy supplies. Continue remains disabled until saves exist.
+
+Latest gameplay source integrated: GitHub main fefcb797c8c942749151d9783571c6aa90b8f2de. The custom pistol retains its existing 15-round magazine, 90 reserve and 2.1 s reload; the terminal adds 24 reserve rounds for $12. The cooking-loop test now exercises that actual animated pistol through player fire gates and its real reload timing. Gameplay and intro buses are separate owner-supplied assets.
+
+All 84 owned scripts parse; all 15 suites pass (validate, movement, zombie, ooze, knife, knife viewmodel, spawn, Scuttler, pickup, cooking loop, pistol, Crop Duster, menu, presentation and kitchen visuals). Rendered and inspected menu/video handoff, grill/customer stations and current weapon poses. The short capped performance check passed focus limits; it does not prove sustained 60 FPS under every load.
+
+See docs/handover/FINAL_COMBINED.md for provenance, integration and verification. Esc now pauses; F1 toggles detailed controls. Audio, sensitivity and comfort settings persist between sessions. The kitchen uses calmer serving-room tiles and steel. See docs/handover/PRESENTATION_POLISH.md for this pass. Older sections below describe earlier development stages and may use superseded controls.
+
+Original sawn-off update: over-chamber reload hand, stronger recoil/report, brief vapor and 22 damage per pellet. Kitchen grinder/bin visuals and distant ambience are included. These props await Claude’s transaction/interaction wiring. See docs/handover/CODEX_SIDE_IMPLEMENTED.md and docs/video/sawn_off_updated.mp4.
+
+---
+
 # The Drive Thru — greybox prototype
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 / 3 / 4 or mouse wheel switch weapon (4 = the shotgun, once bought) · LMB shoot (pistol, shotgun) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · C spawn a Lancer · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 pistol / 2 knife / 3 Crop Duster (or mouse wheel) · LMB fire / slash · RMB aim / stab · R reload firearms (restart after death, or while holding knife) · F inspect firearms · hold E repair · Z spawn zombie · L labels · Esc release mouse (click to recapture)
 
-Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new zombie every **11 seconds**. Every third one is a **Scuttler** (set `scuttler_every`, or 0 to turn them off). From wave 2, every fifth is a **Lancer** (`lancer_every`). Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; while full, pending wave enemies wait for a later spawn tick. Spawning stops when you die.
-
-The settings are on the `Main` node in `main.tscn`, and are easy to tweak: `spawn_interval` (11), `first_zombie_delay` (3) and `max_zombies` (12).
+The first Shambler comes down Window A's lane (east, kitchen side) three seconds after you start.
 
 ## What's here
 
@@ -88,49 +116,6 @@ Bullets and enemies ignore this layer. The player's mask is `1 | 2 | 16`. Add cl
 - If you slide along a wall past an open doorway, you drift in and brush the far frame. That's normal physics, not a snag.
 - The windows can't be climbed. Their sills sit just above jump height, and the opening is shorter than the player even with the boards gone. If you raise `jump_velocity` above about 4.2, rerun the test.
 
-## The burger loop
-
-The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.md` (cooking). The aim is that the player thinks "what should I cook next?", not "why am I doing this animation again?". The grill cooks in the background while you defend; it's another front to keep an eye on.
-
-**Kill → collect → store → grill → bag → serve → cash → buy → survive waves.** Look at a station and press **E**. Menus list numbered options: **1–4** picks one, **E** picks the first available.
-
-| Station | Where | What E does |
-|---|---|---|
-| **Mushroom store** (`game/storage_bin.gd`) | storeroom, by the doorway | Stores everything you're carrying. The sign shows stock per kind. |
-| **Grill** (`game/grill.gd`) | kitchen flat-top | Patty menu: **Common xN / Blue xN / Red xN / Cancel**. The patty goes on the first free slot. You can also scrape off a burnt patty. **Look at a cooking patty and E flips it** (once): it cooks the rest 1.6× faster. |
-| **Prep bench** (`game/prep_bench.gd`) | left of the grill | One press: bun + topping + cooked patty (or two) = wrapped burger, built on the board in front of you. It makes what's on the order ticket and says what you'll get first ("bag blue burger · PERFECT"). |
-| **Warming tray** (`game/holding_tray.gd`) | the shelf over the counter, under a heat lamp | Once bought: moves up to 2 ready patties off the grill and keeps them at their quality. The bench uses them first. |
-| **Order rail** (`game/order_rail.gd`) | the wall above the counter | Not a station: it shows the current customer's ticket (burger, name, patience bar), so you can cook without walking to the hatch. |
-| **Drive-thru window** (`game/customer_window.gd`) | the service hatch | Serve the burger you're holding. |
-| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Three pages: **Weapons and ammo**, **Kitchen supplies**, **Upgrades**. A page stays open after you buy, so you can buy twice. |
-
-- **Mushroom kinds** are the livestock. Shamblers drop **common brown** (20% blue). Scuttlers drop **blue** (30% red). Lancers always drop **red**. Pickups, carried counts, stock, patties and orders are all colour-coded with matching pixel icons.
-- **Orders:** a customer pulls up in the **armoured school bus** or the **armoured truck** ("ALL HAIL THE GRILL"), chosen at random. Both are built by `tools/build_vehicles.gd` from the owner's GLBs, at full detail with their tyres cut out so they roll by distance. The customer honks and shows a **pixel burger icon in its patty colour**, with no text: brown 55%, blue 30%, red 15%. They wait 50 s with a patience bar (75 s with the bell), and a missed order costs nothing. The same ticket slides down the kitchen's order rail.
-- **Recipes** (`game/recipes.gd`, from docs/COOKING_DESIGN.md "Later Recipes"): after you've served 3 burgers, customers also order a **Double** (two patties of one kind, $50) or the **Special** (a red and a blue patty, $60), each with its own icon. A double needs all its patties ready (the bench says what's missing: "the double red needs 2 red patties") and is only as good as its older patty. Tips as below. Clips: `docs/video/bus_wheels.mp4`, `docs/video/truck_customer.mp4`.
-- **The patty is the mushroom** (`game/patty.gdshader`): a whole one drops onto the plate gills-up (stalk showing, its cap in the kind's colour), the spatula presses it down, grease spits while it sizzles, and it browns, goldens, then chars. A flip turns it onto its gills, showing the seared cap.
-- **Grill states**, per slot: RAW (0–1 s) → COOKING (1–6 s, sizzle, steam, %) → READY (6–18 s, golden, bell, tick icon, countdown) → BURNT (charred, smoke, cross icon, a repeating alarm). The label says the kind and the number ("BLUE / 75%"). No state relies on colour alone.
-- **Quality** is set when you bag, by how long the patty sat READY. **Perfect** (≤ 4 s) pays $30 + $6, **Good** (≤ 8 s) $30 + $3, **Standard** $30. **Burnt salvage** pays $15 from any customer, so a mistake is recoverable. A burger of the wrong kind is refused.
-- **Upgrades** (terminal): grills, Starter 2 slots → **Reinforced** 3 ($90) → **Restaurant** 4 ($180) → **Apocalypse** 4 with a 20 s ready window ($300); the **Warming tray** ($120, holds 2 cooked patties without losing quality); the **Drive-thru bell** ($100, customers wait 50% longer; a brass bell appears on the sill).
-- **Supplies:** buns and toppings come 5 + 5 for $40 ($8 a burger, as designed) or in the big box, 15 + 15 for $110. You start with 8 of each. The prep bench's bun tray and topping tub show what's left.
-- **Weapons and ammo:** pistol rounds, 24 for $12 (you start with 12 + 36); the **pump shotgun** for $150 (slot 4, see below), then 12 shells for $30.
-- **Cash:** $2 per kill. Pistol: 12-round magazine, 1.1 s reload, a reserve topped up at the terminal.
-- **Waves:** wave *n* sends 4 + 2*n* enemies, one every max(5, 12 − *n*) s, then a 20 s break.
-- **Auto-collect (F2):** pickups fly to you from anywhere.
-- **HUD:** cash; per kind, carried (stored); buns and toppings; the burger you're holding (kind + quality); wave and ammo; prompts, menus and toasts such as "PERFECT +$36".
-- **Art and sound:** icons are pixel art drawn in code from the palette (`game/icons.gd`). Sounds are synthesised in code (`game/sfx.gd`).
-
-`tools/loop_test.gd` plays all of this headless. `tools/capture_loop.gd` renders `docs/previews/loop1..7*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
-
-`tools/capture_kitchen.gd` renders `docs/previews/kitchen_patties.png` (the drop, press, flip and states), `kitchen_pass.png` (rail, tray, bench, bell) and `kitchen_recipes.png`.
-
-**Not yet:** the commercial prep station and bun dispenser upgrades, cheeseburgers, deliveries and the supply runner, traps and power-ups.
-
-## Trailer
-
-`docs/video/trailer.mp4` (about 40 s) is a demo trailer cut from in-engine footage: the shop at night with the title, the horde, the boards, the shotgun, harvesting, the grill, building an order, the armoured truck, getting paid, gearing up, the Lancer at the boards, and an end card. Captions use the pixel font between letterbox bars; the soundtrack is synthesised.
-
-`python3 tools/make_trailer.py` films every shot with `tools/film_trailer.gd` and edits them together (`--edit` re-cuts already-filmed shots). Shot trims, captions and music are all in those two files.
-
 ## The Shambler (first zombie)
 
 `enemies/shambler/` is built from your `voxel_zombie_3d_model.glb`. The original is kept in `source/`.
@@ -194,108 +179,6 @@ The clips `docs/video/ooze_closeup.mp4` and `shambler_encounter.mp4` show it in 
 
 Everything currently passes. Typical timeline: at the window at 10 s, boards gone and climbing at 15.6 s, inside at 17 s.
 
-## The Scuttler (second enemy)
-
-`enemies/scuttler/` is built from your `Mushroom_AllAround_Glow_1.glb`: the repainted cap colour plus the orange-spot glow map. The original is kept in `source/`. It's the brief's "fast small intruder": a mushroom on two boots.
-
-**Model:** `tools/build_scuttler.gd` builds it:
-- It's 1.05 m tall, with 10 bones: root, hips, body, cap, plus a thigh, shin and boot per leg. The legs hang off the hips, so the body and cap can squash and wobble without dragging them.
-- **The right leg is rebuilt.** The sculpt has the right leg kicked back with the boot toe-down, and bending it into a stride tore the trousers and boot into spikes. The build swaps it for a mirror image of the planted left leg and smooths the right hip to match. Both legs go in as closed pieces tucked up into the belly, so a swinging leg never opens a gap at the hip.
-- The legs use **inverse kinematics**. Each clip says where the ankles go and how the boots pitch, and the hip, knee and ankle angles are solved from that. Boots stay flat, the stance is symmetrical, and feet don't slide or sink.
-- Each boot's direction is measured from its own vertices, not guessed.
-- Skin weights: the cap is solid; the stalk bends smoothly from hips to body to cap; legs own only the trouser part, so the round belly never follows a swinging leg. A bone-colour render checks this.
-- The mesh is watertight (checked at build time) and double-sided.
-- There are 5 LOD levels, from 9,338 triangles down to about 330 at range.
-- **Glow:** only your orange spots emit, using the glow map with multiply. Godot's default "add" mode made the whole creature glow white. These spots are the one deliberate exception to the "only light sources emit" rule: bioluminescent fungus.
-
-**Animations:** 7 clips, authored in code and baked at 30 fps:
-- `idle`: weight shifts, with the cap swaying a beat behind;
-- `run`: a 0.36 s cycle with toe-off, heel strike and a bouncing, squashing body. Every curve in it is smooth through the loop, so there are no pops at plant or lift-off;
-- `ram`: crouch, spring, and the cap smashes the board at 0.42 s;
-- `dive`: the cap flattens and the boots tuck;
-- `kick`: a hop-in dropkick, landing at 0.3 s;
-- `flinch`;
-- `death`: keels over sideways, kicks twice, goes still.
-
-`docs/previews/scuttler_animations.png` shows them all.
-
-**Behaviour** (`scuttler.gd`, same interface as the Shambler):
-- **Lane:** sprints down the lane at 3.2 m/s.
-- **Breach:** rams the boards with its cap, knocking them out **from the bottom**. A Shambler tears them from the top.
-- **Dive:** as soon as **two neighbouring boards are gone**, it dives through with its cap squashed flat. It doesn't need the whole window open. If a Shambler has already opened a gap at the top, it dives straight through that without ramming.
-- **Speed:** it's inside in about 5 s, against about 17 s for a Shambler.
-- **Repair counters it:** repairs go back bottom-up, so they close its gap first. One ram takes 1.1 s, just slower than a 0.9 s repair, so holding E keeps a lone Scuttler out.
-- **Hunt:** runs you down at 3.4 m/s, under your 6.5 m/s sprint.
-- **Attack:** hops in and dropkicks your shins for 8 damage.
-- **Health:** 55. The cap is the weak spot (×1.5 damage), and from eye height it covers the legs, so you'll usually hit it. Two pistol hits kill either way, as does a knife stab. A slash leaves it on 15. Every hit knocks it back.
-- **Death:** the glowing spots fade out, and an ooze puddle spreads.
-- **Size:** it's knee-high, so you aim down. A wide cap collision keeps the cap out of walls, and it steers round other zombies.
-
-`tools/scuttler_test.gd` covers:
-- both lanes to four hiding spots: ramming at 2.9 s, diving at 4.5 s, kicking you at 6 to 8 s;
-- bottom-up ramming, and diving with two boards left;
-- diving through a Shambler's top gap;
-- repair holding it off;
-- cap and body hits for the pistol and the knife, and knockback;
-- the glow fading and the corpse not blocking;
-- mixed crowds of 2 Scuttlers and 4 Shamblers at two spots.
-
-It passed repeated runs. The clip `docs/video/scuttler_encounter.mp4` shows it in action.
-
-## The Lancer (third enemy)
-
-`enemies/lancer/` is built from your `stylized_creature_3d_model.glb`: a tall stalker with a morel cap for a head, bird-clawed feet and forearms that end in long bone lances. The original and its textures are kept in `source/`. It's the tough one: slow, but it hits hard and has reach.
-
-**Model:** `tools/build_lancer.gd` rigs the static T-pose:
-- It's 1.85 m tall, with 18 bones: hips, spine, chest, neck, head (cap), and per side an upper arm, forearm, lance, thigh, shin and foot.
-- Skin weights come straight from position, because the T-pose keeps the parts apart: arms by distance out from the shoulder (and never below the hip, so the wide clawed feet don't follow the arms), legs by side and height, and the torso by smooth height ramps. Every joint blends over a short band. No vertex is moved or dropped, so the mesh stays watertight.
-- One skinned surface, 9,764 triangles, with auto LODs down to about 1,450 for crowds. The albedo is baked to 1024 px with nearest filtering, so it matches the pixel look.
-
-**Animations:** 7 clips, authored in code (editable in Godot's animation editor):
-- `idle`: hunched breathing, lances twitching;
-- `stalk`: a long, deliberate 1.1 s stride, lances trailing;
-- `pry`: drives both lances between the boards and levers one off at 0.95 s;
-- `lunge`: rears back, then thrusts both lances level at chest height;
-- `climb`: hooks the sill and hauls itself through;
-- `flinch`;
-- `death`: the knees go and it pitches forward onto its cap.
-
-`docs/previews/lancer_animations.png` shows them all.
-
-**Behaviour** (`lancer.gd`, same interface as the Shambler):
-- **Lane:** stalks down the lane at 1.3 m/s.
-- **Breach:** pries boards off **from the top**, one every 1.4 s. That's slower than a 0.9 s repair, so holding E keeps it out.
-- **Its twist, reach:** once there's any gap in the boards, it stabs **through** the window at anyone within 2 m inside, for 12 damage, then has to pry again before the next stab. Repairing a Lancer's window can cost you health, unless you shut each gap promptly. Step back out of reach and it goes back to prying.
-- **Hunt:** follows you round the building at 1.6 m/s.
-- **Attack:** a two-lance lunge from 1.8 m that hits for 24. The wind-up is slow and easy to read; back off during it and it stabs air.
-- **Health:** 150. The cap is the weak spot (×2): three pistol headshots or five body shots, or two knife stabs. Only heavy hits (headshots, knife stabs) make it flinch.
-- **Drops:** always a **red** mushroom.
-- **Waves:** from wave 2, every 5th spawn is a Lancer (`lancer_every`, `lancer_from_wave`). Press **C** to spawn one.
-
-`tools/lancer_test.gd` covers:
-- the model: clips, bones, height, hitbox on the cap, red drop;
-- both lanes to four hiding spots: prying, climbing, then lancing you;
-- top-down prying, slower than a repair;
-- stabbing through gaps, stepping out of reach, and repair holding it off;
-- dodging the lunge;
-- pistol cap and body kills, knife stabs, flinching;
-- wave rules;
-- mixed crowds of 2 Lancers, a Scuttler and 3 Shamblers at two spots.
-
-The clip `docs/video/lancer_encounter.mp4` shows it in action: it stalks in, pries, stabs through the gap at you while you repair, climbs in, and goes down to the pistol.
-
-## Mushroom drops
-
-Every enemy drops one glowing mushroom when it dies. The model is the owner's pixelated mushroom (`pickups/mushroom/source/pixelated_mushroom_3d_model.glb`), scaled to 0.34 m tall. `tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res`, its material and textures.
-
-- **Drop:** 0.6 s after the kill it pops out of the body in a little arc and lands hovering 0.42 m above the floor, a step to one side. It never lands inside a wall.
-- **Look:** it spins (about one turn every 3.5 s) and bobs gently. It has a faint warm self-glow, a thin amber halo outlines it (`pickup_glow.gdshader`, an additive rim pass), and a small amber light pulses on the floor beneath it.
-- **Pickup:** walk into it. Within 2.6 m, with nothing solid between you, it flies to you. Boards don't block it, so a mushroom dropped just outside a window can be pulled in from the repair spot; one under a sill rises over it first.
-- **Count:** `player.mushrooms` (signal `mushrooms_changed`), shown on the HUD as `MUSHROOMS n`. Nothing spends them yet.
-- **Script:** `pickups/mushroom/mushroom_pickup.gd` (`class_name MushroomPickup`). `main.drop_pickup(position)` drops one anywhere.
-
-`tools/pickup_test.gd` checks both enemy types drop exactly one, that it floats, spins, bobs and glows, that it stays put while you're far away, that walking up collects it and updates the HUD, that one dropped outside a window can be pulled in, and that four at once are all collected. `docs/video/pickup.mp4` shows two kills, a close-up of a mushroom, and the pickup.
-
 ## The knife
 
 `weapons/knife/` is built from your `knife_3d_model.glb`; the original is kept in `source/`.
@@ -306,7 +189,6 @@ Every enemy drops one glowing mushroom when it dies. The model is the owner's pi
 - The origin sits on the grip, which is where the PSX arms' `weapon_r` bone holds it.
 - A `Tip` marker marks the point.
 - The texture is reduced to a 512 px nearest-filtered map.
-- It is simplified to about a third of the source triangles (9,680 → 3,264) and flat shaded, so it reads a little blocky like the voxel zombies (`tools/blocky_mesh.gd`).
 
 `docs/previews/knife_orthographic.png` has side, top and front views on a 1 cm grid.
 
@@ -321,23 +203,19 @@ Every enemy drops one glowing mushroom when it dies. The model is the owner's pi
 - **Walls and boards:** the blade clinks on them and never hits through them.
 - **Feel:** a draw animation, idle breathing, bob while walking and lag behind mouse look.
 
-**The right hand** is a sculpt, not the PSX hand. `tools/knife_hand_mesh.gd` derives it from the supplied `weapons/knife/source/reference_hand_with_dagger.glb` (left untouched): the fused dagger is cut away, the fist is fitted round *our* knife's handle, and the sleeve is lengthened to run off-screen. The viewmodel builder skins it to `hand_r` (fist) and `lowerarm_r` (sleeve), blended across the cuff, and drops the PSX right arm. The left arm and watch are still the PSX mesh. Like the knife, the hand is simplified (6,898 → 4,384 triangles) and flat shaded to match the zombies' blocky look. In every knife clip the PSX fingers and `weapon_r` never move relative to `hand_r`, so a fist that's rigid on the hand loses none of the source animation and can't drift off the handle.
-
-The right forearm pivots about the sculpt's own wrist (the top of the cuff). It aims halfway between the authored elbow and the lower right of the view, 40 cm long. The sleeve is pre-bent at build time to that idle direction, so the skeleton adds at most about 26° of wrist bend (in the draw).
+The right forearm is re-aimed from the lower-right side of the view. The source elbow sat slightly left of centre and behind the eye; the runtime adjustment moves that elbow while retaining the original 40 cm forearm length and preserving the wrist position and relative finger/knife attachment. The blade stays in the same grip during draw, slash and stab.
 
 The native `kitchen_knife_draw`, `kitchen_knife_idle` and `kitchen_knife_stab` clips animate the arms. There is no supplied slash clip: the existing procedural sweep moves the complete rig while retaining its closed knife grip. Source stab frame 7 (full extension) maps to the existing 0.24-second contact; recovery ends at the original 0.72 seconds. Gameplay damage, reach, buffering, head stabs, backstabs, switching, wall blocking and ooze are unchanged.
 
 `tools/build_knife_viewmodel.gd` generates `weapons/knife/knife_viewmodel.tscn`, its skinned recoloured mesh, material and a copy of the atlas. The arms rotate 180 degrees around Y; `GripOffset` cancels the imported socket rest axes and turns our -Z-facing knife into the pack's +Z convention. Original assets are preserved in `addons/psx_fps_arms/` with README, licence and credit in `CREDITS.md`. No pack knife or colliders are included in the active viewmodel.
 
-The character recolour uses the shared HD tiles: orange sleeve, charcoal cuff, teal glove (the sculpt's fingers are gloved to match the reference shot), with the sculpt's own painted shading kept as vertex colour. A small watch follows the **left** forearm and always displays **4:20**. Its face reflects light rather than emitting it. The supplied Cleatimus HD base-colour and roughness atlases are now applied with mipmapped filtering. The older non-HD pack and WRAD textures remain unused. The elbow direction blends halfway between the original and outward poses; the resting grip is tilted 15 degrees more upright and rolled 18 degrees to show the blade's flat, easing to the native stab orientation at contact. The sculpted hand is built to face the camera after that turn.
+The optional character recolour uses the shared palette: orange sleeves, charcoal cuffs, teal fingerless gloves and dirty fingertips. A small watch follows the **left** forearm and always displays **4:20**. Its face reflects light rather than emitting it. The supplied Cleatimus HD base-colour and roughness atlases are now applied with mipmapped filtering. The older non-HD pack and WRAD textures remain unused. The elbow direction blends halfway between the original and outward poses; the resting grip is tilted 15 degrees more upright, easing to the native stab orientation at contact.
 
 Rebuild with `godot --headless --path . --script res://tools/build_knife_viewmodel.gd` after importing the source assets. `tools/inspect_knife_arms.gd` prints bones, clips and stab extension samples. `tools/knife_viewmodel_test.gd` checks the visual/gameplay interface alongside the unchanged `knife_test.gd`. Detailed transforms and validation are recorded in `docs/handover/KNIFE_HANDS.md`.
 
 The knife, arms and watch all use the same view-space depth shrink (same screen position at a tenth of the depth), with shadow casting off. The required Compatibility renders, including the close-wall stab, are in `docs/previews/knife0_draw.png` through `knife7_stab_into_wall.png`. Run `tools/capture_knife.gd` to refresh them. Its optional `-- --audit` captures every source frame of draw/stab and 30 Hz slash samples; set `KNIFE_AUDIT_DIR` to choose the output folder.
 
-**Alternative to compare (slot 3, key 3): DAGGER (alt hand).** This is the same knife gameplay script on a second viewmodel, `weapons/knife/dagger_viewmodel.tscn`. It keeps the sculpt's *own* dagger in its own hand: the fingers were sculpted round it, so nothing is cut or refitted, and the dagger keeps the sculpt's painted colours. The arm, sleeve, rig, wrist pre-bend and blocky treatment match the knife hand. Both are built by `tools/build_knife_viewmodel.gd`. Renders are `docs/previews/dagger*.png` (`capture_knife.gd -- --dagger`) and the film is `docs/video/dagger_kill.mp4` (`film_knife.gd -- --dagger`). To keep only one, delete the other node from `player/player.tscn`.
-
-**Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol, slot 2 is the knife and slot 3 is the dagger alternative; the HUD shows the current one, bottom right.
+**Weapon switching:** `player.gd` collects every child of `Head/Camera3D` with `set_active()`. Slot 1 is the placeholder pistol and slot 2 is the knife; the HUD shows the current one, bottom right.
 
 **Shared hit test** (`core/hitscan.gd`): walls and boards block everything, then a head hitbox wins over a body. Both the pistol and the knife use it. It also fixes headshots against a hunched zombie, whose movement capsule wraps round its head.
 
@@ -352,18 +230,6 @@ The knife, arms and watch all use the same view-space depth shrink (same screen 
 
 The clip `docs/video/knife_kill.mp4` shows it in action.
 
-## The shotgun
-
-A pump-action shotgun, bought at the shop terminal for $150. It goes in **slot 4** (key 4 or the wheel) and comes with 6 shells in the tube and 6 spare; more are 12 for $30.
-
-- **Fire (LMB):** 8 pellets in a 3.5° cone, 15 damage each up to 6 m, falling to 35% by 20 m. Pellets that hit the same zombie add up into one body hit and one head hit, so one close blast kills a Shambler, and one to a Lancer's cap staggers it.
-- **Pump:** automatic after every shot, a 0.8 s cycle. Hold LMB to keep firing.
-- **Loading:** a 6-shell tube, loaded one shell every 0.45 s: when it runs dry, or by itself after 1.5 s without firing. Firing interrupts a reload if there's a shell in.
-- **Viewmodel:** `tools/build_shotgun.gd` builds the blocky pump gun and dresses it in your **survivor skin** (`weapons/shotgun/source/Shotgun_Survivor_Skin.glb`: worn teal receiver with five kill tallies, weathered orange stock, grip and pump, navy steel), nearest-filtered. It reuses Cleatimus's sculpted glove from the knife, on the pistol grip and mirrored on the pump. The knife hand's sleeve tapers to a point, so the build cuts it off just past the cuff and grows a proper 8-sided sleeve out of the cuff instead, long enough to leave the screen. The kick, the pump (the left hand rides the fore-end) and shell loading (the gun rolls, the left hand feeds a shell) are animated in code in `weapons/shotgun/shotgun_weapon.gd`.
-- **Sound:** it asks `game/sfx.gd` for "shotgun", "pump" and "shell"; those play silence until they're added.
-
-`tools/shotgun_test.gd` covers buying and switching, pellet damage and falloff, a one-shot Shambler kill up close, the pump cycle, shell-by-shell loading, interrupting and topping up, spread at 4 m, and the Lancer. `tools/capture_shotgun_fp.gd` renders `docs/previews/shotgun_fp.png` (idle, kick, pump, loading) and `tools/capture_shotgun.gd` `docs/previews/shotgun_model.png`.
-
 ## Textures
 
 `tools/make_textures.gd` paints 23 small pixel textures into `textures/` using only palette colours. World-mapped surfaces use 64 px per 2 m.
@@ -371,18 +237,6 @@ A pump-action shotgun, bought at the shop terminal for $150. It goes in **slot 4
 The script **never overwrites an existing PNG** unless you pass `-- --force`. You can repaint any texture by hand (Aseprite etc.) and rebuilds will keep your version.
 
 Imports are set to lossless with mipmaps and nearest filtering, so pixels stay crisp.
-
-## Pixel font
-
-All in-game text (HUD, menus, prompts, 3D signs and the roof sign) uses the owner's chunky pixel lettering: cream letters with a dark outline, from the sheet in `fonts/pixel/source/lettering_sheet.png`.
-
-- `tools/slice_font_sheet.py` (one-off, Python) cut the sheet into glyphs and snapped each one to its pixel grid, writing `fonts/pixel/glyphs.txt`. That file is the editable source: one block per character, `#` outline, `o` fill, `.` clear. It overwrites hand edits if you run it again.
-- The sheet has A-Z, 0-9 and `. , ! ? : ; - + / ( ) $`. The colon and semicolon were redrawn, because their dots merged at grid size. Space and `% · [ ] | ' " = _` were added in the same style, because the game uses them. Lowercase shows as capitals.
-- `tools/build_font.gd` builds `fonts/pixel/pixel_font.tres` (a bitmap font) and `fonts/pixel/ui_theme.tres`, the project theme (`gui/theme/custom`), so every Label and Label3D gets it without setting anything. The fill is white, so a label's font colour tints it exactly, and the outline is baked in.
-- The native size is **18**, and the font only scales by whole steps (18, 36, 54...) so pixels stay square. Other sizes snap to the nearest step.
-- `tools/validate.gd` checks that every character the game shows has a glyph. `tools/capture_font.gd` renders `docs/previews/font.png`.
-
-To change a letter, edit `fonts/pixel/glyphs.txt`, then run `godot --headless --path . --script res://tools/build_font.gd`.
 
 ## Rebuilding
 
@@ -397,21 +251,7 @@ godot --headless --path . --fixed-fps 60 --script res://tools/movement_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/zombie_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/ooze_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
-godot --headless --path . --fixed-fps 60 --script res://tools/shotgun_test.gd
 ```
-
-To rebuild the shotgun's model and hands, run `godot --headless --path . --script res://tools/build_shotgun.gd`.
-
-To rebuild the mushroom pickup, run `godot --headless --path . --script res://tools/build_pickup.gd`. On a fresh checkout it first writes its textures; run `--import`, then run it again.
-
-To rebuild the Lancer, run `godot --headless --path . --script res://tools/build_lancer.gd`. On a fresh checkout it first writes its albedo; run `--import`, then run it again.
-
-To rebuild the Scuttler after changing its bones, weights or clips, run `godot --headless --path . --script res://tools/build_scuttler.gd`.
 
 To rebuild the zombie after changing bones, weights or animations in `tools/build_zombie.gd`, run `godot --headless --path . --script res://tools/build_zombie.gd`.
 
@@ -423,7 +263,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Colours and materials
 
-`core/palette.gd` holds the nine palette colours and is the single source of truth. The builder writes one shared `StandardMaterial3D` per surface type into `materials/`. Only lamps, light panels, screens and the fridge glass emit light; painted teal never does. The exceptions are the Scuttler's cap spots and the dropped mushrooms, which glow on purpose. The interiors are lit warm by amber lights, and the exterior is cool moonlight with amber lane lamps.
+`core/palette.gd` holds the nine palette colours and is the single source of truth. The builder writes one shared `StandardMaterial3D` per surface type into `materials/`. Only lamps, light panels, screens and the fridge glass emit light; painted teal never does. The interiors are lit warm by amber lights, and the exterior is cool moonlight with amber lane lamps.
 
 `export/shop_greybox.glb` is the same geometry for Blender or other tools. It contains no gameplay nodes or collision.
 
@@ -434,9 +274,9 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Not done yet
 
-- Deliveries, toppings, some kitchen upgrades and traps are still to come (see the burger loop section). Zombies arrive on a steady 11 s clock rather than in escalating waves.
+- No customers, deliveries, stock, economy or waves. Zombies come one at a time on a timer or with the Z key.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
-- The player is a plain capsule with a camera and an invisible placeholder pistol (the knife and the shotgun have proper viewmodels). The PSX arms pack's pistol hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
+- The player uses the existing capsule/camera controller with visible pistol, knife and Crop Duster viewmodels. The camera near clip is 0.01.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.
 - There's no monster truck at the hatch.
 - The Shambler's rig is automatic and its animations are hand-keyed in code. They read well at game distance, but an animator pass in Blender would add polish, especially to the death and climb. Because the normal arm and the shirt are one continuous surface, lifting that arm high still stretches the armpit a little, so the clips keep it below about 65°.
@@ -447,6 +287,27 @@ godot --path . --script res://tools/capture_previews.gd
 
 Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
 
-For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the shop, knife attacks and a 12-zombie/ooze stress case, then exits; a 15-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
+For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the pistol/shop, knife attacks, Crop Duster reload and a 12-zombie/ooze stress case, then exits; a 20-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
 
 The reference knife grip now has continuous teal glove coverage and an 18-degree resting roll to show the curled fingers. The roll eases into the authored stab pose at contact and returns during recovery. The original hand-to-knife attachment and gameplay timing remain intact.
+
+
+## Current combined weapon build
+
+The main loadout is now **1 pistol, 2 knife, 3 Crop Duster**, with number keys or the wheel to switch. LMB fires/slashes; RMB aims firearms or stabs with the knife. R reloads a firearm (and restarts after death); F inspects a firearm. The pistol has a 15-round magazine and 90 reserve rounds. Its existing custom model, moving slide and magazine are restored, with animated hands, reload, draw/holster, inspection, sounds and slide lockback when empty. Its original 34 body damage and headshot behaviour remain unchanged. The public low-level shoot() API remains available for the existing scripted hitscan tests; normal player input uses the gated request_fire().
+
+The Crop Duster is a two-shot break-action weapon with 24 reserve shells. It uses its original mechanical reload animation and the new pack's shotgun hands. Shells seat at 1.9 and 2.4 seconds; the full reload takes 3.4 seconds. Interrupted reloads retain seated ammunition and never create extra rounds. Draw, firing, inspection and reversed-draw holstering are included; a pump cycle is deliberately not used for this break-action gun. Eight camera-centred pellets respect cover and zombie head hitboxes. Its game-view model is fitted at 0.65 scale; the original source dimensions/data are preserved.
+
+Both firearms use the world renderer and the existing viewmodel depth technique, without another full-screen 3D viewport. The Crop Duster's game texture copies are 1024px instead of the source's 4096px, reducing measured video memory by about 120 MB in the bounded check. Original source files are retained. Build scripts: tools/build_pistol.gd and tools/build_crop_duster.gd. Source animation clips and licences are in addons/psx_firearms/. See docs/handover/CURRENT_BUILD_CHECK.md for verification and limits.
+
+The Crop Duster has a further bulk/animation pass: broader sleeves and padded gloves, palm-relative support/shell anchors, queued reload after shot recovery, live-shell retention during top-ups, and a pose-preserving holster. See docs/handover/CROP_DUSTER_POLISH.md and docs/video/crop_duster.mp4. The supplied static gloved-hands model was used as a proportion reference; native animated hand geometry remains active.
+
+The playtest now opens the animated main menu. Use Up/Down and Enter or the mouse; Start Cooking plays the bus cinematic, then loads the game. Continue is disabled until a save system exists. Settings changes volume/fullscreen for the current session. Menu artwork/video supplied by the project owner; details in docs/handover/MAIN_MENU.md.
+
+### Claude additions now combined
+
+This project also includes the Scuttler, recurring 11-second enemy spawns (every third a Scuttler), randomized lanes, next-enemy countdown, dropped glowing mushrooms with proximity collection and a mushroom counter, and Claude's sculpt-derived knife grip. Z spawns a Shambler; X spawns a Scuttler. The first automatic enemy arrives after three seconds. These were integrated from D:/zombys/versions/drivethru-main, retaining the current pistol, Crop Duster, menu and bus cinematic. Mushrooms are counted but not yet spent.
+
+Serving room refreshed from the owner's concept and atlas: room-specific tile finishes, teal cabinets, stock/packaging and poster art. Builder/rebuild notes and validation: docs/handover/SERVING_ROOM.md.
+
+Kitchen updated from the owner's two references and Kitchen_Texture_Pack.zip: stained tiles, steel cooking line, hood/utensils, labelled ingredient storage, teal fridge and sink. Live cooking and service mechanics retained. Builder/verification notes: docs/handover/KITCHEN.md.

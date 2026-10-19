@@ -36,7 +36,7 @@ signal ammo_changed(mag: int, reserve: int)
 @export var shell_time := 0.45     # per shell loaded
 @export var top_up_after := 1.5    # idle seconds before it tops the tube up
 
-const REST_POS := Vector3(0.13, -0.19, -0.3)
+const REST_POS := Vector3(0.23, -0.15, -0.50)
 const REST_ROT := Vector3(1.5, 3.0, 0.0)     # degrees
 const DRAW_TIME := 0.4
 const PUMP_START := 0.22                     # into the cycle
@@ -84,7 +84,7 @@ func _ready() -> void:
 	c.material = sm
 	_shell.mesh = c
 	_shell.rotation_degrees.x = 90.0
-	_shell.position = Vector3(0.0, -0.02, -0.03)
+	_shell.position = Vector3(0.01, 0.071, 0.0)
 	_shell.visible = false
 	_hand_l.add_child(_shell)
 	var muzzle: Node3D = _pivot.get_node("MuzzleTip")
@@ -97,13 +97,10 @@ func _ready() -> void:
 	_flash_mesh = MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(0.16, 0.16)
-	var fm := StandardMaterial3D.new()
-	fm.albedo_color = Palette.AMBER_GLOW
-	fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	fm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	fm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	fm.albedo_texture = _star_texture()
-	fm.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	var fm := ShaderMaterial.new()
+	fm.shader = preload("res://weapons/shotgun/muzzle_flash.gdshader")
+	fm.set_shader_parameter("colour",Palette.AMBER_GLOW)
+	fm.set_shader_parameter("flash_tex",_star_texture())
 	q.material = fm
 	_flash_mesh.mesh = q
 	_flash_mesh.visible = false
@@ -318,7 +315,7 @@ func _animate(delta: float) -> void:
 	if _loading:
 		var lk := clampf(_shell_t / shell_time, 0.0, 1.0)
 		var reach_k := sin(lk * PI)
-		hand_off = Vector3(-0.01, -0.035, 0.29) * reach_k
+		hand_off = Vector3(-0.01, -0.105, 0.29) * reach_k
 		rot += Vector3(4.0, 0.0, -28.0)
 		pos += Vector3(-0.03, 0.02, 0.0)
 		_shell.visible = lk < 0.55

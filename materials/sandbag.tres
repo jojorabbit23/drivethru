@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://textures/sandbag.png" id="1_u6okb"]
+[ext_resource type="Texture2D" path="res://textures/sandbag.png" id="1_i0vak"]
 
 [resource]
 resource_name = "sandbag"
-albedo_texture = ExtResource("1_u6okb")
+albedo_texture = ExtResource("1_i0vak")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

@@ -1,9 +1,15 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://player/test_gun.gd" id="2_gun"]
 [ext_resource type="Script" path="res://weapons/knife/knife_weapon.gd" id="3_knife"]
-[ext_resource type="PackedScene" path="res://weapons/knife/dagger_viewmodel.tscn" id="4_dagger"]
+
+[ext_resource type="Script" path="res://weapons/crop_duster/crop_duster.gd" id="4_crop"]
+
+[ext_resource type="PackedScene" path="res://weapons/knife/dagger_viewmodel.tscn" id="5_dagger"]
+
+[ext_resource type="Script" path="res://presentation/world_feedback.gd" id="6_feedback"]
+[ext_resource type="Script" path="res://presentation/pause_menu.gd" id="7_pause"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.35
@@ -34,6 +40,15 @@ script = ExtResource("2_gun")
 [node name="Knife" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("3_knife")
 
+[node name="CropDuster" type="Node3D" parent="Head/Camera3D"]
+script = ExtResource("4_crop")
+
 [node name="Dagger" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("3_knife")
-viewmodel = ExtResource("4_dagger")
+viewmodel = ExtResource("5_dagger")
+
+[node name="Presentation" type="Node" parent="."]
+script = ExtResource("6_feedback")
+
+[node name="PauseMenu" type="CanvasLayer" parent="."]
+script = ExtResource("7_pause")

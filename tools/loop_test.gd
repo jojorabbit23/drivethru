@@ -386,15 +386,17 @@ func _run() -> void:
 
 	print("== ammo")
 	player.switch_weapon(0)
-	await wait(0.3)
+	await wait(0.5)
 	var shots := 0
-	for i in 14:
+	for i in gun.mag_size:
 		if not gun.shoot().is_empty() or gun.mag >= 0:
 			shots += 1
-	check(gun.mag == 0 and gun.is_reloading(), "the magazine empties after 12 and reloads (mag %d)" % gun.mag)
+	await wait(gun.fire_interval + 0.1)
+	gun.request_fire()
+	check(gun.mag == 0 and gun.is_reloading(), "empty pistol starts reload on fire request (mag %d)" % gun.mag)
 	check(gun.shoot().is_empty(), "no shot while reloading")
-	await wait(1.3)
-	check(gun.mag == 12, "reloaded to 12 from the reserve (reserve %d)" % gun.reserve)
+	await wait(gun.reload_time + 0.1)
+	check(gun.mag == gun.mag_size, "OpenCode pistol reloads its full magazine from reserve (reserve %d)" % gun.reserve)
 
 	print("== auto-collect")
 	main.auto_collect = true
