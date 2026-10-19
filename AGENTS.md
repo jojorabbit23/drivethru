@@ -25,6 +25,7 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `vehicles/school_bus/bus_model.tscn`, `bus_*`: `tools/build_bus.gd`
+   - `vehicles/rugged_truck/rugged_*`: `tools/build_rugged_truck.gd` (uses the shared vehicle builder)
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.

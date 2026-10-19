@@ -8,6 +8,7 @@ extends Node3D
 const P = preload("res://core/palette.gd")
 const Sfx = preload("res://game/sfx.gd")
 const Icons = preload("res://game/icons.gd")
+const CubeDriver = preload("res://game/cube_driver.gd")
 const Station = preload("res://game/station.gd")
 
 signal arrived
@@ -19,6 +20,7 @@ const BODY_COLOURS := [P.OXIDISED_TEAL, P.BURNT_ORANGE, P.BLUE_SLATE, P.CONCRETE
 # Customer vehicles (tools/build_vehicles.gd). cab: the driver's window,
 # metres ahead of the vehicle's middle; side: half-width to the hatch side.
 const VEHICLES := {
+	"rugged_truck": {"scene": preload("res://vehicles/rugged_truck/rugged_model.tscn"), "cab": -0.20, "side": 1.35},
 	"school_bus": {"scene": preload("res://vehicles/school_bus/bus_model.tscn"), "cab": 1.6, "side": 1.9},
 	"armored_truck": {"scene": preload("res://vehicles/armored_truck/truck_model.tscn"), "cab": 1.9, "side": 1.65},
 }
@@ -65,6 +67,11 @@ func _build_bus() -> void:
 	for w in _body.get_children():
 		if w.name.begins_with("Wheel"):
 			_bus_wheels.append(w)
+	if vehicle=="rugged_truck":
+		var driver: Node3D=CubeDriver.new()
+		driver.name="CubeDriver"
+		_body.add_child(driver)
+		driver.position=Vector3(0.68,1.40,0.20)
 	_add_bubble(Vector3(VEHICLES[vehicle]["side"], 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
 
 # Old placeholder car (kept for reference; unused).

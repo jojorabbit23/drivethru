@@ -1,3 +1,11 @@
+## Rugged customer truck
+
+The supplied off-road truck joins the bus and armoured truck in the random customer
+pool. Its driver is a plain black cube head with two white dots; the head turns
+smoothly to keep the dots facing the player. Four separated wheels roll with the
+vehicle. Normal hatch alignment, orders, automatic tray sales and departure apply.
+Rebuild with tools/build_rugged_truck.gd; see docs/handover/RUGGED_TRUCK.md.
+
 ## Kitchen radio
 
 The weathered teal-and-orange radio above the bun counter plays Short Order

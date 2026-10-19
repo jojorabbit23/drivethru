@@ -32,3 +32,5 @@ The supplied pack and full licence are retained in addons/psx_firearms/. Adaptat
 Current pistol integration: the original textured pistol mesh is fitted to the newer sculpt-derived hands and wrist sockets from OpenCode, using PSX FPS Arms Free animated pistol nodes. Source models and licences remain intact.
 
 Kitchen radio music: Short Order Carnage, Locked Screen Door and The Skillet Vigil — tracks supplied by the project owner.
+
+Rugged off-road customer truck: model supplied by the project owner (rugged off-road truck 3d model.glb). Cube driver and tracking behaviour created for this project.
