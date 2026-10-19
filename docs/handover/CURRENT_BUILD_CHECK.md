@@ -36,3 +36,11 @@ Set Compatibility as the project default as well as the launcher override, so op
 Repeated the bounded 30 FPS performance check with normal shader-cache access. Focus caps passed (60 foreground / 15 background); frame-time p95 was 34.8–35.5 ms, with a 62.5 ms maximum in the 12-zombie/ooze stress stage. VRAM was 51.9–54.3 MB. Restricted cache access produced a much larger first-use compilation hitch, so the normal-cache results above are the relevant comparison. These short checks do not prove sustained 60 FPS or that every possible animation intersection is eliminated.
 
 The next Play_DriveThru.cmd launch loads this combined project: slot 1 custom pistol, slot 2 knife, slot 3 Crop Duster, existing HD hand materials, thicker shotgun arms and video-reference handling. Unintegrated concept enemies and the separate static dagger-hand reference are not part of this playtest.
+
+## Claude feature integration — 19 October 2026
+
+Located the separate Claude-updated project at D:/zombys/versions/drivethru-main. The prior launcher had been opening the local firearm/menu branch, which lacked these changes. Imported Claude's Scuttler model, rig, behaviour and tests; recurring randomized-lane spawns and next-spawn HUD; mushroom drop/collection system and counter; Scuttler-specific barricade gaps; and the sculpt-derived knife grip/wrist fit with its builder and source. Source folders on D: were not modified.
+
+Merged main/player scripts while retaining the restored custom pistol, Crop Duster slot 3, reload input rules and ammo HUD, latest hand/shotgun handling, menu intro and bus cinematic. The default menu Start Cooking now enters the combined gameplay scene. X spawns a Scuttler; Z spawns a Shambler. Automatic spawns begin after 3 seconds, repeat every 11 seconds, and every third enemy is a Scuttler. Kills drop mushrooms, which are collected by proximity and counted on the HUD; nothing spends them yet.
+
+Verification: 52 owned scripts pass check-only. validate, movement, zombie, ooze, knife, revised knife-viewmodel, pistol, Crop Duster, spawn, Scuttler, pickup and menu tests pass. Rendered and inspected the revised knife and a combined Scuttler/pickup scene. New feature source assets and build scripts are included in DriveThru_Latest.zip.

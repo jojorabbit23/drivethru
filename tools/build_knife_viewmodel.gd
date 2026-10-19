@@ -5,6 +5,9 @@ const P = preload("res://core/palette.gd")
 const OUT := "res://weapons/knife/"
 const HD_DIR := OUT + "textures/cleatimus_hd/"
 const SOURCE := "res://addons/psx_fps_arms/models/fp_arms_free_v7_model.glb"
+const HandMesh = preload("res://tools/knife_hand_mesh.gd")
+const Weapon = preload("res://weapons/knife/knife_weapon.gd")
+const FOREARM_LENGTH := 0.4 # elbow to the sculpt's wrist pivot
 func _initialize() -> void:
  build.call_deferred()
 func material(texture: Texture2D, regions: bool, tint: Color = Color.WHITE, face: bool = false) -> ShaderMaterial:
@@ -74,6 +77,8 @@ func build() -> void:
   var bone: int = skeleton.find_bone(bone_name)
   var centre: Vector3 = (vertices[indices[face_index]] + vertices[indices[face_index+1]] + vertices[indices[face_index+2]]) / 3.0
   var local: Vector3 = skeleton.get_bone_global_rest(bone).affine_inverse() * centre
+  if bone_name.ends_with("_r"):
+   continue # the right arm is replaced by the derived sculpted hand below
   var kind := 2
   if bone_name.begins_with("lowerarm"):
    kind = 1 if local.y > 0.35 else 0
@@ -108,6 +113,7 @@ func build() -> void:
  knife.scene_file_path = ""
  knife.name = "Model"
  grip.add_child(knife)
+ var hand_info: Dictionary = build_right_hand(arms, skeleton, grip, knife, mat)
  var watch := BoneAttachment3D.new()
  watch.name = "LeftWatch"
  skeleton.add_child(watch)
@@ -131,10 +137,126 @@ func build() -> void:
  var animation: AnimationPlayer = arms.find_child("AnimationPlayer",true,false)
  animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
  animation.get_animation("kitchen_knife_idle").loop_mode = Animation.LOOP_LINEAR
+ for key in hand_info:
+  scene.set_meta(key, hand_info[key])
  own(scene,scene)
  var packed := PackedScene.new()
  packed.pack(scene)
  var error: Error = ResourceSaver.save(packed,OUT + "knife_viewmodel.tscn")
- print("Knife viewmodel saved: ",error,"; bones=",skeleton.get_bone_count(),"; source blade meshes=0; custom knife only")
+ print("Knife viewmodel saved: ",error,"; bones=",skeleton.get_bone_count(),"; supplied dagger removed; our knife only")
  scene.free()
  quit(error)
+
+# Handle cross-section of OUR knife, in knife space, between guard and pommel.
+func handle_profile(knife: Node3D) -> Array:
+ var mesh: ArrayMesh = (knife.get_node("Mesh") as MeshInstance3D).mesh
+ var verts: PackedVector3Array = mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+ var z_min := INF
+ var z_max := -INF
+ for p in verts:
+  if absf(p.x) < 0.0155: # the guard is wider than the handle
+   pass
+  z_max = maxf(z_max, p.z)
+ # guard: the widest slice; handle runs from just past it to the pommel
+ var guard_z := -INF
+ for p in verts:
+  if absf(p.x) > 0.0155 and p.z < 0.0 and p.z > -0.12:
+   guard_z = maxf(guard_z, p.z)
+ z_min = guard_z + 0.002
+ var lo := Vector2(INF, INF)
+ var hi := Vector2(-INF, -INF)
+ for p in verts:
+  if p.z > z_min and p.z < z_max:
+   lo = Vector2(minf(lo.x, p.x), minf(lo.y, p.y))
+   hi = Vector2(maxf(hi.x, p.x), maxf(hi.y, p.y))
+ var centre := (lo + hi) * 0.5
+ var rows := []
+ var z := z_min
+ while z <= z_max:
+  var half := Vector2.ZERO
+  for p in verts:
+   if absf(p.z - z) <= 0.003:
+    half = Vector2(maxf(half.x, absf(p.x - centre.x)), maxf(half.y, absf(p.y - centre.y)))
+  if half != Vector2.ZERO:
+   rows.append([z, half.x, half.y])
+  z += 0.004
+ return [centre, rows]
+
+# Builds the sculpted right hand, skinned to hand_r (fist) and lowerarm_r
+# (sleeve), blended across the cuff. Returns metadata knife_weapon.gd uses to
+# place the forearm about the sculpt's own wrist.
+func build_right_hand(arms: Node3D, skeleton: Skeleton3D, grip: Node3D, knife: Node3D, mat: Material) -> Dictionary:
+ var anim: AnimationPlayer = arms.find_child("AnimationPlayer", true, false)
+ anim.play("kitchen_knife_idle", 0.0)
+ anim.seek(0.0, true)
+ var hand_bone := skeleton.find_bone("hand_r")
+ var arm_bone := skeleton.find_bone("lowerarm_r")
+ var weapon_bone := skeleton.find_bone("weapon_r")
+ var hand0: Transform3D = skeleton.get_bone_global_pose(hand_bone)
+ var knife0: Transform3D = skeleton.get_bone_global_pose(weapon_bone) * grip.transform * knife.transform
+ # the camera's +Z, expressed in knife space at the corrected idle pose
+ # (knife_weapon.gd turns the whole hand upright and rolls it about the knife)
+ var skel_to_view: Transform3D = skeleton.global_transform
+ var wrist_axis: Vector3 = (skel_to_view.basis.inverse() * Vector3.RIGHT).normalized()
+ var socket_axis: Vector3 = skeleton.get_bone_global_pose(weapon_bone).basis.y.normalized()
+ var turn := Basis(wrist_axis, Weapon.UPRIGHT_ANGLE) * Basis(socket_axis, Weapon.GRIP_ROLL)
+ var face_dir: Vector3 = (turn * knife0.basis).inverse() * (skel_to_view.basis.inverse() * Vector3(0, 0, 1))
+ # where knife_weapon.gd will aim the forearm at idle: halfway between the
+ # authored elbow and the lower-right screen direction (see _position_right_forearm)
+ var arm0: Transform3D = skeleton.get_bone_global_pose(arm_bone)
+ var eye_dir: Vector3 = (skel_to_view.basis.inverse() * Weapon.RIGHT_ELBOW_DIRECTION).normalized()
+ var idle_dir: Vector3 = (arm0.origin - hand0.origin).normalized().slerp(eye_dir, 0.5).normalized()
+ # ...seen from the turned hand, then put back into the unturned bind pose
+ var bind_dir: Vector3 = hand0.basis * ((turn * hand0.basis).inverse() * idle_dir)
+ var fit: Dictionary = HandMesh.build(face_dir.normalized(), handle_profile(knife), knife0.basis.inverse() * bind_dir)
+ var wrist: Vector3 = knife0 * (fit["wrist"] as Vector3)
+ var out_dir: Vector3 = (knife0.basis * (fit["forearm"] as Vector3)).normalized()
+ # lowerarm bind frame: Y runs elbow -> wrist, no twist relative to the hand
+ var y_axis := -out_dir
+ var x_axis: Vector3 = hand0.basis.x.slide(y_axis).normalized()
+ var arm_bind := Transform3D(Basis(x_axis, y_axis, x_axis.cross(y_axis)).orthonormalized(), wrist + out_dir * FOREARM_LENGTH)
+ var verts: PackedVector3Array = fit["vertices"]
+ var bones := PackedInt32Array()
+ var weights := PackedFloat32Array()
+ var cuff_end: float = fit["cuff_end"]
+ var skel_verts := PackedVector3Array()
+ var skel_norms := PackedVector3Array()
+ var normals: PackedVector3Array = fit["normals"]
+ for i in verts.size():
+  var p: Vector3 = knife0 * verts[i]
+  skel_verts.append(p)
+  skel_norms.append((knife0.basis * normals[i]).normalized())
+  var a := (p - wrist).dot(out_dir)
+  var w := smoothstep(-0.004, cuff_end * 0.8, a)
+  bones.append_array([0, 1, 0, 0])
+  weights.append_array([1.0 - w, w, 0.0, 0.0])
+ var arrays := []
+ arrays.resize(Mesh.ARRAY_MAX)
+ arrays[Mesh.ARRAY_VERTEX] = skel_verts
+ arrays[Mesh.ARRAY_NORMAL] = skel_norms
+ arrays[Mesh.ARRAY_TEX_UV] = fit["uv"]
+ arrays[Mesh.ARRAY_TEX_UV2] = fit["uv2"]
+ arrays[Mesh.ARRAY_COLOR] = fit["colors"]
+ arrays[Mesh.ARRAY_BONES] = bones
+ arrays[Mesh.ARRAY_WEIGHTS] = weights
+ var mesh := ArrayMesh.new()
+ mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+ mesh.surface_set_material(0, mat)
+ ResourceSaver.save(mesh, OUT + "cleatimus_right_hand_mesh.res")
+ mesh.take_over_path(OUT + "cleatimus_right_hand_mesh.res")
+ var skin := Skin.new()
+ skin.add_named_bind("hand_r", hand0.affine_inverse())
+ skin.add_named_bind("lowerarm_r", arm_bind.affine_inverse())
+ var instance := MeshInstance3D.new()
+ instance.name = "RightHand"
+ instance.mesh = mesh
+ instance.skin = skin
+ instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+ skeleton.add_child(instance)
+ instance.skeleton = NodePath("..")
+ print("Right hand: %d sculpt triangles kept, %d dagger triangles removed, %d vertices fitted to our handle, sleeve x%.2f, wrist pre-bent %.1f deg" % [fit["kept"], fit["removed"], fit["opened"], fit["stretch"], fit["pre_bend"]])
+ # hand-local data for knife_weapon.gd
+ return {
+  "hand_wrist": hand0.affine_inverse() * wrist,
+  "hand_forearm_bind": hand0.affine_inverse() * arm_bind,
+ }

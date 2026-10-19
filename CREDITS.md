@@ -18,3 +18,18 @@ PSX Firearms Free by heyheythere - https://heyheythere.itch.io/psx-firearms-free
 The supplied pack and full licence are retained in addons/psx_firearms/. Adaptations use its pistol/shotgun hands and animation hierarchy, remove its weapon geometry, apply the project HD glove/sleeve textures, and fit the project owner's custom pistol and Crop Duster. Crop Duster breech textures and 1024px game-view texture copies are derived from the owner-supplied model; its source remains intact. The custom pistol and synthetic audio are restored from the earlier project FPS prototype.
 
 - Main menu lettering and zombie/burger intro clips: supplied by the project owner. Menu uses cropped atlas regions of the supplied overlay; video editing/alignment and final-frame hovering loop prepared for this project.
+
+# Credits
+
+## Third-party assets
+
+PSX FPS Arms Free by heyheythere - https://heyheythere.itch.io/psx-fps-arms-free - CC BY 4.0
+
+The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Project adaptations: a palette atlas copy, orange sleeves, charcoal cuffs, teal fingerless gloves, dirty fingertips, left-wrist 4:20 watch, viewmodel materials and knife attachment. The original atlas and corrected knife rig remain unchanged.
+
+## Project assets
+
+- Shambler, Scuttler, mushroom pickup, survival knife and knife-hand (`reference_hand_with_dagger.glb`, its dagger removed at build time) models: supplied by the project owner (`enemies/*/source/`, `pickups/mushroom/source/`, `weapons/knife/source/`).
+- Shop, textures, rig, animations, ooze and tools: made for this project.
+
+- Cleatimus HD hand material atlas and roughness: supplied by the project owner; mapped onto the PSX arms, sleeves and watch. Source images and pack README retained under weapons/knife/textures/cleatimus_hd/.

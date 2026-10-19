@@ -40,6 +40,7 @@ func run() -> void:
  var socket_index: int = skeleton.find_bone("weapon_r")
  var grip_preserved := true
  var length_preserved := true
+ var max_bend := 0.0
  for clip in ["kitchen_knife_draw","kitchen_knife_idle","kitchen_knife_stab"]:
   var frame_count: int = ceili(animation.get_animation(clip).length * 30.0) + 1
   for frame in frame_count:
@@ -50,10 +51,14 @@ func run() -> void:
    var hand_after: Transform3D = skeleton.get_bone_global_pose(hand_index)
    var socket_after: Transform3D = skeleton.get_bone_global_pose(socket_index)
    grip_preserved = grip_preserved and hand_before.origin.is_equal_approx(hand_after.origin) and (hand_before.affine_inverse() * socket_before).is_equal_approx(hand_after.affine_inverse() * socket_after)
-   var length: float = skeleton.get_bone_global_pose(hand_index).origin.distance_to(skeleton.get_bone_global_pose(arm_index).origin)
+   # the forearm pivots about the sculpted hand's wrist (top of the cuff)
+   var wrist: Vector3 = skeleton.get_bone_global_pose(hand_index) * (knife.get("_hand_wrist") as Vector3)
+   var length: float = wrist.distance_to(skeleton.get_bone_global_pose(arm_index).origin)
    length_preserved = length_preserved and absf(length - 0.4) < 0.0001
+   max_bend = maxf(max_bend, knife.call("wrist_bend"))
  check(grip_preserved,"upright hold preserves wrist position and knife attachment throughout native clips")
  check(length_preserved,"forearm keeps its original length")
+ check(max_bend < 30.0,"wrist bends at most %.1f degrees beyond the pre-bent sculpt (no skin collapse)" % max_bend)
  knife.call("_sample_clip","kitchen_knife_idle",0.0)
  knife.call("_set_pose",knife.REST_POS,knife.REST_ROT)
  var camera: Camera3D = player.get_node("Head/Camera3D")
@@ -67,6 +72,16 @@ func run() -> void:
  var direction_after: Vector3 = skeleton.get_bone_global_pose(socket_index).basis.y
  # Our -Z knife tip is the socket's -Y axis after the rest-axis correction.
  check((-direction_after).dot(up_axis) > (-direction_before).dot(up_axis) + 0.1,"resting knife is visibly more upright")
+ var right_hand: MeshInstance3D = pivot.find_child("RightHand",true,false)
+ var right_ok: bool = right_hand != null and right_hand.skin != null and right_hand.skin.get_bind_count() == 2
+ var psx_right_faces := 0
+ var psx_mesh: MeshInstance3D = pivot.find_child("fp_arms_mesh",true,false)
+ var psx_bones: PackedInt32Array = psx_mesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_BONES]
+ for i in range(0, psx_bones.size(), 4):
+  if psx_mesh.skin.get_bind_name(psx_bones[i]).ends_with("_r"): psx_right_faces += 1
+ check(right_ok and psx_right_faces == 0,"sculpted right hand replaces the PSX right arm (skinned to hand_r + lowerarm_r)")
+ var hand_box: AABB = right_hand.get_aabb()
+ check(hand_box.size.length() > 0.2 and pivot.find_children("*","MeshInstance3D",true,false).filter(func(m: MeshInstance3D) -> bool: return m.mesh != null and m.mesh.resource_path.contains("dagger")).is_empty(),"the supplied dagger is not in the viewmodel")
  var arms_mesh: MeshInstance3D = pivot.find_child("fp_arms_mesh",true,false)
  var active_material: ShaderMaterial = arms_mesh.mesh.surface_get_material(0)
  var active_albedo: Texture2D = active_material.get_shader_parameter("albedo_tex")

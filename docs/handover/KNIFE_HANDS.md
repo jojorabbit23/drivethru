@@ -260,3 +260,7 @@ The builder maps distal fingers to the same teal leather as the glove, matching 
 ### Combined firearm follow-up
 
 The knife gameplay/controller remains intact. The current combined project also includes the restored visible pistol and animated Crop Duster. See CURRENT_BUILD_CHECK.md for source assets, firearm hand adaptation, ammunition checks, performance findings and current launcher. Fresh tools/capture_knife.gd renders and sampled audit were reviewed after the loadout integration.
+
+### Sculpt-derived knife hand integration
+
+The revised hand/wrist fit from the Claude project is now integrated, replacing the earlier low-poly fist approximation described above. Its original reference-hand-with-dagger source, triangle separation/fit builder, skinned hand mesh and wrist-bend tests are included. The game's existing knife model and gameplay timings remain. New knife renders and combined feature screenshot were inspected; revised knife-viewmodel and gameplay tests pass.

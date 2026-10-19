@@ -16,7 +16,10 @@ const VIEWMODEL := preload("res://weapons/knife/knife_viewmodel.tscn")
 const VIEW_OFFSET := Vector3(0.0, -0.015, -0.025)
 # Blend the authored elbow halfway toward the right while retaining the grip.
 const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
-const GRIP_ROLL := -0.314159265 # -18 degrees: expose the curled fingers as in the reference.
+# -18 degrees about the knife: shows the blade's flat face as in the reference.
+# The sculpted hand is built to face the camera after this roll and the upright
+# turn (tools/build_knife_viewmodel.gd reads both constants).
+const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
@@ -58,6 +61,8 @@ var _skeleton: Skeleton3D
 var _right_forearm := -1
 var _right_hand := -1
 var _forearm_length := 0.4
+var _hand_wrist := Vector3.ZERO          # the sculpt's wrist pivot, in hand_r space
+var _forearm_bind := Transform3D()       # lowerarm_r frame the sleeve was skinned in, hand_r space
 var _attack: Dictionary = {}
 var _attack_t := 0.0
 var _attack_kind := ""
@@ -76,7 +81,9 @@ func _ready() -> void:
 	_skeleton = _pivot.find_child("Skeleton3D", true, false) as Skeleton3D
 	_right_forearm = _skeleton.find_bone("lowerarm_r")
 	_right_hand = _skeleton.find_bone("hand_r")
-	_forearm_length = _skeleton.get_bone_rest(_right_hand).origin.length()
+	_hand_wrist = _pivot.get_meta("hand_wrist", Vector3.ZERO)
+	_forearm_bind = _pivot.get_meta("hand_forearm_bind", Transform3D())
+	_forearm_length = _forearm_bind.origin.distance_to(_hand_wrist)
 	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
@@ -201,8 +208,11 @@ func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
 	_position_right_forearm()
 
 func _position_right_forearm() -> void:
-	# The source elbow starts behind the eye and left of centre. Re-aim the
-	# forearm from the right. The upright wrist turn carries knife and fingers together.
+	# The forearm swings about the sculpted hand's own wrist (the top of the
+	# cuff), toward a direction halfway between the authored elbow and the
+	# lower right of the screen. The sleeve is skinned to lowerarm_r, the fist
+	# to hand_r, blended across the cuff, so this bends only the wrist. The
+	# upright wrist turn carries the knife and fingers together.
 	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
 	var upright_weight := 1.0
 	if _visual_clip == "kitchen_knife_stab":
@@ -212,20 +222,30 @@ func _position_right_forearm() -> void:
 	var socket_axis: Vector3 = _skeleton.get_bone_global_pose(_skeleton.find_bone("weapon_r")).basis.y.normalized()
 	hand.basis = Basis(wrist_axis, UPRIGHT_ANGLE * upright_weight) * Basis(socket_axis, GRIP_ROLL * upright_weight) * hand.basis
 	var forearm: Transform3D = _skeleton.get_bone_global_pose(_right_forearm)
-	var eye_offset: Vector3 = RIGHT_ELBOW_DIRECTION.normalized() * _forearm_length
-	var offset: Vector3 = _skeleton.global_basis.inverse() * camera.global_basis * eye_offset
-	var authored_offset: Vector3 = (forearm.origin - hand.origin).normalized()
-	offset = authored_offset.slerp(offset.normalized(), 0.5) * _forearm_length
-	var elbow: Vector3 = hand.origin + offset
-	var y: Vector3 = (hand.origin - elbow).normalized()
-	var x: Vector3 = forearm.basis.x.slide(y).normalized()
-	if x.length_squared() < 0.001:
-		x = y.cross(Vector3.UP).normalized()
-	var z: Vector3 = x.cross(y).normalized()
-	_skeleton.set_bone_global_pose(_right_forearm, Transform3D(Basis(x, y, z).orthonormalized(), elbow))
+	var wrist: Vector3 = hand * _hand_wrist
+	var eye_dir: Vector3 = (_skeleton.global_basis.inverse() * camera.global_basis * RIGHT_ELBOW_DIRECTION).normalized()
+	var authored_dir: Vector3 = (forearm.origin - hand.origin).normalized()
+	var target: Vector3 = authored_dir.slerp(eye_dir, 0.5).normalized()
+	var bind: Transform3D = hand * _forearm_bind
+	var bind_dir: Vector3 = (bind.origin - wrist).normalized()
+	var bend := Basis(Quaternion(bind_dir, target))
+	_skeleton.set_bone_global_pose(_right_forearm, Transform3D((bend * bind.basis).orthonormalized(), wrist + target * _forearm_length))
 	_skeleton.set_bone_global_pose(_right_hand, hand)
 
+# Wrist bend (degrees) between the sleeve as sculpted and as placed; for tests.
+func wrist_bend() -> float:
+	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
+	var wrist: Vector3 = hand * _hand_wrist
+	var bind_dir: Vector3 = ((hand * _forearm_bind).origin - wrist).normalized()
+	var arm_dir: Vector3 = (_skeleton.get_bone_global_pose(_right_forearm).origin - wrist).normalized()
+	return rad_to_deg(bind_dir.angle_to(arm_dir))
+
 func _sample_clip(clip: String, time: float) -> void:
+	# _position_right_forearm overrides these two bones; the clips key only
+	# their rotations, so clear the override first or it feeds back into the
+	# next sample and the hand drifts away from its authored position.
+	_skeleton.reset_bone_pose(_right_forearm)
+	_skeleton.reset_bone_pose(_right_hand)
 	if _visual_clip != clip:
 		_arms_anim.play(clip, 0.0)
 		_visual_clip = clip

@@ -6,6 +6,7 @@ extends CharacterBody3D
 signal health_changed(health: float, max_health: float)
 signal hurt(amount: float, from: Node3D)
 signal died
+signal mushrooms_changed(count: int)
 
 @export var walk_speed := 4.2
 @export var sprint_speed := 6.5
@@ -20,6 +21,7 @@ signal died
 @onready var camera: Camera3D = $Head/Camera3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+var mushrooms := 0
 var health := 0.0
 var repair_window: Node3D = null   # window currently in reach (for the HUD)
 var repair_progress := 0.0         # 0..1 toward the next board
@@ -137,6 +139,10 @@ func take_damage(amount: float, from: Node3D = null) -> void:
 		died.emit()
 		var tw := create_tween()
 		tw.tween_property(head, "position:y", 0.35, 0.6).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+func add_mushrooms(n: int) -> void:
+	mushrooms += n
+	mushrooms_changed.emit(mushrooms)
 
 func is_dead() -> bool:
 	return health <= 0.0
