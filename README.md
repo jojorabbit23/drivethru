@@ -8,7 +8,11 @@ Rebuild with tools/build_rugged_truck.gd; see docs/handover/RUGGED_TRUCK.md.
 
 ## Kitchen radio
 
-The weathered teal-and-orange radio above the bun counter plays Short Order
+The counter below the radio now holds stacked cheese squares and seeded tomato
+slices in two shallow ingredient trays (owner reference shapes). Capture close-ups
+with tools/capture_kitchen_toppings.gd.
+
+The weathered teal-and-orange radio above the counter plays Short Order
 Carnage, Locked Screen Door and The Skillet Vigil in order, repeating the playlist.
 Music fades with distance from the radio and is inaudible beyond 22 metres.
 E pauses/resumes the current song. Settings has a separate kitchen-radio volume

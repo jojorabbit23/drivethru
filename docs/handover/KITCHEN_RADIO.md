@@ -1,7 +1,7 @@
 # Kitchen radio — 20 October 2026
 
 A low-poly, weathered teal radio with orange controls sits on its own small shelf
-above the bun counter at (4.4, 1.045, -4.5). It adds no movement collider and keeps
+above the topping counter at (4.4, 1.045, -4.5). It adds no movement collider and keeps
 prep, grill, ingredient and fridge interactions clear.
 
 Playlist order: Short Order Carnage, Locked Screen Door, The Skillet Vigil, repeat.
@@ -26,3 +26,11 @@ bus audio at listener distances 1 m and 18 m. Measured RMS was 0.06931 nearby an
 0.000728 far away. The settings panel fits at 1280x720. Both captures were inspected,
 as were kitchen, serving room, pistol, knife and shotgun renders. MP3 SHA256 hashes
 match the owner's three source files. Every changed/new GDScript passes check-only.
+
+Counter dressing update: tools/kitchen_room.gd now replaces the six yellow bun
+placeholders below the radio with two stacks of three thin cheese squares and
+three overlapping tomato slices. Tomatoes have a skin rim, flesh, four seed
+chambers, pale pith and seeds. Their natural red follows the owner-provided tomato
+reference; cheese uses the shared amber palette. Both trays are merged into
+Props_Kitchen with no additional movement collision. Rebuild via build_shop.gd;
+render/inspect with capture_kitchen_toppings.gd.

@@ -52,7 +52,8 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
 5. **Palette only.** Colours come from `core/palette.gd` (9 colours). Don't
    introduce new hues. Only light sources emit light. The exceptions are the
    Scuttler's glowing orange cap spots and the dropped mushroom pickups, which
-   are deliberate bioluminescence.
+   are deliberate bioluminescence. The owner-supplied tomato reference also permits
+   natural red flesh for the kitchen tomato slices (local food-colour exception).
 6. **Respect licences.** The PSX FPS Arms Free pack is CC BY 4.0. Any use of it
    must keep its LICENSE file and the credit line in `CREDITS.md`.
 7. **Small, honest commits.** Say in the commit message what you changed and
