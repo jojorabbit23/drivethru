@@ -100,7 +100,7 @@ The design is in `docs/GAME_DESIGN.md`. This is its "first playable vertical sli
 | **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Buy 24 pistol rounds for $12, or 10 buns for $40. |
 
 - **Grill states:** each of the 3 slots runs RAW (grey, 1 s) → COOKING (browning, steam, sizzle, % shown; done at 6 s) → READY (golden, bell, tick icon, countdown) → BURNT at 18 s (black, heavy smoke, cross icon). Every state has its own colour, icon, word, particles and sound, so none relies on colour alone.
-- **Customers:** the armoured school bus (`vehicles/school_bus/`, built by `tools/build_bus.gd` from the owner's GLB: 6 m long, kept at its full 19,464 triangles with smooth shading, since simplifying shredded the wheels and plough) drives up the road and stops with its cab at the hatch. It honks and plays an order chime. A pixel-burger speech bubble shows its order, with a patience bar (teal → amber → orange, 50 s). Correctly served, it pays **$30** plus a speed tip: **$6** in the first third, **$2** in the second, nothing after. A missed customer drives away with no penalty and no payment. Then the next car comes after 18–32 s.
+- **Customers:** the armoured school bus (`vehicles/school_bus/`, built by `tools/build_bus.gd` from the owner's GLB: 6 m long, kept at its full 19,464 triangles with smooth shading, since simplifying shredded the wheels and plough. Its four tyres are cut out of the fused sculpt into their own meshes and roll exactly as far as the bus moves: `docs/video/bus_wheels.mp4`) drives up the road and stops with its cab at the hatch. It honks and plays an order chime. A pixel-burger speech bubble shows its order, with a patience bar (teal → amber → orange, 50 s). Correctly served, it pays **$30** plus a speed tip: **$6** in the first third, **$2** in the second, nothing after. A missed customer drives away with no penalty and no payment. Then the next car comes after 18–32 s.
 - **Cash:** **$2 per kill**, plus burger sales (`game/economy.gd` holds all the prices). You start with $0, 12 buns and 12 + 36 pistol rounds.
 - **Pistol ammo:** 12-round magazine, automatic 1.1 s reload, and a reserve you top up at the terminal. An empty gun clicks.
 - **Waves:** wave *n* sends 4 + 2*n* enemies (every third one is a Scuttler), one every max(5, 12 − *n*) s. That's 6 enemies 11 s apart in wave 1. Clearing a wave gives a 20 s break before the next.
@@ -108,7 +108,7 @@ The design is in `docs/GAME_DESIGN.md`. This is its "first playable vertical sli
 - **HUD:** cash, carried mushrooms, mushrooms in store, buns and what you're holding (top left); the wave (top right); ammo (bottom right); the station prompt and menu (bottom centre); announcements (top centre).
 - **Art and sound:** icons are 16×16 pixel art drawn in code from the 9 palette colours (`game/icons.gd`). Sounds (bell, horn, chime, till, sizzle, click) are synthesised in code (`game/sfx.gd`), so there are no asset files.
 
-`tools/loop_test.gd` plays the whole loop headless (38 checks). `tools/capture_loop.gd` renders `docs/previews/loop1..6*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
+`tools/loop_test.gd` plays the whole loop headless (40 checks). `tools/capture_loop.gd` renders `docs/previews/loop1..6*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
 
 **Not yet** (the design's "after this loop feels good" list): blue, red and rare patties, double patties, cheese and toppings, defended delivery runs, building upgrades, traps and power-ups.
 

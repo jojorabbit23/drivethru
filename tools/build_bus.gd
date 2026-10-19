@@ -15,6 +15,16 @@ const SRC := "res://vehicles/school_bus/source/armored_school_bus.glb"
 const OUT := "res://vehicles/school_bus/"
 const LENGTH := 6.0
 const TEX_SIZE := 2048
+# The sculpt is one fused mesh. The four tyres are cut out by shape so they
+# can roll: triangles whose corners all lie inside the tyre's cylinder
+# (source units: radius WHEEL_R about the axle, outboard of WHEEL_IN, below
+# WHEEL_TOP so the mudguards above stay on the body).
+const WHEELS := {"Wheel_RL": Vector3(1, 0.09, -0.283), "Wheel_RR": Vector3(-1, 0.09, -0.283),
+	"Wheel_FL": Vector3(1, 0.09, 0.258), "Wheel_FR": Vector3(-1, 0.09, 0.258)}
+const WHEEL_R := 0.12          # below the axle line (nothing else down there)
+const WHEEL_R_UP := 0.104      # above it, tighter: the mudguards sit just outside
+const WHEEL_IN := 0.09
+const WHEEL_TOP := 0.192
 
 func _initialize() -> void:
 	var doc := GLTFDocument.new()
@@ -41,19 +51,71 @@ func _initialize() -> void:
 		aabb = aabb.expand(p)
 	var s := LENGTH / aabb.size.z
 	var c := aabb.get_center()
+	var source_v := PackedVector3Array(v)   # untouched copy, for cutting out the tyres
 	for i in v.size():
 		var p := (v[i] - Vector3(c.x, aabb.position.y, c.z)) * s
 		v[i] = Vector3(-p.x, p.y, -p.z)      # turn 180° so the front faces -Z
 		n[i] = Vector3(-n[i].x, n[i].y, -n[i].z)
-	var keep := []
-	keep.resize(Mesh.ARRAY_MAX)
-	keep[Mesh.ARRAY_VERTEX] = v
-	keep[Mesh.ARRAY_NORMAL] = n
-	keep[Mesh.ARRAY_TEX_UV] = arr[Mesh.ARRAY_TEX_UV]
-	keep[Mesh.ARRAY_INDEX] = arr[Mesh.ARRAY_INDEX]
-	var before := BlockyMesh.triangle_count(keep)
-	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, keep)
+	# which wheel (if any) owns each triangle, decided in source space
+	var src := source_v
+	var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+	var uv: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+	var owner_of := PackedInt32Array()
+	owner_of.resize(idx.size() / 3)
+	var names: Array = WHEELS.keys()
+	for t in idx.size() / 3:
+		owner_of[t] = -1
+		for w in names.size():
+			var wc: Vector3 = WHEELS[names[w]]
+			var inside := true
+			for k in 3:
+				var p := src[idx[t * 3 + k]]
+				var lim := WHEEL_R if p.y < wc.y + 0.03 else WHEEL_R_UP
+				if p.x * wc.x < WHEEL_IN or p.y > WHEEL_TOP or Vector2(p.z - wc.z, p.y - wc.y).length() > lim:
+					inside = false
+					break
+			if inside:
+				owner_of[t] = w
+				break
+	var parts := []   # [name, arrays, centre (final space)]
+	for w in range(-1, names.size()):
+		var centre := Vector3.ZERO
+		if w >= 0:
+			var wc: Vector3 = WHEELS[names[w]]
+			var xs := 0.0
+			var nx := 0
+			for t in idx.size() / 3:
+				if owner_of[t] == w:
+					for k in 3:
+						xs += src[idx[t * 3 + k]].x
+						nx += 1
+			var c_src := Vector3(xs / maxi(nx, 1), wc.y, wc.z)
+			var q := (c_src - Vector3(c.x, aabb.position.y, c.z)) * s
+			centre = Vector3(-q.x, q.y, -q.z)
+		var pv := PackedVector3Array()
+		var pn := PackedVector3Array()
+		var pu := PackedVector2Array()
+		var pi := PackedInt32Array()
+		var remap := {}
+		for t in idx.size() / 3:
+			if owner_of[t] != w:
+				continue
+			for k in 3:
+				var i := idx[t * 3 + k]
+				if not remap.has(i):
+					remap[i] = pv.size()
+					pv.append(v[i] - centre)
+					pn.append(n[i])
+					pu.append(uv[i])
+				pi.append(remap[i])
+		var pa := []
+		pa.resize(Mesh.ARRAY_MAX)
+		pa[Mesh.ARRAY_VERTEX] = pv
+		pa[Mesh.ARRAY_NORMAL] = pn
+		pa[Mesh.ARRAY_TEX_UV] = pu
+		pa[Mesh.ARRAY_INDEX] = pi
+		parts.append(["Body" if w < 0 else names[w], pa, centre])
+	var before := BlockyMesh.triangle_count(arr)
 	var mat := StandardMaterial3D.new()
 	mat.albedo_texture = load(albedo)
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -61,17 +123,24 @@ func _initialize() -> void:
 	mat.metallic_specular = 0.3
 	ResourceSaver.save(mat, OUT + "bus_material.tres")
 	mat.take_over_path(OUT + "bus_material.tres")
-	mesh.surface_set_material(0, mat)
-	ResourceSaver.save(mesh, OUT + "bus_mesh.res")
-	mesh.take_over_path(OUT + "bus_mesh.res")
 	var size := aabb.size * s
 	var root_node := Node3D.new()
 	root_node.name = "SchoolBus"
-	var mi := MeshInstance3D.new()
-	mi.name = "Body"
-	mi.mesh = mesh
-	root_node.add_child(mi)
-	mi.owner = root_node
+	var counts := []
+	for part in parts:
+		var m := ArrayMesh.new()
+		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, part[1])
+		m.surface_set_material(0, mat)
+		var path: String = OUT + ("bus_mesh.res" if part[0] == "Body" else "bus_%s.res" % (part[0] as String).to_lower())
+		ResourceSaver.save(m, path)
+		m.take_over_path(path)
+		var mi := MeshInstance3D.new()
+		mi.name = part[0]
+		mi.mesh = m
+		mi.position = part[2]
+		root_node.add_child(mi)
+		mi.owner = root_node
+		counts.append("%s %d" % [part[0], BlockyMesh.triangle_count(part[1])])
 	var body := StaticBody3D.new()   # bullets stop on it
 	body.name = "Collision"
 	body.collision_layer = 1
@@ -86,9 +155,10 @@ func _initialize() -> void:
 	body.add_child(cs)
 	cs.owner = root_node
 	root_node.set_meta("size", size)
+	root_node.set_meta("wheel_radius", WHEEL_R * s)
 	var ps := PackedScene.new()
 	ps.pack(root_node)
 	var err := ResourceSaver.save(ps, OUT + "bus_model.tscn")
-	print("bus: %d -> %d triangles, size %s m, saved err=%d" % [before, BlockyMesh.triangle_count(keep), str(size.snapped(Vector3.ONE * 0.01)), err])
+	print("bus: %d triangles (%s), size %s m, wheel radius %.2f m, saved err=%d" % [before, ", ".join(counts), str(size.snapped(Vector3.ONE * 0.01)), WHEEL_R * s, err])
 	root_node.free()
 	quit()

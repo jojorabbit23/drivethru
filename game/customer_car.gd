@@ -42,9 +42,17 @@ func setup(from: Vector3, stop: Vector3, to: Vector3, colour_index := -1) -> voi
 
 var _body: Node3D
 
+var _bus_wheels: Array[Node3D] = []
+var _wheel_r := 0.7
+var _last_pos := Vector3.ZERO
+
 func _build_bus() -> void:
 	_body = BUS.instantiate()
 	add_child(_body)
+	_wheel_r = _body.get_meta("wheel_radius", 0.7)
+	for w in _body.get_children():
+		if w.name.begins_with("Wheel"):
+			_bus_wheels.append(w)
 	_add_bubble(Vector3(1.9, 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
 
 # Old placeholder car (kept for reference; unused).
@@ -137,6 +145,7 @@ func _box(size: Vector3, at: Vector3, colour: Color) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
+	_spin_wheels()
 	match state:
 		"arriving":
 			var k := clampf(_t / DRIVE_IN, 0.0, 1.0)
@@ -165,6 +174,22 @@ func _process(delta: float) -> void:
 			_roll(delta, k)
 			if k >= 1.0:
 				queue_free()
+
+# Wheels roll exactly as far as the bus moved: angle = distance / radius.
+# The bus drives forward (local -Z), so the tops of the wheels turn forward:
+# a negative turn about local X.
+func _spin_wheels() -> void:
+	var moved := (position - _last_pos).length()
+	if _last_pos == Vector3.ZERO:
+		moved = 0.0
+	_last_pos = position
+	if moved <= 0.0 or moved > 5.0:
+		return
+	for w in _bus_wheels:
+		w.rotation.x = wrapf(w.rotation.x - moved / _wheel_r, -PI, PI)
+
+func wheel_angle() -> float:
+	return _bus_wheels[0].rotation.x if not _bus_wheels.is_empty() else 0.0
 
 func _roll(delta: float, speed: float) -> void:
 	if _body:
