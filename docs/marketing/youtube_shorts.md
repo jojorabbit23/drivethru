@@ -1,6 +1,7 @@
 # YouTube Shorts: The Drive Thru
 
 Videos in `docs/video/shorts/` (1080x1920, vertical). Built by `tools/make_shorts.py`.
+Covers in `docs/marketing/shorts/*_cover.png` (1080x1920), built by `tools/make_short_covers.py`. In the YouTube app, tap **Edit cover** or **Add cover** when uploading, then **Upload from gallery** if your app offers it; otherwise pick the frame closest to the cover.
 For each: paste the title and description; the hashtags go at the end of the
 description (the first three show above the title). Link each Short to the
 full trailer with the "Related video" setting so viewers can jump to it.
