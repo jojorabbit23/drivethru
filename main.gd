@@ -9,7 +9,7 @@ const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
-@export var max_zombies := 12        # alive at once; a spawn is skipped while at the cap
+@export var max_zombies := 12        # alive at once; pending wave enemies wait at the cap
 @export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
 @export var lancer_every := 5        # from wave 2, every Nth spawn is a Lancer (0 = never; beats a Scuttler)
 @export var lancer_from_wave := 2
@@ -142,6 +142,9 @@ func _physics_process(delta: float) -> void:
 		_spawn_t -= delta
 		if _spawn_t <= 0.0:
 			_spawn_t += wave_interval(wave)
+			# The cap delays a spawn; it must not erase enemies from the wave.
+			if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
+				return
 			_wave_left -= 1
 			var n := _spawned + 1
 			if lancer_every > 0 and wave >= lancer_from_wave and n % lancer_every == 0:
