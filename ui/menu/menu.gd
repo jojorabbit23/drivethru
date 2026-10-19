@@ -2,9 +2,11 @@ extends Control
 const P=preload("res://core/palette.gd")
 const SHEET=preload("res://ui/menu/menu_reference.png")
 const INTRO=preload("res://ui/menu/intro.ogv")
+const BUS=preload("res://ui/menu/start_bus.ogv")
 const LOOP=preload("res://ui/menu/bread_loop.ogv")
 const TITLES=["Start Cooking","Continue","How to Play","Settings","Credits","Quit"]
 const RECTS=[Rect2(225,105,970,130),Rect2(225,250,610,130),Rect2(225,393,805,130),Rect2(225,535,600,130),Rect2(225,678,520,130),Rect2(225,820,300,140)]
+var starting: bool=false
 var selected: int=0
 var buttons: Array[Button]=[]
 var images: Array[TextureRect]=[]
@@ -30,7 +32,7 @@ func _ready() -> void:
  video.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(video)
  video.stream=INTRO
- video.finished.connect(_loop_bread)
+ video.finished.connect(_video_finished)
  if DisplayServer.get_name()!="headless": video.play()
  canvas=Control.new()
  canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -92,12 +94,26 @@ func layout() -> void:
   buttons[i].size=Vector2(365,58)
   images[i].position=Vector2.ZERO
   images[i].size=Vector2(RECTS[i].size.x*0.37,RECTS[i].size.y*0.37)
+func _video_finished() -> void:
+ if starting:
+  Engine.max_fps=60
+  get_tree().change_scene_to_file("res://main.tscn")
+ else:
+  _loop_bread()
+func _start_game() -> void:
+ if starting:return
+ starting=true
+ canvas.hide()
+ video.stop()
+ video.loop=false
+ video.stream=BUS
+ if DisplayServer.get_name()!="headless":video.play()
 func _loop_bread() -> void:
  video.stream=LOOP
  video.loop=true
  video.play()
 func select(index: int) -> void:
- if index==1:return
+ if starting or index==1:return
  selected=index
  for i in images.size():
   var ink: Color=P.AMBER_GLOW if i==selected else (P.CONCRETE_GREY if i==1 else P.WARM_CHALK)
@@ -105,7 +121,7 @@ func select(index: int) -> void:
  arrow.position=Vector2(57,146+selected*65)
  arrow.size=Vector2(22,34)
 func _unhandled_key_input(event: InputEvent) -> void:
- if not event.is_pressed():return
+ if starting or not event.is_pressed():return
  if event.is_action_pressed("ui_cancel"):
   panel.hide()
  elif not panel.visible:
@@ -133,10 +149,9 @@ func paragraph(value: String) -> void:
  label.add_theme_color_override("font_color",P.WARM_CHALK)
  content.add_child(label)
 func activate(index: int) -> void:
+ if starting:return
  match index:
-  0:
-   Engine.max_fps=60
-   get_tree().change_scene_to_file("res://main.tscn")
+  0:_start_game()
   1:return
   2:
    clear_panel("HOW TO PLAY")

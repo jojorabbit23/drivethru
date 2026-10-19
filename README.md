@@ -272,4 +272,4 @@ Both firearms use the world renderer and the existing viewmodel depth technique,
 
 The Crop Duster has a further bulk/animation pass: broader sleeves and padded gloves, palm-relative support/shell anchors, queued reload after shot recovery, live-shell retention during top-ups, and a pose-preserving holster. See docs/handover/CROP_DUSTER_POLISH.md and docs/video/crop_duster.mp4. The supplied static gloved-hands model was used as a proportion reference; native animated hand geometry remains active.
 
-The playtest now opens the animated main menu. Use Up/Down and Enter or the mouse; Start Cooking loads the game. Continue is disabled until a save system exists. Settings changes volume/fullscreen for the current session. Menu artwork/video supplied by the project owner; details in docs/handover/MAIN_MENU.md.
+The playtest now opens the animated main menu. Use Up/Down and Enter or the mouse; Start Cooking plays the bus cinematic, then loads the game. Continue is disabled until a save system exists. Settings changes volume/fullscreen for the current session. Menu artwork/video supplied by the project owner; details in docs/handover/MAIN_MENU.md.

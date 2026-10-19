@@ -19,6 +19,11 @@ func run() -> void:
   check(menu.panel.visible and menu.content.get_child_count()>1,"panel %d opens" % index)
  current_scene=menu
  menu.activate(0)
+ check(menu.starting and not menu.canvas.visible,"selection hides menu for bus cinematic")
+ check(menu.video.stream==menu.BUS and not menu.video.loop,"bus plays once")
+ menu.activate(5)
+ check(menu.starting,"repeated activation is ignored")
+ menu._video_finished()
  await process_frame
  await process_frame
  check(current_scene!=null and current_scene.name=="Main","Start Cooking loads game scene")
