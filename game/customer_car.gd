@@ -20,7 +20,7 @@ const BUS := preload("res://vehicles/school_bus/bus_model.tscn")
 const CAB_FROM_CENTRE := 1.6     # driver's window, metres ahead of the bus's middle
 
 @export var patience := 50.0
-var order := "burger"
+var order := "brown"        # which burger: brown (common) | blue | red
 var state := "arriving"     # arriving | waiting | leaving
 var waited := 0.0
 var _t := 0.0
@@ -105,7 +105,7 @@ func _add_bubble(at: Vector3) -> void:
 	back.texture = _bubble_texture()
 	back.render_priority = 0
 	_bubble.add_child(back)
-	var icon := Icons.sprite(order, 0.026)
+	var icon := Icons.sprite("burger_" + order, 0.026)
 	icon.position = Vector3(0, 0.04, 0.0)
 	icon.render_priority = 1
 	_bubble.add_child(icon)

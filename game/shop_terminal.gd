@@ -1,5 +1,6 @@
 # The back-office CRT, now the shop terminal: E opens a menu to buy pistol
-# ammo and bun supplies with cash. Its screen shows your balance.
+# ammo, supplies (buns + toppings) and grill upgrades with cash. Its screen
+# shows your balance.
 extends "res://game/station.gd"
 
 var _screen: Label3D
@@ -32,10 +33,16 @@ func interact(player: Node) -> void:
 func options(player: Node) -> Array:
 	var e := economy()
 	var gun: Node = player.get_node_or_null("Head/Camera3D/TestGun")
-	return [
+	var opts := [
 		{"label": "%d pistol rounds  $%d" % [Economy.AMMO_PACK, Economy.AMMO_PRICE], "enabled": e.cash >= Economy.AMMO_PRICE and gun != null, "icon": "ammo", "action": buy_ammo.bind(player)},
-		{"label": "%d buns  $%d" % [Economy.BUN_PACK, Economy.BUN_PRICE], "enabled": e.cash >= Economy.BUN_PRICE, "icon": "bun", "action": buy_buns},
+		{"label": "%d buns + %d toppings  $%d" % [Economy.SUPPLY_PACK, Economy.SUPPLY_PACK, Economy.SUPPLY_PRICE], "enabled": e.cash >= Economy.SUPPLY_PRICE, "icon": "bun", "action": buy_supplies},
 	]
+	var next: Array = e.next_grill()
+	if not next.is_empty():
+		var what := "%d slots" % next[1] if int(next[1]) > int(e.grill()[1]) else "longer ready time"
+		opts.append({"label": "%s (%s)  $%d" % [next[0], what, next[2]], "enabled": e.cash >= int(next[2]), "icon": "cooking", "action": buy_grill})
+	opts.append({"label": "Cancel", "enabled": true, "icon": "cancel", "action": func() -> void: pass})
+	return opts
 
 func buy_ammo(player: Node) -> bool:
 	var gun: Node = player.get_node_or_null("Head/Camera3D/TestGun")
@@ -45,9 +52,18 @@ func buy_ammo(player: Node) -> bool:
 	Sfx.play(self, "till", -8.0)
 	return true
 
-func buy_buns() -> bool:
-	if not economy().spend(Economy.BUN_PRICE):
+func buy_supplies() -> bool:
+	if not economy().spend(Economy.SUPPLY_PRICE):
 		return false
-	economy().add_buns(Economy.BUN_PACK)
+	economy().add_supplies(Economy.SUPPLY_PACK)
+	Sfx.play(self, "till", -8.0)
+	return true
+
+func buy_buns() -> bool:
+	return buy_supplies()
+
+func buy_grill() -> bool:
+	if not economy().upgrade_grill():
+		return false
 	Sfx.play(self, "till", -8.0)
 	return true

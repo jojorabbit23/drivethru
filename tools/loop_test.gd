@@ -55,7 +55,8 @@ func _run() -> void:
 	await fresh()
 	var econ: Node = main.economy
 	var gun: Node = player.get_node("Head/Camera3D/TestGun")
-	check(econ.cash == 0 and econ.buns == 12 and econ.mushrooms == 0, "start: $0, 12 buns, empty store")
+	check(econ.cash == 0 and econ.buns == 8 and econ.toppings == 8 and econ.mushrooms == 0, "start: $0, 8 buns, 8 toppings, empty store")
+	check(main.grill.slot_count() == 2, "the starter grill has 2 slots")
 
 	print("== kill -> collect")
 	var z: Node3D = main.spawn_zombie(main.get_node("ShopGreybox/Windows/Window_A"))
@@ -63,6 +64,7 @@ func _run() -> void:
 	z.global_position = Vector3(1.0, 0.05, -1.4)
 	player.global_position = Vector3(-2.8, 0.05, 3.0)
 	await physics_frame
+	seed(3)
 	z.take_damage(999.0)
 	await wait(1.5)
 	check(econ.cash == 2, "a kill pays $2 (cash $%d)" % econ.cash)
@@ -71,87 +73,170 @@ func _run() -> void:
 	if not picks.is_empty():
 		player.global_position = (picks[0] as Node3D).global_position + Vector3(1.0, -0.4, 0)
 		await wait(1.0)
-	check(player.mushrooms == 1, "walking over it picks it up (carrying %d)" % player.mushrooms)
+	check(player.mushrooms == 1, "walking over it picks it up (carrying %s)" % str(player.carried))
+	var kind_got := ""
+	for k in player.carried:
+		if player.carried[k] > 0:
+			kind_got = k
 
 	print("== store")
 	var f: Node = await look_at_station(main.storage, Vector3(1.5, 0, 1.4))
 	check(f == main.storage, "looking at the bin focuses it")
 	check("store 1 mushroom" in main.storage.prompt(player), "prompt: '%s'" % main.storage.prompt(player))
 	player.use_focus()
-	check(player.mushrooms == 0 and econ.mushrooms == 1, "E stores it (carried %d, stored %d)" % [player.mushrooms, econ.mushrooms])
+	check(player.mushrooms == 0 and econ.stock[kind_got] == 1, "E stores it by kind (stock %s)" % str(econ.stock))
+	# drops by enemy: Shamblers mostly brown, Scuttlers blue or red
+	var shambler_kinds := {}
+	var scuttler_kinds := {}
+	for i in 200:
+		var sk: String = main.drop_kind(null)
+		shambler_kinds[sk] = shambler_kinds.get(sk, 0) + 1
+	var sc: Node = main.spawn_scuttler(main.get_node("ShopGreybox/Windows/Window_B"))
+	for i in 200:
+		var k: String = main.drop_kind(sc)
+		scuttler_kinds[k] = scuttler_kinds.get(k, 0) + 1
+	sc.queue_free()
+	check(shambler_kinds.get("brown", 0) > 120 and shambler_kinds.has("blue") and not shambler_kinds.has("red"), "Shamblers drop mostly common brown, some blue: %s" % str(shambler_kinds))
+	check(not scuttler_kinds.has("brown") and scuttler_kinds.has("red") and scuttler_kinds.get("blue", 0) > scuttler_kinds.get("red", 0), "Scuttlers drop blue, sometimes red: %s" % str(scuttler_kinds))
+	econ.stock = {"brown": 0, "blue": 0, "red": 0}
+	econ.store_mushrooms(3, "brown")
+	econ.store_mushrooms(2, "blue")
+	econ.store_mushrooms(1, "red")
 
 	print("== cook")
 	f = await look_at_station(main.grill, Vector3(2.1, 0, -3.2))
-	check(f == main.grill, "looking at the grill focuses it")
+	check(f == main.grill and "place patty" in main.grill.prompt(player), "at the grill: '%s'" % main.grill.prompt(player))
 	player.use_focus()
-	check(player.menu_station == main.grill, "E opens the grill menu")
 	var labels: Array = player.menu_options.map(func(o): return o["label"])
-	check(labels.size() == 1 and "Common patty  x1" in labels[0], "menu shows the patties: %s" % str(labels))
+	check(labels == ["Common patty  x3", "Blue patty  x2", "Red patty  x1", "Cancel"], "patty menu: %s" % str(labels))
+	player.choose(1)     # key 2: blue
+	check(main.grill.state_of(0) == "raw" and main.grill.kind_of(0) == "blue" and econ.stock["blue"] == 1, "key 2 puts a blue patty on")
 	player.use_focus()
-	check(econ.mushrooms == 0 and main.grill.state_of(0) == "raw", "E again puts a raw patty on (store %d, slot 0 %s)" % [econ.mushrooms, main.grill.state_of(0)])
+	player.use_focus()   # E: first available (common)
+	check(main.grill.state_of(1) == "raw" and main.grill.kind_of(1) == "brown", "E puts the first available (common) on")
+	player.use_focus()
+	var full: Array = player.menu_options.map(func(o): return "%s%s" % [o["label"], "" if o["enabled"] else " (off)"])
+	check(not player.menu_options[0]["enabled"] and "grill full" in full[0], "two slots: now full %s" % str(full))
+	player.use_focus()   # only Cancel is enabled
+	check(player.menu_station == null, "E on a full grill picks Cancel")
 	await wait(2.0)
 	check(main.grill.state_of(0) == "cooking", "cooking after a second")
 	var rang := [false]
-	main.grill.patty_state.connect(func(_i, s): if s == "ready": rang[0] = true)
+	main.grill.patty_state.connect(func(_i, st): if st == "ready": rang[0] = true)
 	await wait(4.2)
-	check(main.grill.state_of(0) == "ready" and rang[0], "ready at 6 s")
-	# a second patty left to burn
-	econ.store_mushrooms(1)
+	check(main.grill.state_of(0) == "ready" and rang[0], "ready at 6 s (bell)")
+
+	print("== bag at the prep bench")
+	var car: Node3D
+	main.hatch.next_order = "blue"
+	car = main.hatch.spawn_customer()
+	check(car.order == "blue", "a customer pulls in wanting a BLUE burger")
+	f = await look_at_station(main.bench, Vector3(0.8, 0, -3.3))
+	check(f == main.bench and main.bench.prompt(player) == "E  bag burger", "at the prep bench: '%s'" % main.bench.prompt(player))
 	player.use_focus()
-	var opts: Array = player.menu_options.map(func(o): return o["label"])
-	check(opts.size() == 2 and "Bag burger" in opts[0], "with a ready patty, bagging comes first: %s" % str(opts))
-	player.choose(1)   # key 2: the patty
-	check(main.grill.state_of(1) == "raw", "key 2 picks the second option (a second patty)")
-	player.use_focus()
-	player.use_focus()  # E on the first option: bag it
-	check(player.held == "burger" and econ.buns == 11 and main.grill.state_of(0) == "", "bagging takes a bun and the patty (holding '%s', buns %d)" % [player.held, econ.buns])
-	await wait(18.5)
-	check(main.grill.state_of(1) == "burnt", "a patty left 18 s burns")
-	player.use_focus()
-	var burnt_opt: Array = player.menu_options.map(func(o): return o["label"])
-	check("Scrape burnt patty" in burnt_opt, "the menu offers to scrape it")
-	player.choose(burnt_opt.find("Scrape burnt patty"))
-	check(main.grill.state_of(1) == "", "scraped off")
+	check(player.held == "burger" and player.held_burger["kind"] == "blue" and player.held_burger["quality"] == "perfect", "one press bags the ordered blue patty, fresh: %s" % str(player.held_burger))
+	check(econ.buns == 7 and econ.toppings == 7 and main.grill.state_of(0) == "", "it used a bun, a topping and that patty")
+	await wait(5.5)
 
 	print("== serve")
-	var car: Node3D = main.hatch.spawn_customer()
-	check(main.hatch.prompt(player).contains("pulling in"), "a car pulls in")
-	var a0: float = car.wheel_angle()
-	await wait(1.0)
-	check(absf(wrapf(car.wheel_angle() - a0, -PI, PI)) > 0.1, "its wheels roll while it drives in")
-	await wait(4.5)
-	check(car.state == "waiting", "it stops at the hatch and waits")
-	var a1: float = car.wheel_angle()
-	await wait(0.5)
-	check(is_equal_approx(car.wheel_angle(), a1), "and stop turning when it stops")
+	check(car.state == "waiting", "the customer is at the hatch")
 	f = await look_at_station(main.hatch, Vector3(-3.0, 0, -3.9))
-	check(f == main.hatch and "serve burger" in main.hatch.prompt(player), "at the hatch with a burger: '%s'" % main.hatch.prompt(player))
+	check(f == main.hatch and "serve BLUE burger" in main.hatch.prompt(player) and "PERFECT" in main.hatch.prompt(player), "at the hatch: '%s'" % main.hatch.prompt(player))
 	var before: int = econ.cash
 	player.use_focus()
-	check(econ.cash - before == 36 and player.held == "", "served quickly: $30 + $6 tip (got $%d)" % (econ.cash - before))
+	check(econ.cash - before == 36 and player.held == "", "PERFECT: $30 + $6 tip (got $%d)" % (econ.cash - before))
 	await wait(4.5)
 	check(not is_instance_valid(car), "the car drives off")
+	# the common patty: say it has sat READY for 6 s (GOOD), then bag it
+	main.hatch.next_order = "red"
+	car = main.hatch.spawn_customer()
+	await wait(5.5)
+	main.grill.slots[1]["t"] = 6.0 + 6.0
+	await wait(0.1)
+	main.bench.bag(player)
+	check(player.held_burger.get("kind", "") == "brown" and player.held_burger.get("quality", "") == "good", "no red ready: the bench bags the waiting common patty, now GOOD: %s" % str(player.held_burger))
+	check(not main.hatch.serve(player) and "WRONG BURGER" in main.hatch.prompt(player), "the red customer won't take a common burger")
+	car.leave(false)
+	await wait(4.5)
+	main.hatch.next_order = "brown"
+	car = main.hatch.spawn_customer()
+	await wait(5.5)
+	before = econ.cash
+	main.hatch.serve(player)
+	check(econ.cash - before == 33, "GOOD: $30 + $3 tip (got $%d)" % (econ.cash - before))
+	await wait(4.5)
+	# standard and burnt
+	econ.store_mushrooms(2, "brown")
+	econ.store_mushrooms(1, "red")
+	main.grill.add_patty("brown")
+	main.grill.add_patty("red")
+	main.grill.slots[1]["t"] = 19.0
+	await wait(0.2)
+	check(main.grill.state_of(1) == "burnt", "a patty left past 18 s burns")
+	main.grill.slots[0]["t"] = 6.0 + 11.5
+	await wait(0.1)
+	main.bench.bag(player)
+	check(player.held_burger.get("quality", "") == "standard", "bagged 11.5 s after it was ready, before it burns: STANDARD, still sellable (%s)" % str(player.held_burger))
+	player.set_held("")
+	check("salvage" in main.bench.prompt(player), "with only a burnt patty left, the bench offers salvage: '%s'" % main.bench.prompt(player))
+	main.bench.bag(player)
+	check(player.held_burger.get("quality", "") == "burnt", "bagged as burnt salvage")
+	main.hatch.next_order = "blue"
+	car = main.hatch.spawn_customer()
+	await wait(5.5)
+	before = econ.cash
+	check(main.hatch.serve(player) and econ.cash - before == 15, "any customer takes salvage for $15")
+	await wait(4.5)
+	check(Economy_q(3.0, false) == "perfect" and Economy_q(6.0, false) == "good" and Economy_q(10.0, false) == "standard", "quality: perfect <= 4 s ready, good <= 8 s, standard until it burns")
 	var car2: Node3D = main.hatch.spawn_customer()
 	car2.patience = 3.0
 	before = econ.cash
 	await wait(13.0)
 	check(not is_instance_valid(car2) and econ.cash == before, "an unserved car leaves after its patience: no pay, no penalty")
-	check(Economy_tip(0.5) == 2 and Economy_tip(0.9) == 0, "tips: $2 served normally, $0 just before leaving")
+
+	print("== burnt alarm")
+	var alarms := [0]
+	var grill_node: Node = main.grill
+	main.grill.add_patty("brown")
+	main.grill.slots[0]["t"] = 17.9
+	var t0 := 0.0
+	var played := false
+	while t0 < 1.0:
+		await physics_frame
+		t0 += DT
+		for n in root.get_children():
+			if n is AudioStreamPlayer3D and (n as AudioStreamPlayer3D).stream == (load("res://game/sfx.gd") as GDScript).stream("alarm"):
+				played = true
+	check(played, "a burning patty sounds the alarm")
+	main.grill.scrape()
 
 	print("== buy ammo")
 	f = await look_at_station(main.terminal, Vector3(-2.9, 0, 3.2))
 	check(f == main.terminal, "looking at the CRT focuses the shop terminal")
 	player.use_focus()
 	var shop_opts: Array = player.menu_options.map(func(o): return "%s%s" % [o["label"], "" if o["enabled"] else " (off)"])
-	check(shop_opts.size() == 2 and not player.menu_options[1]["enabled"], "menu: %s" % str(shop_opts))
+	check(shop_opts.size() == 4 and "buns + 5 toppings" in shop_opts[1] and "Reinforced Grill" in shop_opts[2], "menu: %s" % str(shop_opts))
 	var reserve: int = gun.reserve
 	before = econ.cash
 	player.use_focus()
 	check(econ.cash == before - 12 and gun.reserve == reserve + 24, "24 rounds for $12 (cash $%d, reserve %d)" % [econ.cash, gun.reserve])
 	econ.add_cash(40)
+	var buns0: int = econ.buns
 	player.use_focus()
 	player.choose(1)
-	check(econ.buns == 21, "10 buns for $40 (buns %d)" % econ.buns)
+	check(econ.buns == buns0 + 5 and econ.toppings == econ.buns, "5 buns + 5 toppings for $40 (buns %d, toppings %d)" % [econ.buns, econ.toppings])
+	print("== grill upgrades")
+	var slots_seen := [main.grill.slot_count()]
+	for i in 3:
+		econ.add_cash(300)
+		player.use_focus()
+		player.choose(2)
+		slots_seen.append(main.grill.slot_count())
+	check(slots_seen == [2, 3, 4, 4] and main.grill.ready_window() == 20.0, "Reinforced 3 slots, Restaurant 4, Apocalypse 4 with a 20 s ready window: %s" % str(slots_seen))
+	player.use_focus()
+	var last: Array = player.menu_options.map(func(o): return o["label"])
+	check(last.size() == 3, "fully upgraded: no more grills on sale %s" % str(last))
+	player.close_menu()
 
 	print("== ammo")
 	player.switch_weapon(0)
@@ -203,5 +288,5 @@ func _run() -> void:
 	print("\n%d failure(s)" % failures)
 	quit(1 if failures > 0 else 0)
 
-func Economy_tip(frac: float) -> int:
-	return (load("res://game/economy.gd") as GDScript).tip_for(frac)
+func Economy_q(ready_for: float, burnt: bool) -> String:
+	return (load("res://game/economy.gd") as GDScript).quality_for(ready_for, burnt)

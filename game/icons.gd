@@ -1,6 +1,10 @@
 # Pixel-art icons drawn in code from the 9-colour palette (16x16, nearest
 # filtered): order bubbles, grill states, HUD.
 #   Icons.texture("burger")   burger | raw | cooking | ready | burnt | mushroom | bun | ammo
+#                             | topping | grill | cancel
+# Kinds: "burger_blue", "mushroom_red", ... recolour the patty / the cap:
+#   brown (common): dark burnt-orange cap, charcoal patty
+#   blue: teal cap and patty      red: orange cap and patty
 extends RefCounted
 
 const P = preload("res://core/palette.gd")
@@ -10,7 +14,17 @@ static var _cache := {}
 const KEY := {
 	"n": P.MIDNIGHT_TYNE, "s": P.BLUE_SLATE, "c": P.WET_CHARCOAL, "g": P.CONCRETE_GREY,
 	"t": P.OXIDISED_TEAL, "e": P.ELECTRIC_TEAL, "o": P.BURNT_ORANGE, "a": P.AMBER_GLOW, "w": P.WARM_CHALK,
+	"b": Color(0.394, 0.21, 0.104),   # mushroom brown: burnt orange at half brightness, not a new hue
 }
+
+# [rows to recolour, {from: to}] per base icon and kind
+const KIND_SWAP := {
+	"burger": {"rows": [8, 9, 10], "brown": {}, "blue": {"c": "s", "o": "e"}, "red": {"c": "o", "o": "a"}},
+	"mushroom": {"rows": [1, 2, 3, 4, 5, 6], "brown": {"o": "b", "a": "o"}, "blue": {"o": "t", "a": "e"}, "red": {}},
+}
+
+# The world colour of each kind (patty tint on the grill, pickup tint, halo).
+const KIND_COLOUR := {"brown": Color(0.52, 0.31, 0.18), "blue": P.ELECTRIC_TEAL, "red": P.BURNT_ORANGE}
 
 const ART := {
 	"burger": [
@@ -132,6 +146,40 @@ const ART := {
 		"................",
 		"................",
 		"................"],
+	"topping": [
+		"................",
+		"................",
+		"................",
+		"....tt....tt....",
+		"...teet..teet...",
+		"..teeeettteeet..",
+		"..tteetteetttt..",
+		"...ttttttttt....",
+		"....oooooooo....",
+		"...oaoooooaoo...",
+		"...oooooaoooo...",
+		"....oooooooo....",
+		"................",
+		"................",
+		"................",
+		"................"],
+	"cancel": [
+		"................",
+		"................",
+		"....gggggggg....",
+		"...gg......gg...",
+		"..g.g.......g...",
+		"..g..g......g...",
+		"..g...g.....g...",
+		"..g....g....g...",
+		"..g.....g...g...",
+		"..g......g..g...",
+		"..g.......g.g...",
+		"...gg......gg...",
+		"....gggggggg....",
+		"................",
+		"................",
+		"................"],
 	"ammo": [
 		"................",
 		"....a...a...a...",
@@ -152,7 +200,21 @@ const ART := {
 }
 
 static func image(name: String) -> Image:
-	var rows: Array = ART[name]
+	var base := name
+	var kind := ""
+	for k in ["_brown", "_blue", "_red"]:
+		if name.ends_with(k):
+			base = name.trim_suffix(k)
+			kind = k.substr(1)
+	var rows: Array = (ART[base] as Array).duplicate()
+	if kind != "" and KIND_SWAP.has(base):
+		var swap: Dictionary = KIND_SWAP[base][kind]
+		for r in KIND_SWAP[base]["rows"]:
+			var row: String = rows[r]
+			var out := ""
+			for ch in row:
+				out += swap.get(ch, ch)
+			rows[r] = out
 	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 	for y in 16:

@@ -88,29 +88,35 @@ Bullets and enemies ignore this layer. The player's mask is `1 | 2 | 16`. Add cl
 - If you slide along a wall past an open doorway, you drift in and brush the far frame. That's normal physics, not a snag.
 - The windows can't be climbed. Their sills sit just above jump height, and the opening is shorter than the player even with the boards gone. If you raise `jump_velocity` above about 4.2, rerun the test.
 
-## The burger loop (first playable slice)
+## The burger loop
 
-The design is in `docs/GAME_DESIGN.md`. This is its "first playable vertical slice": **kill → collect → store → cook → serve → cash → buy ammo → survive waves**. Look at a station and press **E**. Menus list numbered options: press **1–4** for a specific option, or **E** for the first available one.
+The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.md` (cooking). The aim is that the player thinks "what should I cook next?", not "why am I doing this animation again?". The grill cooks in the background while you defend; it's another front to keep an eye on.
+
+**Kill → collect → store → grill → bag → serve → cash → buy → survive waves.** Look at a station and press **E**. Menus list numbered options: **1–4** picks one, **E** picks the first available.
 
 | Station | Where | What E does |
 |---|---|---|
-| **Mushroom store** (`game/storage_bin.gd`) | storeroom, by the doorway | Stores every mushroom you're carrying. The sign and the heap show the stock. |
-| **Grill** (`game/grill.gd`) | kitchen flat-top | Menu: bag a ready burger (uses a bun), scrape a burnt patty, or put a common patty on (uses a stored mushroom). |
-| **Drive-thru window** (`game/customer_window.gd`) | the service hatch | With a bagged burger in hand: serve the waiting car. |
-| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Buy 24 pistol rounds for $12, or 10 buns for $40. |
+| **Mushroom store** (`game/storage_bin.gd`) | storeroom, by the doorway | Stores everything you're carrying. The sign shows stock per kind. |
+| **Grill** (`game/grill.gd`) | kitchen flat-top | Patty menu: **Common xN / Blue xN / Red xN / Cancel**. The patty goes on the first free slot. You can also scrape off a burnt patty. |
+| **Prep bench** (`game/prep_bench.gd`) | left of the grill | One press: bun + topping + cooked patty = wrapped burger. It bags the ordered kind if one is ready, else the patty that's been waiting longest, else a burnt one as salvage. |
+| **Drive-thru window** (`game/customer_window.gd`) | the service hatch | Serve the burger you're holding. |
+| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Ammo, supplies and grill upgrades. |
 
-- **Grill states:** each of the 3 slots runs RAW (grey, 1 s) → COOKING (browning, steam, sizzle, % shown; done at 6 s) → READY (golden, bell, tick icon, countdown) → BURNT at 18 s (black, heavy smoke, cross icon). Every state has its own colour, icon, word, particles and sound, so none relies on colour alone.
-- **Customers:** the armoured school bus (`vehicles/school_bus/`, built by `tools/build_bus.gd` from the owner's GLB: 6 m long, kept at its full 19,464 triangles with smooth shading, since simplifying shredded the wheels and plough. Its four tyres are cut out of the fused sculpt into their own meshes and roll exactly as far as the bus moves: `docs/video/bus_wheels.mp4`) drives up the road and stops with its cab at the hatch. It honks and plays an order chime. A pixel-burger speech bubble shows its order, with a patience bar (teal → amber → orange, 50 s). Correctly served, it pays **$30** plus a speed tip: **$6** in the first third, **$2** in the second, nothing after. A missed customer drives away with no penalty and no payment. Then the next car comes after 18–32 s.
-- **Cash:** **$2 per kill**, plus burger sales (`game/economy.gd` holds all the prices). You start with $0, 12 buns and 12 + 36 pistol rounds.
-- **Pistol ammo:** 12-round magazine, automatic 1.1 s reload, and a reserve you top up at the terminal. An empty gun clicks.
-- **Waves:** wave *n* sends 4 + 2*n* enemies (every third one is a Scuttler), one every max(5, 12 − *n*) s. That's 6 enemies 11 s apart in wave 1. Clearing a wave gives a 20 s break before the next.
-- **Auto-collect (F2):** the accessibility option from the design. Every dropped mushroom flies to you from anywhere.
-- **HUD:** cash, carried mushrooms, mushrooms in store, buns and what you're holding (top left); the wave (top right); ammo (bottom right); the station prompt and menu (bottom centre); announcements (top centre).
-- **Art and sound:** icons are 16×16 pixel art drawn in code from the 9 palette colours (`game/icons.gd`). Sounds (bell, horn, chime, till, sizzle, click) are synthesised in code (`game/sfx.gd`), so there are no asset files.
+- **Mushroom kinds** are the livestock. Shamblers drop **common brown** (20% blue). Scuttlers drop **blue** (30% red). Pickups, carried counts, stock, patties and orders are all colour-coded with matching pixel icons.
+- **Orders:** the armoured school bus pulls up, honks and shows a **pixel burger icon in its patty colour**, with no text: brown 55%, blue 30%, red 15%. It waits 50 s with a patience bar. A missed order costs nothing.
+- **Grill states**, per slot: RAW (0–1 s, grey) → COOKING (1–6 s, sizzle, steam, %) → READY (6–18 s, golden, bell, tick icon, countdown) → BURNT (black, smoke, cross icon, a repeating alarm). Each patty also shows its kind's mushroom. No state relies on colour alone.
+- **Quality** is set when you bag, by how long the patty sat READY. **Perfect** (≤ 4 s) pays $30 + $6, **Good** (≤ 8 s) $30 + $3, **Standard** $30. **Burnt salvage** pays $15 from any customer, so a mistake is recoverable. A burger of the wrong kind is refused.
+- **Grill upgrades** (terminal): Starter 2 slots → **Reinforced** 3 ($90) → **Restaurant** 4 ($180) → **Apocalypse** 4 with a 20 s ready window ($300).
+- **Supplies:** buns and toppings come in packs of 5 + 5 for $40 ($8 a burger, as designed). You start with 8 of each and 12 + 36 pistol rounds; ammo is 24 rounds for $12.
+- **Cash:** $2 per kill. Pistol: 12-round magazine, 1.1 s reload, a reserve topped up at the terminal.
+- **Waves:** wave *n* sends 4 + 2*n* enemies, one every max(5, 12 − *n*) s, then a 20 s break.
+- **Auto-collect (F2):** pickups fly to you from anywhere.
+- **HUD:** cash; per kind, carried (stored); buns and toppings; the burger you're holding (kind + quality); wave and ammo; prompts, menus and toasts such as "PERFECT +$36".
+- **Art and sound:** icons are pixel art drawn in code from the palette (`game/icons.gd`). Sounds are synthesised in code (`game/sfx.gd`).
 
-`tools/loop_test.gd` plays the whole loop headless (40 checks). `tools/capture_loop.gd` renders `docs/previews/loop1..6*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
+`tools/loop_test.gd` plays all of this headless. `tools/capture_loop.gd` renders `docs/previews/loop1..7*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
 
-**Not yet** (the design's "after this loop feels good" list): blue, red and rare patties, double patties, cheese and toppings, defended delivery runs, building upgrades, traps and power-ups.
+**Not yet:** the double and special (red + blue) burgers, the heated holding tray / prep station / bun dispenser / bell system upgrades, deliveries and the supply runner, traps and power-ups.
 
 ## The Shambler (first zombie)
 

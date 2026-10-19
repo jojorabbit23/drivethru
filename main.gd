@@ -24,6 +24,7 @@ const StorageBin = preload("res://game/storage_bin.gd")
 const Grill = preload("res://game/grill.gd")
 const CustomerWindow = preload("res://game/customer_window.gd")
 const ShopTerminal = preload("res://game/shop_terminal.gd")
+const PrepBench = preload("res://game/prep_bench.gd")
 const MushroomPickupScript = preload("res://pickups/mushroom/mushroom_pickup.gd")
 
 var wave := 0
@@ -34,6 +35,7 @@ var grill: Node3D
 var hatch: Node3D
 var storage: Node3D
 var terminal: Node3D
+var bench: Node3D
 var _toast_t := 0.0
 
 var _spawn_t := 0.0
@@ -70,7 +72,9 @@ func _ready() -> void:
 	if gun:
 		gun.ammo_changed.connect(func(_m, _r): _update_weapon())
 	hatch.customer_arrived.connect(func(_c): _toast("CUSTOMER AT THE WINDOW", P.ELECTRIC_TEAL))
-	hatch.customer_served.connect(func(c: int, tip: int): _toast("+$%d%s" % [c + tip, ("  (tip $%d)" % tip) if tip > 0 else ""], P.AMBER_GLOW))
+	hatch.customer_served.connect(func(c: int, tip: int):
+		var q: String = hatch.last_quality
+		_toast("%s  +$%d%s" % ["SALVAGE" if q == "burnt" else q.to_upper(), c + tip, ("  (tip $%d)" % tip) if tip > 0 else ""], P.AMBER_GLOW))
 	hatch.customer_missed.connect(func(): _toast("CUSTOMER LEFT", P.CONCRETE_GREY))
 	MushroomPickupScript.auto_collect = auto_collect
 	_update_weapon()
@@ -90,6 +94,9 @@ func _build_stations() -> void:
 	grill = _station(Grill, "Grill", Vector3(2.1, 0.92, -iz + 0.325), 0.0)
 	hatch = _station(CustomerWindow, "DriveThruWindow", Vector3(-3.0, 1.0, -5.0), 0.0)
 	terminal = _station(ShopTerminal, "ShopTerminal", Vector3(-2.89, 0.77, iz - 0.29), 0.0)
+	bench = _station(PrepBench, "PrepBench", Vector3(0.79, 0.92, -iz + 0.325), 0.0)
+	bench.grill = grill
+	bench.hatch = hatch
 	hatch.auto = auto_spawn
 	var m := shop.get_node_or_null("Markers")
 	if m:
@@ -188,13 +195,22 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 # Every dead Shambler or Scuttler drops one glowing mushroom.
 func _drop_later(z: Node3D) -> void:
 	var at := z.global_position
+	var kind := drop_kind(z)
 	get_tree().create_timer(drop_delay).timeout.connect(func():
 		if is_instance_valid(z):
 			at = z.global_position
-		drop_pickup(at))
+		drop_pickup(at, kind))
 
-func drop_pickup(at: Vector3) -> Node3D:
+# What each enemy drops (docs/COOKING_DESIGN.md: mushrooms are the livestock):
+# Shamblers mostly common brown, sometimes blue; Scuttlers blue, sometimes red.
+func drop_kind(enemy: Node) -> String:
+	if enemy != null and (enemy.get_script() as Script).resource_path.ends_with("scuttler.gd"):
+		return "red" if randf() < 0.3 else "blue"
+	return "blue" if randf() < 0.2 else "brown"
+
+func drop_pickup(at: Vector3, kind := "brown") -> Node3D:
 	var p: Node3D = PICKUP.new()
+	p.kind = kind
 	add_child(p)
 	p.drop(at, at.y)
 	return p
@@ -273,15 +289,22 @@ func _update_health() -> void:
 	_hud["health"].text = "HEALTH %d   ·   KILLS %d   ·   MUSHROOMS %d" % [int(player.health), _kills, player.mushrooms]
 	_update_status()
 
-# Top-left: cash, carried mushrooms, store and buns, and what's in your hands.
+# Top-left: cash; carried mushrooms by kind (stored in brackets); buns and
+# toppings; the burger in your hands (kind and quality).
 func _update_status() -> void:
 	if _hud.is_empty() or economy == null:
 		return
 	_hud["cash"].text = "$%d" % economy.cash
-	_hud["carry"].text = "x%d" % player.mushrooms
-	_hud["stored"].text = "%d stored" % economy.mushrooms
+	for k in Economy.KINDS:
+		_hud["carry_" + k].text = "%d (%d)" % [player.carried[k], economy.stock[k]]
 	_hud["buns"].text = "%d" % economy.buns
+	_hud["tops"].text = "%d" % economy.toppings
 	_hud["held"].visible = player.held != ""
+	if player.held == "burger":
+		var b: Dictionary = player.held_burger
+		(_hud["held_icon"] as TextureRect).texture = Icons.texture("burger_" + String(b.get("kind", "brown")))
+		var q: String = b.get("quality", "standard")
+		_hud["held_text"].text = "%s %s" % [Economy.KIND_NAME[b.get("kind", "brown")].to_upper(), "SALVAGE" if q == "burnt" else q.to_upper()]
 
 func _update_menu() -> void:
 	var box: VBoxContainer = _hud["menu"]
@@ -410,20 +433,26 @@ func _build_hud() -> void:
 	layer.add_child(status)
 	var cash := _label("$0", 26, P.AMBER_GLOW)
 	status.add_child(cash)
+	var carries := {}
+	for k in Economy.KINDS:
+		status.add_child(_label("  ", 18, P.WARM_CHALK))
+		status.add_child(_icon("mushroom_" + k, 26))
+		var l := _label("0 (0)", 18, P.WARM_CHALK)
+		status.add_child(l)
+		carries[k] = l
 	status.add_child(_label("   ", 18, P.WARM_CHALK))
-	status.add_child(_icon("mushroom", 28))
-	var carry := _label("x0", 20, P.WARM_CHALK)
-	status.add_child(carry)
-	var stored := _label("0 stored", 16, P.CONCRETE_GREY.lightened(0.4))
-	status.add_child(stored)
-	status.add_child(_label("  ", 18, P.WARM_CHALK))
-	status.add_child(_icon("bun", 28))
-	var buns := _label("0", 20, P.WARM_CHALK)
+	status.add_child(_icon("bun", 26))
+	var buns := _label("0", 18, P.WARM_CHALK)
 	status.add_child(buns)
+	status.add_child(_icon("topping", 26))
+	var tops := _label("0", 18, P.WARM_CHALK)
+	status.add_child(tops)
 	var held := HBoxContainer.new()
 	held.add_child(_label("   HOLDING", 16, P.ELECTRIC_TEAL))
-	held.add_child(_icon("burger", 28))
-	held.add_child(_label("BURGER", 16, P.ELECTRIC_TEAL))
+	var held_icon := _icon("burger", 28)
+	held.add_child(held_icon)
+	var held_text := _label("BURGER", 16, P.ELECTRIC_TEAL)
+	held.add_child(held_text)
 	held.visible = false
 	status.add_child(held)
 	# station menu, above the prompt
@@ -443,7 +472,9 @@ func _build_hud() -> void:
 	toast.modulate.a = 0.0
 	layer.add_child(toast)
 	_hud = {"wave": wave_label, "cross": cross, "health": health, "prompt": prompt, "dead": dead, "vignette": vignette, "weapon": weapon,
-		"cash": cash, "carry": carry, "stored": stored, "buns": buns, "held": held, "menu": menu, "toast": toast}
+		"cash": cash, "buns": buns, "tops": tops, "held": held, "held_icon": held_icon, "held_text": held_text, "menu": menu, "toast": toast}
+	for k in carries:
+		_hud["carry_" + k] = carries[k]
 
 # Keep the desktop responsive when this window is not being played.
 # Headless test simulations retain their normal unrestricted speed.

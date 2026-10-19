@@ -1,7 +1,8 @@
-# The service hatch. Customers drive up the road one at a time; hold a bagged
-# burger, look at the hatch and press E to serve: $30 plus a tip for speed
-# ($6 in the first third of their patience, $2 in the second, nothing after).
-# A missed customer just drives away - no penalty, no payment.
+# The service hatch. Customers drive up one at a time and show the burger they
+# want as an icon (brown common, blue or red). Hold the right bagged burger,
+# look at the hatch, press E: $30 plus a tip for a fresh patty (perfect $6,
+# good $3), or $15 for burnt salvage. A missed customer just drives away - no
+# penalty, no payment.
 extends "res://game/station.gd"
 
 const Car = preload("res://game/customer_car.gd")
@@ -19,6 +20,18 @@ var lane_start := Vector3(-38, 0, -8)
 var lane_stop := Vector3(-3, 0, -8)
 var lane_end := Vector3(38, 0, -8)
 var car: Node3D = null
+var next_order := ""                 # tests/films can force the next order
+var last_quality := ""
+const ORDER_WEIGHTS := {"brown": 0.55, "blue": 0.3, "red": 0.15}
+
+static func pick_order() -> String:
+	var r := randf()
+	for k in ORDER_WEIGHTS:
+		r -= float(ORDER_WEIGHTS[k])
+		if r <= 0.0:
+			return k
+	return "brown"
+
 var _next := 0.0
 
 func _ready() -> void:
@@ -46,6 +59,8 @@ func spawn_customer() -> Node3D:
 	c.set_script(Car)
 	c.name = "CustomerCar"
 	get_parent().add_child(c)
+	c.order = next_order if next_order != "" else pick_order()
+	next_order = ""
 	c.setup(lane_start, lane_stop, lane_end)
 	c.arrived.connect(func(): customer_arrived.emit(c))
 	c.left.connect(func(served: bool):
@@ -64,26 +79,41 @@ func prompt(player: Node) -> String:
 	var c := waiting_car()
 	if c == null:
 		if car != null and is_instance_valid(car) and car.state == "arriving":
-			return "DRIVE-THRU  ·  car pulling in"
+			return "DRIVE-THRU  ·  customer pulling in"
 		return "DRIVE-THRU  ·  no customer yet"
 	var left := ceili(c.patience - c.waited)
+	var want: String = Economy.KIND_NAME[c.order].to_upper()
 	if player.held == "burger":
-		return "E  serve burger  ·  $%d + tip" % Economy.BURGER_PRICE
-	return "DRIVE-THRU  ·  wants a burger  ·  %ds" % left
+		var b: Dictionary = player.held_burger
+		if b.get("quality", "") == "burnt":
+			return "E  serve burnt salvage  ·  $%d" % Economy.SALVAGE_PRICE
+		if b.get("kind", "") != c.order:
+			return "WRONG BURGER  ·  they want %s" % want
+		var pay := Economy.payment(b["quality"])
+		return "E  serve %s burger  ·  %s  $%d%s" % [want, (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
+	return "DRIVE-THRU  ·  wants %s  ·  %ds" % [want, left]
 
 func interact(player: Node) -> void:
 	serve(player)
 
+# Pays by the burger's quality (docs/COOKING_DESIGN.md): the right kind earns
+# $30 plus a perfect/good tip; burnt salvage earns $15 from anyone.
 func serve(player: Node) -> bool:
 	var c := waiting_car()
 	if c == null or player.held != "burger":
 		return false
-	var tip := Economy.tip_for(c.waited_fraction())
+	var b: Dictionary = player.held_burger
+	var quality: String = b.get("quality", "standard")
+	if quality != "burnt" and b.get("kind", "brown") != c.order:
+		Sfx.play(self, "click", -6.0)
+		return false
+	var pay := Economy.payment(quality)
 	player.set_held("")
 	var e := economy()
-	e.add_cash(Economy.BURGER_PRICE + tip)
+	e.add_cash(int(pay[0]) + int(pay[1]))
 	e.served += 1
 	c.leave(true)
 	Sfx.play(self, "till", -6.0)
-	customer_served.emit(Economy.BURGER_PRICE, tip)
+	last_quality = quality
+	customer_served.emit(int(pay[0]), int(pay[1]))
 	return true

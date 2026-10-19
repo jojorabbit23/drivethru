@@ -1,8 +1,9 @@
-# Storeroom mushroom bin. E stores every mushroom you're carrying; one stored
-# mushroom makes one common patty at the grill. Its sign shows the stock.
+# Storeroom mushroom bin. E stores every mushroom you're carrying; each stored
+# mushroom makes one patty of its kind at the grill. Its sign shows the stock
+# of each kind (common brown, blue, red) as icon + count.
 extends "res://game/station.gd"
 
-var _sign: Label3D
+var _signs := {}
 var _pile: Array[MeshInstance3D] = []
 
 func _ready() -> void:
@@ -32,33 +33,46 @@ func _ready() -> void:
 	var clip := add_solid(Vector3(0.76, 2.4, 0.61), Vector3(0, 1.2, 0))
 	clip.collision_layer = 16
 	add_zone(Vector3(0.9, 0.9, 0.75), Vector3(0, 0.45, 0))
-	var icon := Icons.sprite("mushroom", 0.014)
-	icon.position = Vector3(-0.2, 1.05, 0)
-	add_child(icon)
-	_sign = add_label("", Vector3(0.12, 1.05, 0))
-	_sign.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	for i in Economy.KINDS.size():
+		var kind: String = Economy.KINDS[i]
+		# one row per kind, stacked, so it reads from any side (billboards)
+		var y := 1.32 - i * 0.2
+		var icon := Icons.sprite("mushroom_" + kind, 0.011)
+		icon.position = Vector3(0, y, 0)
+		icon.offset = Vector2(-10, 0)
+		add_child(icon)
+		var l := add_label("0", Vector3(0, y, 0))
+		l.offset = Vector2(40, 0)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		_signs[kind] = l
 	_refresh.call_deferred()
 
 func _refresh() -> void:
 	var e := economy()
 	if e and not e.changed.is_connected(_refresh):
 		e.changed.connect(_refresh)
-	var n: int = e.mushrooms if e else 0
-	_sign.text = "%d" % n
+	if e == null:
+		return
+	var heap := []
+	for kind in Economy.KINDS:
+		(_signs[kind] as Label3D).text = "%d" % int(e.stock[kind])
+		for k in int(e.stock[kind]):
+			heap.append(kind)
 	for i in _pile.size():
-		_pile[i].visible = i < n
+		_pile[i].visible = i < heap.size()
+		if i < heap.size():
+			(_pile[i].material_override as StandardMaterial3D).albedo_color = Icons.KIND_COLOUR[heap[i]]
 
 func prompt(player: Node) -> String:
 	var carrying: int = player.mushrooms
 	if carrying > 0:
 		return "E  store %d mushroom%s" % [carrying, "" if carrying == 1 else "s"]
-	return "MUSHROOM STORE  ·  %d stored  ·  kill zombies for more" % economy().mushrooms
+	var st: Dictionary = economy().stock
+	return "MUSHROOM STORE  ·  %d common  %d blue  %d red" % [st["brown"], st["blue"], st["red"]]
 
 func interact(player: Node) -> void:
 	var carrying: int = player.mushrooms
 	if carrying <= 0:
 		return
-	player.mushrooms = 0
-	player.mushrooms_changed.emit(0)
-	economy().store_mushrooms(carrying)
+	economy().store_all(player.drop_carried())
 	Sfx.play_at(self, "thunk", global_position + Vector3(0, 0.5, 0))

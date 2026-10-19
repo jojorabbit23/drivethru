@@ -42,15 +42,20 @@ func _run() -> void:
 	await wait(5)
 	var econ: Node = main.economy
 	econ.add_cash(58)
-	econ.store_mushrooms(5)
+	econ.store_mushrooms(4, "brown")
+	econ.store_mushrooms(2, "blue")
+	econ.store_mushrooms(1, "red")
+	econ.add_cash(200)
+	econ.upgrade_grill()     # 3 slots for the shot
 	player.switch_weapon(1)
 	# 1. grill: raw, cooking, ready + menu
-	main.grill.add_patty()
+	await wait(2)
+	main.grill.add_patty("brown")
 	await wait(1)
 	main.grill.slots[0]["t"] = 7.5
-	main.grill.add_patty()
+	main.grill.add_patty("blue")
 	main.grill.slots[1]["t"] = 3.5
-	main.grill.add_patty()
+	main.grill.add_patty("red")
 	main.grill.slots[2]["t"] = 0.3
 	await stand_look(Vector3(2.1, 0, -3.25), main.grill.global_position + Vector3(0, 0.05, 0))
 	player.use_focus()
@@ -65,8 +70,12 @@ func _run() -> void:
 	# 3. bag a burger and serve a car
 	main.grill.slots[1]["t"] = 7.0
 	await wait(2)
-	main.grill.bag_burger(player)
+	main.hatch.next_order = "blue"
 	var car: Node3D = main.hatch.spawn_customer()
+	main.bench.bag(player)
+	await stand_look(Vector3(0.8, 0, -3.3), main.bench.global_position + Vector3(0, 0.1, 0))
+	await wait(4)
+	await snap("loop7_prep_bench")
 	car.position = main.hatch.lane_stop
 	await wait(2)
 	car.set("_t", 5.0)
@@ -88,7 +97,8 @@ func _run() -> void:
 	main.hatch.serve(player)
 	await wait(4)
 	# 5. storage bin
-	player.add_mushrooms(3)
+	player.add_mushrooms(2, "brown")
+	player.add_mushrooms(1, "red")
 	await stand_look(Vector3(1.7, 0, 1.6), main.storage.global_position + Vector3(0, 0.4, 0))
 	await wait(6)
 	await snap("loop5_storage")

@@ -25,8 +25,10 @@ signal held_changed(item: String)
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var health := 0.0
-var mushrooms := 0                 # glowing mushrooms picked up from dead enemies (carried)
+var mushrooms := 0                 # mushrooms carried, all kinds (see carried)
+var carried := {"brown": 0, "blue": 0, "red": 0}
 var held := ""                     # item in hand: "" or "burger" (a bagged burger)
+var held_burger := {}              # {kind, quality} of the bagged burger
 
 # Stations (game/station.gd) are looked at and used with E. A station may open
 # a small menu: options are {label, enabled, action: Callable, icon}; keys 1-4
@@ -161,12 +163,21 @@ func take_damage(amount: float, from: Node3D = null) -> void:
 func is_dead() -> bool:
 	return health <= 0.0
 
-func add_mushrooms(n: int) -> void:
+func add_mushrooms(n: int, kind := "brown") -> void:
+	carried[kind] = int(carried[kind]) + n
 	mushrooms += n
 	mushrooms_changed.emit(mushrooms)
 
-func set_held(item: String) -> void:
+func drop_carried() -> Dictionary:
+	var out := carried.duplicate()
+	carried = {"brown": 0, "blue": 0, "red": 0}
+	mushrooms = 0
+	mushrooms_changed.emit(0)
+	return out
+
+func set_held(item: String, burger := {}) -> void:
 	held = item
+	held_burger = burger if item == "burger" else {}
 	held_changed.emit(item)
 
 # ----------------------------------------------------------- stations ----

@@ -8,7 +8,7 @@ A Godot **4.3** first-person zombie-siege game set in a roadside drive-through.
 The player is Cleatimus Maximus, a redneck mushroom farmer. Read `README.md`
 for the full tour; it describes every system that exists today.
 
-The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the burger loop) is built; see README.
+The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_DESIGN.md`. The burger loop is built; see README.
 
 ## Hard rules
 
@@ -67,7 +67,7 @@ enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GL
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
 vehicles/        customer vehicles (school bus) built from source GLBs
-game/            the burger loop: economy, stations (store, grill, drive-thru, terminal), cars, pixel icons, synth sounds
+game/            the burger loop: economy, stations (store, grill, prep bench, drive-thru, terminal), customers, pixel icons, synth sounds
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene
 tools/           build scripts, tests, capture/film scripts
