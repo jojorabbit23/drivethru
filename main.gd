@@ -31,6 +31,7 @@ const PrepBench = preload("res://game/prep_bench.gd")
 const HoldingTray = preload("res://game/holding_tray.gd")
 const OrderRail = preload("res://game/order_rail.gd")
 const DiscountBox = preload("res://game/discount_box.gd")
+const KitchenRadio = preload("res://game/kitchen_radio.gd")
 const ServingTray = preload("res://game/serving_tray.gd")
 const BurgerBin = preload("res://game/burger_bin.gd")
 const BurgerItems = preload("res://game/burger_items.gd")
@@ -121,6 +122,7 @@ func _build_stations() -> void:
 	hatch.serving_tray=serving_tray
 	terminal = _station(ShopTerminal, "ShopTerminal", Vector3(-2.89, 0.77, iz - 0.29), 0.0)
 	bench = _station(PrepBench, "PrepBench", Vector3(0.79, 0.92, -iz + 0.325), 0.0)
+	_station(KitchenRadio,"KitchenRadio",Vector3(4.40,1.045,-4.50),0.0)
 	# the pass above the counter: warming tray (once bought) and the ticket rail
 	tray = _station(HoldingTray, "WarmingTray", Vector3(1.38, 1.36, -iz + 0.17), 0.0)
 	tray.grill = grill

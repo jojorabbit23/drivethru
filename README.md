@@ -1,3 +1,12 @@
+## Kitchen radio
+
+The weathered teal-and-orange radio above the bun counter plays Short Order
+Carnage, Locked Screen Door and The Skillet Vigil in order, repeating the playlist.
+Music fades with distance from the radio and is inaudible beyond 22 metres.
+E pauses/resumes the current song. Settings has a separate kitchen-radio volume
+slider; background mute and pause behaviour apply. See tools/radio_test.gd and
+tools/capture_radio.gd for playlist, interaction and actual audio-fade checks.
+
 ## Rush shelf update
 
 Burger slots and tray boxes now show freshness icons. Customers buy matching stock
