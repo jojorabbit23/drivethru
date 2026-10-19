@@ -125,6 +125,12 @@ The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.
 
 **Not yet:** the commercial prep station and bun dispenser upgrades, cheeseburgers, deliveries and the supply runner, traps and power-ups.
 
+## Trailer
+
+`docs/video/trailer.mp4` (about 40 s) is a demo trailer cut from in-engine footage: the shop at night with the title, the horde, the boards, the shotgun, harvesting, the grill, building an order, the armoured truck, getting paid, gearing up, the Lancer at the boards, and an end card. Captions use the pixel font between letterbox bars; the soundtrack is synthesised.
+
+`python3 tools/make_trailer.py` films every shot with `tools/film_trailer.gd` and edits them together (`--edit` re-cuts already-filmed shots). Shot trims, captions and music are all in those two files.
+
 ## The Shambler (first zombie)
 
 `enemies/shambler/` is built from your `voxel_zombie_3d_model.glb`. The original is kept in `source/`.
