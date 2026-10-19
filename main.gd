@@ -58,7 +58,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_Z:
 				spawn_zombie()
 			KEY_R:
-				get_tree().reload_current_scene()
+				if player.is_dead() or not player.current_weapon().has_method("reload"):
+					get_tree().reload_current_scene()
 
 func _process(delta: float) -> void:
 	_hitmark = maxf(0.0, _hitmark - delta * 4.0)
@@ -72,6 +73,12 @@ func _process(delta: float) -> void:
 		if player.repair_progress > 0.0:
 			prompt += "  " + "|".repeat(int(player.repair_progress * 10)).rpad(10, ".")
 	_hud["prompt"].text = prompt
+	if player.weapon_index == 0:
+		var pistol: Node = player.current_weapon()
+		_hud["weapon"].text = "1  PISTOL   %d / %d%s" % [pistol.ammo, pistol.reserve, "  RELOADING" if pistol.state == "reload" else ""]
+	if player.weapon_index == 2:
+		var crop: Node = player.current_weapon()
+		_hud["weapon"].text = "3  CROP DUSTER   %d / %d%s" % [crop.ammo, crop.reserve, "  RELOADING" if crop.state == "reload" else ""]
 
 func _on_hit(_z: Node, headshot: bool, killed: bool) -> void:
 	_hitmark = 1.0
@@ -85,7 +92,7 @@ func _on_player_died() -> void:
 	_hud["dead"].visible = true
 
 func _update_weapon() -> void:
-	var names := ["1  PISTOL (placeholder)", "2  KNIFE"]
+	var names := ["1  PISTOL", "2  KNIFE", "3  CROP DUSTER"]
 	_hud["weapon"].text = names[player.weapon_index] if player.weapon_index < names.size() else ""
 
 func _update_health() -> void:
@@ -108,7 +115,7 @@ func _build_hud() -> void:
 	cross.pivot_offset = cross.size * 0.5
 	layer.add_child(cross)
 	var help := Label.new()
-	help.text = "WASD move · Shift sprint · Space jump · 1/2 or wheel switch weapon · LMB fire / slash · RMB stab · hold E repair · Z spawn zombie · R restart · L labels · Esc mouse"
+	help.text = "WASD move · Shift sprint · Space jump · 1/2/3 or wheel switch weapon · LMB fire / slash · RMB aim / stab · hold E repair · Z spawn zombie · R reload / restart · F inspect · L labels · Esc mouse"
 	help.add_theme_font_size_override("font_size", 13)
 	help.add_theme_color_override("font_color", Color("#E9E1D1", 0.6))
 	help.position = Vector2(16, 12)

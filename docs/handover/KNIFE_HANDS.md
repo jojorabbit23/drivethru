@@ -256,3 +256,7 @@ Fresh Compatibility captures and all 48 audit samples were inspected after the h
 The supplied in-game reference is now used for the closed teal-gloved grip. The resting grip rolls 18 degrees about the weapon axis to reveal more of the curled fingers, while keeping the wrist location, moderated elbow entry and original finger-to-weapon transforms. The full hand and knife turn together; no independent blade offset or finger scaling was introduced. This adjustment uses the same smooth contact/recovery weight as the upright hold, so the authored stab orientation is restored at full extension. Slash and draw retain the closed grip.
 
 The builder maps distal fingers to the same teal leather as the glove, matching the continuous dark glove coverage in the reference. The HD fabric/leather textures, orange sleeve and cuff remain in place. This is an approximation using the existing low-poly mesh, rather than a new hand sculpt. Gameplay values and attack timing remain unchanged. Fresh Compatibility captures, 48 pose samples and the refreshed encoded film were reviewed; the required suites and 12 viewmodel checks pass.
+
+### Combined firearm follow-up
+
+The knife gameplay/controller remains intact. The current combined project also includes the restored visible pistol and animated Crop Duster. See CURRENT_BUILD_CHECK.md for source assets, firearm hand adaptation, ammunition checks, performance findings and current launcher. Fresh tools/capture_knife.gd renders and sampled audit were reviewed after the loadout integration.

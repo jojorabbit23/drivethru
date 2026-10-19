@@ -12,3 +12,7 @@ The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Pro
 - Shop, textures, rig, animations, ooze and tools: made for this project.
 
 - Cleatimus HD hand material atlas and roughness: supplied by the project owner; mapped onto the PSX arms, sleeves and watch. Source images and pack README retained under weapons/knife/textures/cleatimus_hd/.
+
+PSX Firearms Free by heyheythere - https://heyheythere.itch.io/psx-firearms-free - CC BY 4.0
+
+The supplied pack and full licence are retained in addons/psx_firearms/. Adaptations use its pistol/shotgun hands and animation hierarchy, remove its weapon geometry, apply the project HD glove/sleeve textures, and fit the project owner's custom pistol and Crop Duster. Crop Duster breech textures and 1024px game-view texture copies are derived from the owner-supplied model; its source remains intact. The custom pistol and synthetic audio are restored from the earlier project FPS prototype.

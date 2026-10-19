@@ -1,0 +1,77 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/psx_firearms/models/fp_pump_shotgun_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(0.3133, 0.0948, 0.3463)
+
+[sub_resource type="BoxShape3D" id="box1"]
+size = Vector3(0.1418, 0.0685, 0.1696)
+
+[sub_resource type="BoxShape3D" id="box2"]
+size = Vector3(0.0370, 0.1450, 1.0120)
+
+[sub_resource type="BoxShape3D" id="box3"]
+size = Vector3(0.0480, 0.0480, 0.1600)
+
+[sub_resource type="BoxShape3D" id="box4"]
+size = Vector3(0.0050, 0.0210, 0.0580)
+
+[sub_resource type="BoxShape3D" id="box5"]
+size = Vector3(0.0060, 0.0270, 0.0110)
+
+[sub_resource type="BoxShape3D" id="box6"]
+size = Vector3(0.1122, 0.1044, 0.1437)
+
+[sub_resource type="BoxShape3D" id="box7"]
+size = Vector3(0.2079, 0.2967, 0.3228)
+
+[node name="fp_pump_shotgun" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1227, -0.0027, 0.1436)
+shape = SubResource("box0")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0490, -0.0122, 0.0602)
+shape = SubResource("box1")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0000, -0.0125, 0.1540)
+shape = SubResource("box2")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, -0.0000)
+shape = SubResource("box3")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_bolt"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_bolt/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0000, 0.0000, -0.0000)
+shape = SubResource("box4")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_trigger"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_trigger/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.0135, -0.0015)
+shape = SubResource("box5")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump/fp_pump_shotgun_hand_l"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump/fp_pump_shotgun_hand_l/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0275, 0.0052, 0.0494)
+shape = SubResource("box6")
+
+[node name="Collision" type="StaticBody3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump/fp_pump_shotgun_hand_l/fp_pump_shotgun_forearm_l"]
+
+[node name="Box" type="CollisionShape3D" parent="fp_pump_shotgun/fp_pump_shotgun_hand_r/fp_pump_shotgun_held/fp_pump_shotgun_pump/fp_pump_shotgun_hand_l/fp_pump_shotgun_forearm_l/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0822, -0.1337, -0.1474)
+shape = SubResource("box7")

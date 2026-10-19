@@ -1,0 +1,1063 @@
+{
+ "atlas": 512,
+ "atlas_used": 216,
+ "fps": 30,
+ "props": [
+  {
+   "name": "pistol",
+   "title": "9mm Pistol",
+   "group": "handguns",
+   "place": "hand",
+   "note": "9mm, 15 rounds: the slide runs back, the magazine drops",
+   "tris": 280,
+   "size": [
+    0.031,
+    0.2,
+    0.153
+   ],
+   "min": [
+    -0.016,
+    -0.152,
+    -0.057
+   ],
+   "max": [
+    0.016,
+    0.048,
+    0.096
+   ],
+   "parts": [
+    {
+     "name": "pistol",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 68,
+     "min": [
+      -0.015,
+      -0.14,
+      -0.048
+     ],
+     "max": [
+      0.015,
+      0.037,
+      0.058
+     ]
+    },
+    {
+     "name": "pistol_slide",
+     "parent": "pistol",
+     "pivot": [
+      0.0,
+      0.0,
+      0.074
+     ],
+     "tris": 120,
+     "min": [
+      -0.0135,
+      -0.152,
+      0.058
+     ],
+     "max": [
+      0.0135,
+      0.04,
+      0.096
+     ]
+    },
+    {
+     "name": "pistol_trigger",
+     "parent": "pistol",
+     "pivot": [
+      0.0,
+      -0.052,
+      0.041
+     ],
+     "tris": 20,
+     "min": [
+      -0.003,
+      -0.056,
+      0.012
+     ],
+     "max": [
+      0.003,
+      -0.044,
+      0.043
+     ]
+    },
+    {
+     "name": "pistol_magazine",
+     "parent": "pistol",
+     "pivot": [
+      0.0,
+      0.0,
+      -0.05
+     ],
+     "tris": 52,
+     "min": [
+      -0.0155,
+      -0.027,
+      -0.057
+     ],
+     "max": [
+      0.0155,
+      0.039,
+      0.0445
+     ]
+    },
+    {
+     "name": "pistol_hammer",
+     "parent": "pistol",
+     "pivot": [
+      0.0,
+      0.037,
+      0.066
+     ],
+     "tris": 20,
+     "min": [
+      -0.004,
+      0.036,
+      0.062
+     ],
+     "max": [
+      0.004,
+      0.048,
+      0.084
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "fire",
+     "seconds": 0.3,
+     "loop": false
+    },
+    {
+     "name": "reload",
+     "seconds": 1.6,
+     "loop": false
+    }
+   ],
+   "gun": {
+    "muzzle": [
+     0.0,
+     -0.152,
+     0.071
+    ],
+    "sight": [
+     0.0,
+     0.036,
+     0.094
+    ],
+    "ammo": "ammo_9mm",
+    "rounds": 15,
+    "fire": "fire",
+    "reload": "reload"
+   }
+  },
+  {
+   "name": "pump_shotgun",
+   "title": "Pump Shotgun",
+   "group": "shotguns",
+   "place": "hand",
+   "note": "12 gauge, 6 shells: the fore-end pumps",
+   "tris": 452,
+   "size": [
+    0.048,
+    1.012,
+    0.145
+   ],
+   "min": [
+    -0.024,
+    -0.66,
+    -0.085
+   ],
+   "max": [
+    0.024,
+    0.352,
+    0.06
+   ],
+   "parts": [
+    {
+     "name": "pump_shotgun",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 224,
+     "min": [
+      -0.0185,
+      -0.66,
+      -0.085
+     ],
+     "max": [
+      0.0185,
+      0.352,
+      0.06
+     ]
+    },
+    {
+     "name": "pump_shotgun_pump",
+     "parent": "pump_shotgun",
+     "pivot": [
+      0.0,
+      -0.42,
+      0.01
+     ],
+     "tris": 196,
+     "min": [
+      -0.024,
+      -0.5,
+      -0.014
+     ],
+     "max": [
+      0.024,
+      -0.34,
+      0.034
+     ]
+    },
+    {
+     "name": "pump_shotgun_bolt",
+     "parent": "pump_shotgun",
+     "pivot": [
+      0.0175,
+      -0.174,
+      0.034
+     ],
+     "tris": 12,
+     "min": [
+      0.0165,
+      -0.203,
+      0.0235
+     ],
+     "max": [
+      0.0185,
+      -0.145,
+      0.0445
+     ]
+    },
+    {
+     "name": "pump_shotgun_trigger",
+     "parent": "pump_shotgun",
+     "pivot": [
+      0.0,
+      -0.1,
+      -0.004
+     ],
+     "tris": 20,
+     "min": [
+      -0.003,
+      -0.104,
+      -0.031
+     ],
+     "max": [
+      0.003,
+      -0.093,
+      -0.004
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "fire",
+     "seconds": 0.25,
+     "loop": false
+    },
+    {
+     "name": "pump",
+     "seconds": 0.6,
+     "loop": false
+    }
+   ],
+   "gun": {
+    "muzzle": [
+     0.0,
+     -0.66,
+     0.035
+    ],
+    "sight": [
+     0.0,
+     -0.06,
+     0.062
+    ],
+    "ammo": "ammo_12ga",
+    "rounds": 6,
+    "fire": "fire",
+    "cycle": "pump"
+   }
+  },
+  {
+   "name": "ammo_9mm",
+   "title": "9mm Ammo",
+   "group": "ammo",
+   "place": "item",
+   "note": "",
+   "tris": 12,
+   "size": [
+    0.08,
+    0.05,
+    0.035
+   ],
+   "min": [
+    -0.04,
+    -0.025,
+    0.0
+   ],
+   "max": [
+    0.04,
+    0.025,
+    0.035
+   ],
+   "parts": [
+    {
+     "name": "ammo_9mm",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      -0.04,
+      -0.025,
+      0.0
+     ],
+     "max": [
+      0.04,
+      0.025,
+      0.035
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "ammo_12ga",
+   "title": "Shotgun Shells",
+   "group": "ammo",
+   "place": "item",
+   "note": "",
+   "tris": 12,
+   "size": [
+    0.11,
+    0.06,
+    0.07
+   ],
+   "min": [
+    -0.055,
+    -0.03,
+    0.0
+   ],
+   "max": [
+    0.055,
+    0.03,
+    0.07
+   ],
+   "parts": [
+    {
+     "name": "ammo_12ga",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      -0.055,
+      -0.03,
+      0.0
+     ],
+     "max": [
+      0.055,
+      0.03,
+      0.07
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "shotgun_shell",
+   "title": "Shotgun Shell",
+   "group": "ammo",
+   "place": "item",
+   "note": "",
+   "tris": 56,
+   "size": [
+    0.06,
+    0.022,
+    0.022
+   ],
+   "min": [
+    -0.035,
+    -0.011,
+    0.0
+   ],
+   "max": [
+    0.025,
+    0.011,
+    0.022
+   ],
+   "parts": [
+    {
+     "name": "shotgun_shell",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 56,
+     "min": [
+      -0.035,
+      -0.0112,
+      0.0
+     ],
+     "max": [
+      0.025,
+      0.0112,
+      0.0224
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "magazine_pistol",
+   "title": "Pistol Magazine",
+   "group": "ammo",
+   "place": "item",
+   "note": "the 9mm pistol's, 15 rounds",
+   "tris": 52,
+   "size": [
+    0.108,
+    0.061,
+    0.03
+   ],
+   "min": [
+    -0.009,
+    -0.028,
+    -0.0
+   ],
+   "max": [
+    0.099,
+    0.033,
+    0.03
+   ],
+   "parts": [
+    {
+     "name": "magazine_pistol",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 52,
+     "min": [
+      -0.009,
+      -0.028,
+      -0.0
+     ],
+     "max": [
+      0.0985,
+      0.033,
+      0.03
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "target_steel",
+   "title": "Steel Target",
+   "group": "targets",
+   "place": "floor",
+   "note": "rings and swings when hit",
+   "tris": 144,
+   "size": [
+    0.76,
+    0.3,
+    1.08
+   ],
+   "min": [
+    -0.38,
+    -0.15,
+    0.0
+   ],
+   "max": [
+    0.38,
+    0.15,
+    1.08
+   ],
+   "parts": [
+    {
+     "name": "target_steel",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 60,
+     "min": [
+      -0.38,
+      -0.15,
+      0.0
+     ],
+     "max": [
+      0.38,
+      0.15,
+      1.08
+     ]
+    },
+    {
+     "name": "target_steel_plate",
+     "parent": "target_steel",
+     "pivot": [
+      0.0,
+      0.0,
+      1.04
+     ],
+     "tris": 84,
+     "min": [
+      -0.16,
+      -0.007,
+      0.58
+     ],
+     "max": [
+      0.16,
+      0.007,
+      1.0404
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "hit",
+     "seconds": 1.4,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "name": "fp_pistol",
+   "title": "Arms: 9mm Pistol",
+   "group": "arms",
+   "place": "hand",
+   "note": "first-person arms holding the 9mm pistol: drawn, fired and reloaded and inspected",
+   "tris": 1592,
+   "size": [
+    0.3,
+    0.602,
+    0.65
+   ],
+   "min": [
+    -0.285,
+    -0.55,
+    -0.714
+   ],
+   "max": [
+    0.015,
+    0.052,
+    -0.064
+   ],
+   "parts": [
+    {
+     "name": "fp_pistol",
+     "parent": null,
+     "pivot": [
+      -0.2394,
+      0.0406,
+      -0.233
+     ],
+     "tris": 80,
+     "min": [
+      -0.2853,
+      -0.351,
+      -0.2745
+     ],
+     "max": [
+      -0.1451,
+      0.0518,
+      -0.1307
+     ]
+    },
+    {
+     "name": "fp_pistol_hand_r",
+     "parent": "fp_pistol",
+     "pivot": [
+      -0.1734,
+      -0.3459,
+      -0.154
+     ],
+     "tris": 576,
+     "min": [
+      -0.1912,
+      -0.4761,
+      -0.2079
+     ],
+     "max": [
+      -0.0951,
+      -0.3296,
+      -0.1196
+     ]
+    },
+    {
+     "name": "fp_pistol_held",
+     "parent": "fp_pistol_hand_r",
+     "pivot": [
+      -0.13,
+      -0.4,
+      -0.16
+     ],
+     "tris": 68,
+     "min": [
+      -0.1524,
+      -0.5394,
+      -0.208
+     ],
+     "max": [
+      -0.0892,
+      -0.3607,
+      -0.102
+     ]
+    },
+    {
+     "name": "fp_pistol_slide",
+     "parent": "fp_pistol_held",
+     "pivot": [
+      -0.13,
+      -0.4,
+      -0.086
+     ],
+     "tris": 120,
+     "min": [
+      -0.1515,
+      -0.5498,
+      -0.102
+     ],
+     "max": [
+      -0.0856,
+      -0.3581,
+      -0.064
+     ]
+    },
+    {
+     "name": "fp_pistol_trigger",
+     "parent": "fp_pistol_held",
+     "pivot": [
+      -0.1192,
+      -0.4509,
+      -0.119
+     ],
+     "tris": 20,
+     "min": [
+      -0.1238,
+      -0.4554,
+      -0.148
+     ],
+     "max": [
+      -0.1154,
+      -0.4424,
+      -0.117
+     ]
+    },
+    {
+     "name": "fp_pistol_magazine",
+     "parent": "fp_pistol_held",
+     "pivot": [
+      -0.13,
+      -0.4,
+      -0.21
+     ],
+     "tris": 52,
+     "min": [
+      -0.1533,
+      -0.4287,
+      -0.217
+     ],
+     "max": [
+      -0.1101,
+      -0.3586,
+      -0.1155
+     ]
+    },
+    {
+     "name": "fp_pistol_hammer",
+     "parent": "fp_pistol_held",
+     "pivot": [
+      -0.1377,
+      -0.3638,
+      -0.094
+     ],
+     "tris": 20,
+     "min": [
+      -0.1439,
+      -0.3656,
+      -0.098
+     ],
+     "max": [
+      -0.1336,
+      -0.3522,
+      -0.076
+     ]
+    },
+    {
+     "name": "fp_pistol_hand_l",
+     "parent": "fp_pistol_held",
+     "pivot": [
+      -0.0265,
+      -0.3467,
+      -0.4985
+     ],
+     "tris": 576,
+     "min": [
+      -0.0814,
+      -0.455,
+      -0.5275
+     ],
+     "max": [
+      0.0023,
+      -0.3304,
+      -0.4271
+     ]
+    },
+    {
+     "name": "fp_pistol_forearm_l",
+     "parent": "fp_pistol_hand_l",
+     "pivot": [
+      -0.0265,
+      -0.3467,
+      -0.4985
+     ],
+     "tris": 80,
+     "min": [
+      -0.0789,
+      -0.3555,
+      -0.7141
+     ],
+     "max": [
+      0.015,
+      0.031,
+      -0.4806
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "idle",
+     "seconds": 3.0,
+     "loop": true
+    },
+    {
+     "name": "draw",
+     "seconds": 0.55,
+     "loop": false
+    },
+    {
+     "name": "fire",
+     "seconds": 0.3,
+     "loop": false
+    },
+    {
+     "name": "reload",
+     "seconds": 1.6,
+     "loop": false
+    },
+    {
+     "name": "inspect",
+     "seconds": 3.2,
+     "loop": false
+    }
+   ],
+   "gun": {
+    "muzzle": [
+     -0.0984,
+     -0.5487,
+     -0.089
+    ],
+    "sight": [
+     -0.1375,
+     -0.3648,
+     -0.066
+    ],
+    "ammo": "ammo_9mm",
+    "rounds": 15,
+    "fire": "fire",
+    "reload": "reload",
+    "bore": [
+     0.2079,
+     -0.9781,
+     0.0
+    ]
+   },
+   "arms": {
+    "holds": "pistol",
+    "draw": "draw",
+    "inspect": "inspect",
+    "idle": "idle",
+    "thumb_intent": {
+     "r": {
+      "mode": "wrap-backstrap",
+      "parts": [
+       "pistol"
+      ]
+     }
+    },
+    "hand_layout": "palm-four-fingers-three-thumb"
+   }
+  },
+  {
+   "name": "fp_pump_shotgun",
+   "title": "Arms: Pump Shotgun",
+   "group": "arms",
+   "place": "hand",
+   "note": "first-person arms holding the pump shotgun: drawn, fired and reloaded and inspected",
+   "tris": 1780,
+   "size": [
+    0.591,
+    1.038,
+    0.359
+   ],
+   "min": [
+    -0.494,
+    -1.0,
+    -0.449
+   ],
+   "max": [
+    0.097,
+    0.038,
+    -0.09
+   ],
+   "parts": [
+    {
+     "name": "fp_pump_shotgun",
+     "parent": null,
+     "pivot": [
+      -0.4596,
+      0.0081,
+      -0.1432
+     ],
+     "tris": 80,
+     "min": [
+      -0.4936,
+      -0.3087,
+      -0.1933
+     ],
+     "max": [
+      -0.1803,
+      0.0376,
+      -0.0985
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_hand_r",
+     "parent": "fp_pump_shotgun",
+     "pivot": [
+      -0.1974,
+      -0.2934,
+      -0.1599
+     ],
+     "tris": 584,
+     "min": [
+      -0.2193,
+      -0.4384,
+      -0.2063
+     ],
+     "max": [
+      -0.0775,
+      -0.2688,
+      -0.1378
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_held",
+     "parent": "fp_pump_shotgun_hand_r",
+     "pivot": [
+      -0.12,
+      -0.34,
+      -0.15
+     ],
+     "tris": 224,
+     "min": [
+      -0.1385,
+      -1.0,
+      -0.235
+     ],
+     "max": [
+      -0.1015,
+      0.012,
+      -0.09
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_pump",
+     "parent": "fp_pump_shotgun_held",
+     "pivot": [
+      -0.12,
+      -0.76,
+      -0.14
+     ],
+     "tris": 196,
+     "min": [
+      -0.144,
+      -0.84,
+      -0.164
+     ],
+     "max": [
+      -0.096,
+      -0.68,
+      -0.116
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_bolt",
+     "parent": "fp_pump_shotgun_held",
+     "pivot": [
+      -0.1025,
+      -0.514,
+      -0.116
+     ],
+     "tris": 12,
+     "min": [
+      -0.1035,
+      -0.543,
+      -0.1265
+     ],
+     "max": [
+      -0.1015,
+      -0.485,
+      -0.1055
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_trigger",
+     "parent": "fp_pump_shotgun_held",
+     "pivot": [
+      -0.12,
+      -0.44,
+      -0.154
+     ],
+     "tris": 20,
+     "min": [
+      -0.123,
+      -0.444,
+      -0.181
+     ],
+     "max": [
+      -0.117,
+      -0.433,
+      -0.154
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_hand_l",
+     "parent": "fp_pump_shotgun_pump",
+     "pivot": [
+      -0.0887,
+      -0.7459,
+      -0.1674
+     ],
+     "tris": 584,
+     "min": [
+      -0.1723,
+      -0.8671,
+      -0.2144
+     ],
+     "max": [
+      -0.0601,
+      -0.7234,
+      -0.11
+     ]
+    },
+    {
+     "name": "fp_pump_shotgun_forearm_l",
+     "parent": "fp_pump_shotgun_hand_l",
+     "pivot": [
+      -0.0887,
+      -0.7459,
+      -0.1674
+     ],
+     "tris": 80,
+     "min": [
+      -0.1105,
+      -0.7599,
+      -0.4494
+     ],
+     "max": [
+      0.0974,
+      -0.4371,
+      -0.1527
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "idle",
+     "seconds": 3.0,
+     "loop": true
+    },
+    {
+     "name": "draw",
+     "seconds": 0.55,
+     "loop": false
+    },
+    {
+     "name": "fire",
+     "seconds": 0.25,
+     "loop": false
+    },
+    {
+     "name": "pump",
+     "seconds": 0.6,
+     "loop": false
+    },
+    {
+     "name": "reload",
+     "seconds": 2.0,
+     "loop": false
+    },
+    {
+     "name": "inspect",
+     "seconds": 3.2,
+     "loop": false
+    }
+   ],
+   "gun": {
+    "muzzle": [
+     -0.12,
+     -1.0,
+     -0.115
+    ],
+    "sight": [
+     -0.12,
+     -0.4,
+     -0.088
+    ],
+    "ammo": "ammo_12ga",
+    "rounds": 6,
+    "fire": "fire",
+    "cycle": "pump",
+    "bore": [
+     0.0,
+     -1.0,
+     0.0
+    ],
+    "reload": "reload"
+   },
+   "arms": {
+    "holds": "pump_shotgun",
+    "draw": "draw",
+    "inspect": "inspect",
+    "idle": "idle",
+    "hand_layout": "palm-four-fingers-three-thumb"
+   }
+  }
+ ]
+}

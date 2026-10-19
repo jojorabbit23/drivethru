@@ -246,7 +246,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 - No customers, deliveries, stock, economy or waves. Zombies come one at a time on a timer or with the Z key.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
-- The player is a plain capsule with a camera and an invisible placeholder pistol. The PSX arms pack hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
+- The player uses the existing capsule/camera controller with visible pistol, knife and Crop Duster viewmodels. The camera near clip is 0.01.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.
 - There's no monster truck at the hatch.
 - The Shambler's rig is automatic and its animations are hand-keyed in code. They read well at game distance, but an animator pass in Blender would add polish, especially to the death and climb. Because the normal arm and the shirt are one continuous surface, lifting that arm high still stretches the armpit a little, so the clips keep it below about 65°.
@@ -257,6 +257,15 @@ godot --path . --script res://tools/capture_previews.gd
 
 Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
 
-For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the shop, knife attacks and a 12-zombie/ooze stress case, then exits; a 15-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
+For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the pistol/shop, knife attacks, Crop Duster reload and a 12-zombie/ooze stress case, then exits; a 20-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
 
 The reference knife grip now has continuous teal glove coverage and an 18-degree resting roll to show the curled fingers. The roll eases into the authored stab pose at contact and returns during recovery. The original hand-to-knife attachment and gameplay timing remain intact.
+
+
+## Current combined weapon build
+
+The main loadout is now **1 pistol, 2 knife, 3 Crop Duster**, with number keys or the wheel to switch. LMB fires/slashes; RMB aims firearms or stabs with the knife. R reloads a firearm (and restarts after death); F inspects a firearm. The pistol has a 15-round magazine and 90 reserve rounds. Its existing custom model, moving slide and magazine are restored, with animated hands, reload, draw/holster, inspection, sounds and slide lockback when empty. Its original 34 body damage and headshot behaviour remain unchanged. The public low-level shoot() API remains available for the existing scripted hitscan tests; normal player input uses the gated request_fire().
+
+The Crop Duster is a two-shot break-action weapon with 24 reserve shells. It uses its original mechanical reload animation and the new pack's shotgun hands. Shells seat at 1.9 and 2.4 seconds; the full reload takes 3.4 seconds. Interrupted reloads retain seated ammunition and never create extra rounds. Draw, firing, inspection and reversed-draw holstering are included; a pump cycle is deliberately not used for this break-action gun. Eight camera-centred pellets respect cover and zombie head hitboxes. Its game-view model is fitted at 0.65 scale; the original source dimensions/data are preserved.
+
+Both firearms use the world renderer and the existing viewmodel depth technique, without another full-screen 3D viewport. The Crop Duster's game texture copies are 1024px instead of the source's 4096px, reducing measured video memory by about 120 MB in the bounded check. Original source files are retained. Build scripts: tools/build_pistol.gd and tools/build_crop_duster.gd. Source animation clips and licences are in addons/psx_firearms/. See docs/handover/CURRENT_BUILD_CHECK.md for verification and limits.

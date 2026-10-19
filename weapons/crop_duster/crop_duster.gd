@@ -1,0 +1,268 @@
+# Two-shot break-action shotgun. Visuals use the supplied mechanical clips plus PSX arms.
+extends Node3D
+signal hit(target: Node, headshot: bool, killed: bool)
+signal fired
+signal ammo_changed
+const P=preload("res://core/palette.gd")
+const Hitscan=preload("res://core/hitscan.gd")
+const VIEWMODEL=preload("res://weapons/crop_duster/crop_duster_viewmodel.tscn")
+const DRAW_TIME:=0.45
+const RELOAD_TIME:=3.4
+@export var pellet_damage:=16.0
+@export var reach:=40.0
+var active:=false
+var loaded: Array[bool]=[true,true]
+var reserve:=24
+var ammo: int:
+ get: return int(loaded[0])+int(loaded[1])
+var state:="idle"
+var clock:=0.0
+var cooldown:=0.0
+var recoil:=0.0
+var sway:=Vector2.ZERO
+var idle_time:=0.0
+var aim_weight:=0.0
+var _pivot: Node3D
+var _gun: Node3D
+var _arms: Node3D
+var _mechanics: Skeleton3D
+var _arms_anim: AnimationPlayer
+var _gun_anim: AnimationPlayer
+var _left_hand: Node3D
+var _pump: Node3D
+var _support_offset:=Vector3.ZERO
+var _flash: OmniLight3D
+var _sound: AudioStreamPlayer
+var _shell_materials: Array[ShaderMaterial]=[]
+var _rng:=RandomNumberGenerator.new()
+@onready var camera: Camera3D=get_parent()
+func _ready() -> void:
+ _rng.seed=420
+ _pivot=VIEWMODEL.instantiate()
+ add_child(_pivot)
+ _arms=_pivot.get_node("Arms")
+ _gun=_pivot.find_child("Gun",true,false)
+ _mechanics=_gun.find_child("Skeleton3D",true,false)
+ _arms_anim=_arms.get_node("AnimationPlayer")
+ _gun_anim=_gun.find_child("AnimationPlayer",true,false)
+ _left_hand=_arms.find_child("fp_pump_shotgun_hand_l",true,false)
+ _pump=_arms.find_child("fp_pump_shotgun_pump",true,false)
+ _arms_anim.play("idle")
+ _arms_anim.seek(0.0,true)
+ _pump.position=Vector3(0,0.055,0.257)
+ _support_offset=_gun.to_local(_left_hand.global_position)-Vector3(0.015,0.24,0.18)
+ var mesh: MeshInstance3D=_gun.find_child("Shotgun_SkinnedMesh",true,false)
+ for surface in range(5,11):
+  var mat: ShaderMaterial=mesh.mesh.surface_get_material(surface).duplicate()
+  mesh.set_surface_override_material(surface,mat)
+  _shell_materials.append(mat)
+ _flash=OmniLight3D.new()
+ _flash.light_color=P.AMBER_GLOW
+ _flash.omni_range=2.0
+ _flash.light_energy=3.0
+ _flash.visible=false
+ _gun.add_child(_flash)
+ _flash.position=Vector3(0,0.32,0.50)
+ _sound=AudioStreamPlayer.new()
+ _sound.volume_db=-16
+ add_child(_sound)
+ visible=false
+ _pose(0.0)
+func set_active(on: bool) -> void:
+ var was_active: bool=active
+ active=on
+ visible=on or was_active
+ state="draw" if on else ("holster" if was_active else "idle")
+ clock=0.0
+ recoil=0.0
+ aim_weight=0.0
+ camera.fov=75.0
+ _flash.visible=false
+ if not on: _sound.stop()
+ # Interrupted reloads retain only seated shells. A brief reversed draw lowers the gun.
+ _pose(0.0)
+func is_busy() -> bool: return state!="idle" or cooldown>0.0
+func can_act() -> bool:
+ var player: Node=owner
+ return active and not (player!=null and player.has_method("is_dead") and player.is_dead())
+func _unhandled_input(event: InputEvent) -> void:
+ if event is InputEventMouseMotion and active:
+  sway+=(event as InputEventMouseMotion).relative*0.00012
+ if not can_act() or Input.mouse_mode!=Input.MOUSE_MODE_CAPTURED: return
+ if event is InputEventKey and event.pressed and not event.echo:
+  if event.physical_keycode==KEY_R: reload()
+  elif event.physical_keycode==KEY_F and not is_busy():
+   state="inspect"
+   clock=0.0
+func _physics_process(delta: float) -> void:
+ if not active and state!="holster": return
+ if active and not can_act(): set_active(false)
+ var aiming: bool=can_act() and state=="idle" and Input.mouse_mode==Input.MOUSE_MODE_CAPTURED and Input.is_action_pressed("alt_fire")
+ aim_weight=lerpf(aim_weight,1.0 if aiming else 0.0,1.0-exp(-12.0*delta))
+ if active: camera.fov=lerpf(75.0,65.0,aim_weight)
+ if can_act() and Input.mouse_mode==Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("fire"):
+  shoot()
+ _update(delta)
+func reload() -> bool:
+ if not can_act() or state!="idle" or ammo==2 or reserve<=0: return false
+ state="reload"
+ clock=0.0
+ _click()
+ return true
+func _update(delta: float) -> void:
+ if not active and state!="holster": return
+ cooldown=maxf(0.0,cooldown-delta)
+ recoil=move_toward(recoil,0.0,delta*4.5)
+ var previous: float=clock
+ clock+=delta
+ idle_time+=delta
+ sway=sway.lerp(Vector2.ZERO,1.0-exp(-10.0*delta))
+ if state=="reload":
+  for i in 2:
+   var seat_time: float=1.9 if i==0 else 2.4
+   if previous<seat_time and clock>=seat_time and not loaded[i] and reserve>0:
+    loaded[i]=true
+    reserve-=1
+    ammo_changed.emit()
+    _click()
+  if previous<3.0 and clock>=3.0: _click()
+  if clock>=RELOAD_TIME:
+   state="idle"
+   clock=0.0
+ elif state=="holster" and clock>=0.22:
+  state="idle"
+  visible=false
+ elif state=="draw" and clock>=DRAW_TIME:
+  state="idle"
+  clock=0.0
+ elif state=="inspect" and clock>=3.2:
+  state="idle"
+  clock=0.0
+ _flash.visible=recoil>0.87
+ _pose(delta)
+func shoot() -> bool:
+ if not can_act() or is_busy(): return false
+ if ammo==0:
+  _click()
+  reload()
+  return false
+ var barrel: int=0 if loaded[0] else 1
+ loaded[barrel]=false
+ cooldown=0.42
+ recoil=1.0
+ ammo_changed.emit()
+ fired.emit()
+ _shot_sound()
+ var accumulated: Dictionary={}
+ var exclude: Array[RID]=[]
+ if owner is CollisionObject3D: exclude.append((owner as CollisionObject3D).get_rid())
+ for pellet in 8:
+  var radius: float=0.0 if pellet==0 else sqrt(float(pellet)/7.0)*tan(deg_to_rad(3.5))
+  var angle: float=float(pellet)*2.39996323
+  var direction: Vector3=(camera.global_basis*Vector3(cos(angle)*radius,sin(angle)*radius,-1)).normalized()
+  var result: Dictionary=Hitscan.cast(camera.get_world_3d().direct_space_state,camera.global_position,camera.global_position+direction*reach,exclude)
+  if result.is_empty(): continue
+  var col: Object=result["collider"]
+  var zombie: Node=null
+  var headshot:=false
+  if col is Area3D and (col as Area3D).has_meta("zombie"):
+   zombie=(col as Area3D).get_meta("zombie")
+   headshot=true
+  elif col is Node and (col as Node).is_in_group("zombies"): zombie=col
+  if zombie==null: continue
+  var key: int=zombie.get_instance_id()
+  var distance: float=camera.global_position.distance_to(result["position"])
+  var amount: float=pellet_damage*clampf(1.0-(distance-8.0)/40.0,0.35,1.0)
+  if headshot: amount*=float(zombie.get("head_multiplier"))
+  if not accumulated.has(key): accumulated[key]={"zombie":zombie,"damage":0.0,"head":false,"result":result,"dir":direction}
+  accumulated[key]["damage"]+=amount
+  accumulated[key]["head"]=accumulated[key]["head"] or headshot
+ for record: Dictionary in accumulated.values():
+  var zombie: Node=record["zombie"]
+  var result: Dictionary=record["result"]
+  zombie.take_damage(record["damage"],false,{"pos":result["position"],"dir":record["dir"],"normal":result["normal"]})
+  hit.emit(zombie,record["head"],zombie.is_dead())
+ return true
+func _pose(_delta: float) -> void:
+ if _gun==null: return
+ var reload_t: float=clock if state=="reload" else 0.0
+ var clip: String="idle"
+ var sample: float=fmod(idle_time,3.0)
+ if state=="holster":
+  clip="draw"
+  sample=(1.0-clampf(clock/0.22,0.0,1.0))*_arms_anim.get_animation(clip).length
+ elif state=="draw":
+  clip="draw"
+  sample=clampf(clock/DRAW_TIME,0.0,1.0)*_arms_anim.get_animation(clip).length
+ elif state=="reload":
+  clip="reload"
+  sample=clampf(clock/RELOAD_TIME,0.0,1.0)*2.0
+ elif state=="inspect":
+  clip="inspect"
+  sample=clampf(clock/3.2,0.0,1.0)*3.2
+ elif cooldown>0.15:
+  clip="fire"
+  sample=clampf((0.42-cooldown)/0.27,0.0,1.0)*0.2666667
+ _arms_anim.play(clip,0.0)
+ _arms_anim.seek(sample,true)
+ var reload_weight: float=smoothstep(0.0,0.4,reload_t)*(1.0-smoothstep(2.95,3.4,reload_t))
+ _pivot.position=Vector3(-sway.x,sway.y-0.075,-0.10)+Vector3(-0.02,-0.02,0.0)*reload_weight
+ _pivot.rotation=Vector3(0.25,0.40,-0.10)*reload_weight
+ var anchor:=Vector3(0.20,-0.20,-0.50)
+ _pivot.position+=anchor-_pivot.basis*anchor+Vector3(0,0.02,0)*reload_weight
+ _gun_anim.play("reload_empty" if state=="reload" else "idle",0.0)
+ _gun_anim.seek(minf(reload_t,RELOAD_TIME),true)
+ _pump.position=Vector3(0,0.055,0.257)
+ var support:=Vector3(0.015,0.24,0.18)
+ var hinge: Transform3D=_mechanics.get_bone_global_pose(_mechanics.find_bone("barrel_hinge"))
+ var rest: Transform3D=_mechanics.get_bone_global_rest(_mechanics.find_bone("barrel_hinge"))
+ var moving: Vector3=(hinge*rest.affine_inverse())*support
+ var left_point: Vector3=moving
+ if state=="reload":
+  var shell_l: Vector3=_gun.to_local(_mechanics.to_global(_mechanics.get_bone_global_pose(_mechanics.find_bone("shell_left")).origin))
+  var shell_r: Vector3=_gun.to_local(_mechanics.to_global(_mechanics.get_bone_global_pose(_mechanics.find_bone("shell_right")).origin))
+  var keys: Array=[ [0.0,moving],[0.45,moving],[0.85,Vector3(-0.13,0.11,-0.08)],[1.35,Vector3(-0.12,-0.10,-0.12)],[1.75,shell_l],[1.95,shell_l],[2.12,Vector3(-0.12,-0.10,-0.12)],[2.28,shell_r],[2.45,shell_r],[2.7,moving],[3.4,moving] ]
+  for i in keys.size()-1:
+   if reload_t<=float(keys[i+1][0]):
+    var u: float=smoothstep(float(keys[i][0]),float(keys[i+1][0]),reload_t)
+    left_point=(keys[i][1] as Vector3).lerp(keys[i+1][1],u)
+    break
+ _left_hand.global_position=_gun.to_global(left_point+_support_offset)
+ var sight: Vector3=camera.to_local(_gun.to_global(Vector3(0,0.36,-0.02)))
+ _pivot.position+=Vector3(-sight.x,-sight.y-0.015,0)*aim_weight
+ _update_shell_visibility()
+func _update_shell_visibility() -> void:
+ for i in 2:
+  var approaching: bool=state=="reload" and reserve>0 and clock>=(1.45 if i==0 else 2.05)
+  var show_shell: bool=loaded[i] or approaching or (state=="reload" and clock<0.75)
+  for part in 3:
+   _shell_materials[i*3+part].set_shader_parameter("visible_part",show_shell)
+func _shot_sound() -> void:
+ if DisplayServer.get_name()=="headless": return
+ var bytes:=PackedByteArray()
+ bytes.resize(6615*2)
+ var filtered:=0.0
+ for i in 6615:
+  var t: float=float(i)/22050.0
+  filtered=lerpf(filtered,_rng.randf_range(-1.0,1.0),0.4)
+  var sample: float=(filtered*0.8+sin(t*TAU*72.0)*0.2)*exp(-t*24.0)
+  bytes.encode_s16(i*2,int(clampf(sample,-1,1)*30000))
+ var stream:=AudioStreamWAV.new()
+ stream.format=AudioStreamWAV.FORMAT_16_BITS
+ stream.mix_rate=22050
+ stream.data=bytes
+ _sound.stream=stream
+ _sound.play()
+func _click() -> void:
+ if DisplayServer.get_name()=="headless": return
+ var bytes:=PackedByteArray()
+ bytes.resize(1102*2)
+ for i in 1102:
+  var t: float=float(i)/22050.0
+  bytes.encode_s16(i*2,int(sin(t*TAU*850.0)*exp(-t*100.0)*11000))
+ var stream:=AudioStreamWAV.new()
+ stream.format=AudioStreamWAV.FORMAT_16_BITS
+ stream.mix_rate=22050
+ stream.data=bytes
+ _sound.stream=stream
+ _sound.play()

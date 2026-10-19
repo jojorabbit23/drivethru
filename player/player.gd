@@ -1,5 +1,5 @@
-# Greybox first-person controller. Placeholder until the PSX arms pack is
-# wired in: the Head/Camera3D node is where the arms rig will be parented.
+# First-person controller. Pistol, knife and Crop Duster viewmodels live
+# below Head/Camera3D and share the weapon switching interface.
 # Also owns health and window repair (hold E at a window's repair spot).
 extends CharacterBody3D
 
@@ -38,12 +38,13 @@ const DEFAULT_BINDINGS := {
 	"interact": [KEY_E],
 	"weapon_1": [KEY_1],
 	"weapon_2": [KEY_2],
+	"weapon_3": [KEY_3],
 }
 
 signal weapon_changed(index: int, weapon: Node)
 
 # Weapons are the children of Head/Camera3D that have set_active():
-# 0 = placeholder pistol, 1 = knife. 1/2 or the mouse wheel switch.
+# 0 = pistol, 1 = knife, 2 = Crop Duster. Number keys or wheel switch.
 var weapons: Array[Node] = []
 var weapon_index := 0
 
@@ -82,6 +83,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		switch_weapon(0)
 	elif event.is_action_pressed("weapon_2"):
 		switch_weapon(1)
+	elif event.is_action_pressed("weapon_3"):
+		switch_weapon(2)
 	elif event is InputEventMouseButton and event.pressed and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
 		if not weapons.is_empty():
 			var step := 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1
