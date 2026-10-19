@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/serving_room/pack/magazine_hill_climb.png" id="1_cg8eq"]
+
+[resource]
+resource_name = "serve_hill"
+albedo_texture = ExtResource("1_cg8eq")
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

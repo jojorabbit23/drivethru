@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/serving_room/pack/paper_bag_graphic.png" id="1_bdux0"]
+
+[resource]
+resource_name = "serve_bag"
+albedo_texture = ExtResource("1_bdux0")
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

@@ -20,3 +20,7 @@ The supplied pack and full licence are retained in addons/psx_firearms/. Adaptat
 - Main menu lettering and zombie/burger intro clips: supplied by the project owner. Menu uses cropped atlas regions of the supplied overlay; video editing/alignment and final-frame hovering loop prepared for this project.
 
 - Scuttler, mushroom pickup, armoured school bus and sculpted knife/dagger hand: owner-supplied models; latest source and build tools integrated from GitHub main fefcb797.
+
+- Serving-room reference and material/poster/packaging atlas: supplied by the project owner, kept in art/serving_room/. UV cell extraction, room construction and integration prepared for this game.
+
+- Serving_Room_Texture_Pack.zip: owner-supplied individual PNG textures; source README and native images retained in art/serving_room/pack/.

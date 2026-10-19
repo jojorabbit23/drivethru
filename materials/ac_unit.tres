@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://textures/ac_unit.png" id="1_a7euw"]
+[ext_resource type="Texture2D" path="res://textures/ac_unit.png" id="1_6f50u"]
 
 [resource]
 resource_name = "ac_unit"
-albedo_texture = ExtResource("1_a7euw")
+albedo_texture = ExtResource("1_6f50u")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2
