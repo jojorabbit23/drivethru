@@ -52,11 +52,26 @@ func run() -> void:
  for i in 3: await physics_frame
  gun.cooldown=0.0
  gun.loaded.fill(true)
+ player.camera.look_at(z.global_position+Vector3(0,1.0,0))
  var hp: float=z.health
  gun.shoot()
  check(z.health<hp,"pellet cone damages the target under the crosshair")
+ check(z.is_dead(),"close centered shot kills a full-health Shambler")
  z.queue_free()
  await process_frame
+ var scuttler: Node3D=load("res://enemies/scuttler/scuttler.tscn").instantiate()
+ main.add_child(scuttler)
+ scuttler.global_position=Vector3(3.4,0.05,-1.4)
+ scuttler.set_physics_process(false)
+ player.camera.look_at(scuttler.global_position+Vector3(0,0.55,0))
+ for i in 3:await physics_frame
+ gun.cooldown=0.0
+ gun.loaded.fill(true)
+ gun.shoot()
+ check(scuttler.is_dead(),"close centered shot kills a full-health Scuttler")
+ scuttler.queue_free()
+ await process_frame
+ player.camera.rotation=Vector3.ZERO
  var behind: Node3D=main.spawn_zombie(main.get_node("ShopGreybox/Windows/Window_A"))
  behind.global_position=Vector3(3.4,0.05,-1.4)
  behind.set_physics_process(false)
@@ -97,13 +112,25 @@ func run() -> void:
  gun.loaded.fill(false)
  gun.reload()
  var left: Node3D=gun.get("_left_hand")
- var local_grip: Vector3=gun.get("_grip_in_hand")
  var model: Node3D=gun.get("_gun")
  for i in 2:
   gun.clock=1.9 if i==0 else 2.4
   gun._pose(0.0)
   var target: Vector3=gun.call("_shell_grip_point",i)
-  check(left.to_global(local_grip).distance_to(model.to_global(target))<0.0001,"palm anchor follows shell %d through the rotated action" % (i+1))
+  check(left.to_global(gun.get("_hand_anchor")).distance_to(model.to_global(target))<0.0001,"palm anchor follows shell %d through the rotated action" % (i+1))
+ # The palm must sit above the shell instead of disappearing underneath the receiver.
+ var palm_center: Vector3=player.camera.to_local(left.to_global((left as MeshInstance3D).get_aabb().get_center()))
+ var shell_center: Vector3=player.camera.to_local(model.to_global(gun._shell_grip_point(1)))
+ check(palm_center.y>shell_center.y+0.025,"loading palm approaches from above the chamber")
+ var pose_visible:=true
+ for frame in 69:
+  gun.clock=float(frame)*0.05
+  gun._pose(0.0)
+  var center: Vector3=player.camera.to_local(left.to_global((left as MeshInstance3D).get_aabb().get_center()))
+  pose_visible=pose_visible and center.z< -0.1 and absf(center.y/center.z)<0.72 and absf(center.x/center.z)<1.2
+ check(pose_visible,"loading glove stays within the view throughout reload")
+ gun.clock=2.4
+ gun._pose(0.0)
  var before_hand: Transform3D=model.global_transform.affine_inverse()*left.global_transform
  var before_hinge: Transform3D=mechanics.get_bone_global_pose(mechanics.find_bone("barrel_hinge"))
  player.switch_weapon(1)
@@ -122,6 +149,10 @@ func run() -> void:
  for mesh: MeshInstance3D in pivot.find_children("*","MeshInstance3D",true,false):
   if mesh.mesh!=null: shadows_off=shadows_off and mesh.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
  check(shadows_off,"held meshes cast no world shadows")
+ gun._vapour.release(model.to_global(Vector3(0,0.32,0.5)),player.camera)
+ check(gun._vapour.puffs.size()==8,"muzzle vapor uses a fixed eight-puff pool")
+ gun._vapour.advance(1.0)
+ check(gun._vapour.puffs.all(func(puff: MeshInstance3D):return not puff.visible),"vapor fully clears after firing")
  main.free()
  for i in 3: await process_frame
  print("%d failure(s)" % failures)

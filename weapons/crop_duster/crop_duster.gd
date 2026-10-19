@@ -8,7 +8,7 @@ const Hitscan=preload("res://core/hitscan.gd")
 const VIEWMODEL=preload("res://weapons/crop_duster/crop_duster_viewmodel.tscn")
 const DRAW_TIME:=0.45
 const RELOAD_TIME:=3.4
-@export var pellet_damage:=16.0
+@export var pellet_damage:=22.0
 @export var reach:=40.0
 var active:=false
 var loaded: Array[bool]=[true,true]
@@ -40,6 +40,12 @@ var _left_forearm: Node3D
 var _forearm_direction:=Vector3(0.12,-0.20,-0.23).normalized()
 var _flash: OmniLight3D
 var _sound: AudioStreamPlayer
+var _mechanism_sound: AudioStreamPlayer
+var _shot_voices: Array[AudioStreamPlayer]=[]
+var _shot_voice: int=0
+var _vapour: Node3D
+var _hand_anchor:=Vector3.ZERO
+const Sounds=preload("res://presentation/audio_library.gd")
 var _shell_materials: Array[ShaderMaterial]=[]
 var _rng:=RandomNumberGenerator.new()
 @onready var camera: Camera3D=get_parent()
@@ -72,9 +78,22 @@ func _ready() -> void:
  _flash.visible=false
  _gun.add_child(_flash)
  _flash.position=Vector3(0,0.32,0.50)
- _sound=AudioStreamPlayer.new()
- _sound.volume_db=-16
- add_child(_sound)
+ for i in 3:
+  var voice:=AudioStreamPlayer.new()
+  voice.volume_db=-5.0
+  voice.bus="Effects"
+  add_child(voice)
+  _shot_voices.append(voice)
+ _sound=_shot_voices[0]
+ _mechanism_sound=AudioStreamPlayer.new()
+ _mechanism_sound.volume_db=-11.0
+ _mechanism_sound.bus="Effects"
+ add_child(_mechanism_sound)
+ if DisplayServer.get_name()!="headless":
+  for i in 4:Sounds.sound("shotgun",i)
+  Sounds.sound("mechanism")
+ _vapour=preload("res://weapons/crop_duster/muzzle_vapour.gd").new()
+ add_child(_vapour)
  visible=false
  _pose(0.0)
 func set_active(on: bool) -> void:
@@ -89,7 +108,10 @@ func set_active(on: bool) -> void:
  aim_weight=0.0
  camera.fov=75.0
  _flash.visible=false
- if not on: _sound.stop()
+ if not on:
+  for voice in _shot_voices:voice.stop()
+  _mechanism_sound.stop()
+  if _vapour: _vapour.clear()
  # Interrupted reloads retain only seated shells. A brief reversed draw lowers the gun.
  _pose(0.0)
 func is_busy() -> bool: return state!="idle" or cooldown>0.0
@@ -134,7 +156,8 @@ func _update(delta: float) -> void:
  var remaining_cooldown: float=cooldown
  var action_delta: float=delta
  cooldown=maxf(0.0,cooldown-delta)
- recoil=move_toward(recoil,0.0,delta*4.5)
+ recoil=move_toward(recoil,0.0,delta*3.8)
+ _vapour.advance(delta)
  if _reload_requested and cooldown<=0.0:
   reload()
   action_delta=maxf(0.0,delta-remaining_cooldown)
@@ -179,6 +202,7 @@ func shoot() -> bool:
  ammo_changed.emit()
  fired.emit()
  _shot_sound()
+ _vapour.release(_gun.to_global(Vector3(_flash.position.x,0.32,0.50)),camera)
  var accumulated: Dictionary={}
  var exclude: Array[RID]=[]
  if owner is CollisionObject3D: exclude.append((owner as CollisionObject3D).get_rid())
@@ -271,24 +295,37 @@ func _pose(_delta: float) -> void:
  if state=="reload":
   var shell_l: Vector3=_shell_grip_point(0)
   var shell_r: Vector3=_shell_grip_point(1)
-  if not _reload_plan[0]: shell_l=Vector3(-0.12,-0.10,-0.12)
-  if not _reload_plan[1]: shell_r=moving
-  var keys: Array=[ [0.0,moving],[0.30,moving],[0.70,Vector3(-0.13,0.11,-0.08)],[1.25,Vector3(-0.12,-0.10,-0.12)],[1.75,shell_l],[1.95,shell_l],[2.12,Vector3(-0.12,-0.10,-0.12)],[2.28,shell_r],[2.45,shell_r],[2.85,moving],[3.4,moving] ]
+  # Fetch stays in frame; both insertions approach the breech from above.
+  var pocket: Vector3=_gun.to_local(camera.to_global(Vector3(-0.17,-0.22,-0.52)))
+  var lift: Vector3=_gun.global_basis.inverse()*camera.global_basis*Vector3(-0.025,0.105,0.055)
+  if not _reload_plan[0]:shell_l=pocket
+  if not _reload_plan[1]:shell_r=moving
+  var keys: Array=[ [0.0,moving],[0.30,moving],[0.75,pocket],[1.25,shell_l+lift],[1.55,shell_l+lift*0.5],[1.75,shell_l],[1.95,shell_l],[2.08,shell_l+lift],[2.18,shell_r+lift],[2.28,shell_r],[2.45,shell_r],[2.65,shell_r+lift],[2.95,moving],[3.4,moving] ]
   for i in keys.size()-1:
    if reload_t<=float(keys[i+1][0]):
     var u: float=smoothstep(float(keys[i][0]),float(keys[i+1][0]),reload_t)
     left_point=(keys[i][1] as Vector3).lerp(keys[i+1][1],u)
     break
  # A palm-space anchor keeps the grasp on the fore-end/shell as the wrist rotates.
- _left_hand.global_basis=_gun.global_basis.orthonormalized()*(hinge.basis*rest.basis.inverse()).orthonormalized()*_support_basis_in_gun
- _left_hand.global_position=_gun.to_global(left_point)-_left_hand.global_basis*_grip_in_hand
+ var support_basis: Basis=_gun.global_basis.orthonormalized()*(hinge.basis*rest.basis.inverse()).orthonormalized()*_support_basis_in_gun
+ var loading_weight: float=smoothstep(0.35,1.15,reload_t)*(1.0-smoothstep(2.60,3.10,reload_t)) if state=="reload" else 0.0
+ # Finger ends point down into the chambers; the palm and sleeve stay above/left.
+ var loading_basis: Basis=camera.global_basis*Basis.from_euler(Vector3(-PI/2,0.18,-0.30))*Basis(Vector3.UP,PI)
+ _left_hand.global_basis=Basis(support_basis.get_rotation_quaternion().slerp(loading_basis.get_rotation_quaternion(),loading_weight))
+ _hand_anchor=_grip_in_hand.lerp(Vector3(-0.028,-0.005,0.105),loading_weight)
+ _left_hand.global_position=_gun.to_global(left_point)-_left_hand.global_basis*_hand_anchor
  # Keep the sleeve coming from below-left instead of following the barrel's full tilt.
  var elbow: Vector3=camera.to_global(Vector3(-0.48,-0.55,0.05))
  var direction: Vector3=_left_hand.global_basis.inverse()*(elbow-_left_hand.global_position).normalized()
  var turn:=Quaternion(_forearm_direction,direction.normalized())
- _left_forearm.quaternion=Quaternion.IDENTITY.slerp(turn,0.90)
+ var length_scale: float=lerpf(1.0,maxf(1.0,_left_hand.global_position.distance_to(elbow)/0.40),loading_weight)
+ var axis: Vector3=_forearm_direction
+ var stretch:=Basis(Vector3.RIGHT+axis*axis.x*(length_scale-1.0),Vector3.UP+axis*axis.y*(length_scale-1.0),Vector3.BACK+axis*axis.z*(length_scale-1.0))
+ _left_forearm.basis=Basis(Quaternion.IDENTITY.slerp(turn,lerpf(0.90,1.0,loading_weight)))*stretch
  var sight: Vector3=camera.to_local(_gun.to_global(Vector3(0,0.36,-0.02)))
  _pivot.position+=Vector3(-sight.x,-sight.y-0.015,0)*aim_weight
+ _pivot.position+=Vector3(0,0.022,0.105)*recoil
+ _pivot.rotation+=Vector3(0.18,-0.018,-0.022)*recoil
  _update_shell_visibility()
 func _shell_grip_point(index: int) -> Vector3:
  var bone: int=_mechanics.find_bone("shell_left" if index==0 else "shell_right")
@@ -301,31 +338,12 @@ func _update_shell_visibility() -> void:
   for part in 3:
    _shell_materials[i*3+part].set_shader_parameter("visible_part",show_shell)
 func _shot_sound() -> void:
- if DisplayServer.get_name()=="headless": return
- var bytes:=PackedByteArray()
- bytes.resize(6615*2)
- var filtered:=0.0
- for i in 6615:
-  var t: float=float(i)/22050.0
-  filtered=lerpf(filtered,_rng.randf_range(-1.0,1.0),0.4)
-  var sample: float=(filtered*0.8+sin(t*TAU*72.0)*0.2)*exp(-t*24.0)
-  bytes.encode_s16(i*2,int(clampf(sample,-1,1)*30000))
- var stream:=AudioStreamWAV.new()
- stream.format=AudioStreamWAV.FORMAT_16_BITS
- stream.mix_rate=22050
- stream.data=bytes
- _sound.stream=stream
+ if DisplayServer.get_name()=="headless":return
+ _shot_voice=(_shot_voice+1)%_shot_voices.size()
+ _sound=_shot_voices[_shot_voice]
+ _sound.stream=Sounds.sound("shotgun",_rng.randi_range(0,3))
  _sound.play()
 func _click() -> void:
- if DisplayServer.get_name()=="headless": return
- var bytes:=PackedByteArray()
- bytes.resize(1102*2)
- for i in 1102:
-  var t: float=float(i)/22050.0
-  bytes.encode_s16(i*2,int(sin(t*TAU*850.0)*exp(-t*100.0)*11000))
- var stream:=AudioStreamWAV.new()
- stream.format=AudioStreamWAV.FORMAT_16_BITS
- stream.mix_rate=22050
- stream.data=bytes
- _sound.stream=stream
- _sound.play()
+ if DisplayServer.get_name()=="headless":return
+ _mechanism_sound.stream=Sounds.sound("mechanism")
+ _mechanism_sound.play()

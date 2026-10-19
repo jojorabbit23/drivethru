@@ -19,7 +19,7 @@ func run() -> void:
  check(AudioServer.is_bus_mute(0),"background audio mutes")
  Prefs.set_focused(true)
  check(not AudioServer.is_bus_mute(0),"foreground audio restores")
- for name: String in ["tile","grit","rubber","land","hurt","wood","groan","chitter","death","fridge","air","select","confirm"]:
+ for name: String in ["tile","grit","rubber","land","hurt","wood","groan","chitter","death","fridge","air","select","confirm","shotgun","mechanism","distant_drone","distant_moan","grinder"]:
   var sound: AudioStreamWAV=Sounds.sound(name)
   check(sound==Sounds.sound(name),name+" reuses cached stream")
   var peak: int=0

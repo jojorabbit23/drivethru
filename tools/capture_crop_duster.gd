@@ -4,6 +4,8 @@ var main: Node3D
 var gun: Node3D
 func _initialize() -> void: run.call_deferred()
 func snap(label: String, state: String, clock: float, recoil: float=0.0) -> void:
+ gun._vapour.clear()
+ if recoil>0.0:gun._vapour.release(gun._gun.to_global(Vector3(0,0.32,0.50)),gun.camera);gun._vapour.advance(0.1)
  if state=="holster": gun.set_active(false)
  gun.set("state",state)
  gun.set("clock",clock)
@@ -15,7 +17,13 @@ func snap(label: String, state: String, clock: float, recoil: float=0.0) -> void
   await process_frame
   OS.delay_usec(33334)
  await RenderingServer.frame_post_draw
- root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://docs/previews/crop_"+label+".png"))
+ var image: Image=root.get_texture().get_image()
+ var path: String=ProjectSettings.globalize_path("res://docs/previews/crop_"+label+".png")
+ var error: Error=image.save_png(path)
+ if error!=OK:
+  await create_timer(0.15).timeout
+  error=image.save_png(path)
+ assert(error==OK,"capture must be written")
  print("saved crop_",label)
 func run() -> void:
  root.size=Vector2i(1280,720)
@@ -38,11 +46,12 @@ func run() -> void:
  await snap("fire","idle",0.0,1.0)
  gun.loaded[0]=false
  gun.loaded[1]=false
- for t in [0.5,1.0,1.7,1.9,2.2,2.4,3.1]:
+ for t in [0.5,0.75,1.0,1.25,1.7,1.9,2.2,2.4,2.65,3.1]:
   await snap("reload_%02d" % int(t*10),"reload",t)
  gun.loaded[0]=true
  gun.loaded[1]=true
  await snap("inspect","inspect",1.6)
  await snap("holster","holster",0.12)
  main.free()
+ for i in 3:await process_frame
  quit()
