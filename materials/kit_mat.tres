@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://art/kitchen/pack/rubber_mat.png" id="1_wtjrl"]
+[ext_resource type="Texture2D" path="res://art/kitchen/pack/rubber_mat.png" id="1_yicvc"]
 
 [resource]
 resource_name = "kit_mat"
-albedo_texture = ExtResource("1_wtjrl")
+albedo_texture = ExtResource("1_yicvc")
 metallic_specular = 0.25
 roughness = 0.92
 uv1_scale = Vector3(4, 4, 4)

@@ -8,7 +8,12 @@ static func material_specs() -> Dictionary:
  for key: String in files:
   specs[key]={"texture_path":"res://art/kitchen/pack/"+files[key]+".png","uv":"face"}
  for key in ["kit_wall","kit_floor","kit_ceiling","kit_steel","kit_mat"]:specs[key]["uv"]="world"
- specs["kit_wall"]["repeat"]=1.5
+ # The owner requested the calmer serving-room finishes for the kitchen.
+ specs["kit_wall"]["texture_path"]="res://art/serving_room/pack/wall_tiles.png"
+ specs["kit_floor"]["texture_path"]="res://art/serving_room/pack/checker_floor.png"
+ specs["kit_ceiling"]["texture_path"]="res://art/serving_room/pack/ceiling_tiles.png"
+ specs["kit_steel"]["texture_path"]="res://art/serving_room/pack/steel_counter.png"
+ specs["kit_wall"]["repeat"]=2.0
  specs["kit_mat"]["repeat"]=4.0
  specs["kit_steel"]["roughness"]=0.78
  specs["kit_steel"]["metal"]=0.05
@@ -155,6 +160,10 @@ func wall_details() -> void:
  # A real polygon clock with hands, rather than extra raster lettering.
  b.prism(G,"metal",Vector3(3.0,2.47,-0.115),0.18,0.03,12,Basis(Vector3.RIGHT,PI/2))
  b.prism(G,"chalk",Vector3(3.0,2.47,-0.12),0.16,0.008,12,Basis(Vector3.RIGHT,PI/2))
+ for i in 12:
+  var angle: float=TAU*float(i)/12.0
+  var position: Vector3=Vector3(3.0+sin(angle)*0.135,2.47+cos(angle)*0.135,-0.129)
+  d.rbox(G,"metal",d.T(position),Vector3.ZERO,Vector3(0.008,0.021 if i%3==0 else 0.012,0.006),d.rotz(-rad_to_deg(angle)))
  d.rbox(G,"metal",d.T(Vector3(3.0,2.47,-0.125)),Vector3(0,0.035,0),Vector3(0.013,0.09,0.008),d.rotz(40))
  d.rbox(G,"metal",d.T(Vector3(3.0,2.47,-0.13)),Vector3(0,0.055,0),Vector3(0.01,0.13,0.008),d.rotz(-55))
 func jar(pos: Vector3, label: String) -> void:
