@@ -51,7 +51,9 @@ const NATIVE := 4      # vertex colour is the albedo (the sculpt's own dagger)
 
 # --- alternative: keep the sculpt's dagger ---------------------------------
 const DAGGER_SCALE := 0.29          # sculpt units -> m, uniform (dagger ~26 cm)
-const DAGGER_GRIP_S := -0.46        # fist centre along the blade axis (sculpt units)
+const DAGGER_GRIP_SH := -0.19       # fist centre along the handle axis, below the neck (sculpt units)
+const POMMEL_FROM := -0.22          # handle below here (past the little finger) is the pommel
+const POMMEL_KEEP := 0.12            # keep this much of the pommel's length
 
 static func _load() -> Dictionary:
 	var doc := GLTFDocument.new()
@@ -110,7 +112,7 @@ static func _lum(c: Color) -> float:
 # at idle; the wrist is pre-bent to it here so the skeleton only adds small bends.
 # keep_dagger: the alternative build. The sculpt's own dagger stays in its
 # hand (the fingers were sculpted round it, so no channel fitting is needed);
-# the blade axis becomes the weapon's -Z, scaled uniformly by DAGGER_SCALE, and
+# the straightened handle axis becomes the weapon's -Z, scaled uniformly by DAGGER_SCALE, and
 # the dagger keeps the sculpt's own colours (region NATIVE).
 static func build(face_dir: Vector3, handle: Array, bend_to: Vector3 = Vector3.ZERO, keep_dagger := false) -> Dictionary:
 	var src := _load()
@@ -198,8 +200,35 @@ static func build(face_dir: Vector3, handle: Array, bend_to: Vector3 = Vector3.Z
 	print("  sculpt: wrist ", wrist, " forearm ", forearm, " face_dir ", face_dir)
 
 	# 3. sculpt frame -> knife frame
-	var grip_axis := blade if keep_dagger else axis
-	var pivot := c0 + blade * DAGGER_GRIP_S if keep_dagger else neck
+	# dagger mode: straighten and shorten the sculpt's handle first. Its blade
+	# sits 22° off the handle (it reads bent) and the pommel pokes well below the
+	# fist. The blade, guard and neck are turned about the neck onto the handle
+	# line (fading in over the neck, so the fist top doesn't move), and the
+	# pommel's own vertices are pulled up toward the bottom of the fist.
+	var straightened := 0
+	var shortened := 0
+	if keep_dagger:
+		var only_dagger := {}
+		for t in tri_count:
+			for j in 3:
+				var i := idx[t * 3 + j]
+				only_dagger[i] = (only_dagger.get(i, true) as bool) and is_dagger[t] == 1
+		var turn_axis := blade.cross(axis).normalized()
+		var turn := blade.angle_to(axis)
+		for i in v.size():
+			var sh := (v[i] - neck).dot(axis)
+			if sh > -0.02:
+				var w := smoothstep(-0.02, 0.04, sh)
+				var rot := Basis(turn_axis, turn * w)
+				v[i] = neck + rot * (v[i] - neck)
+				nrm[i] = rot * nrm[i]
+				straightened += 1
+			elif sh < POMMEL_FROM and only_dagger.get(i, false):
+				v[i] += axis * (POMMEL_FROM - sh) * (1.0 - POMMEL_KEEP)
+				shortened += 1
+		print("  dagger: handle straightened (%.1f deg, %d verts), pommel pulled in (%d verts)" % [rad_to_deg(turn), straightened, shortened])
+	var grip_axis := axis
+	var pivot := neck + axis * DAGGER_GRIP_SH if keep_dagger else neck
 	var s_face := (Vector3(0, 0, 1) - grip_axis * grip_axis.z).normalized()
 	var s_side := grip_axis.cross(s_face)
 	var k_axis := Vector3(0, 0, -1)
@@ -316,8 +345,10 @@ static func build(face_dir: Vector3, handle: Array, bend_to: Vector3 = Vector3.Z
 			continue
 		var s := (cent[t] - c0).dot(blade)
 		var kind := GLOVE
-		if keep_dagger and is_dagger[t] == 1:
-			kind = NATIVE
+		if keep_dagger and is_dagger[t] == 1 and (cent[t] - neck).dot(axis) > -0.03:
+			kind = NATIVE   # blade, guard and the neck above the fist
+		elif keep_dagger and is_dagger[t] == 1:
+			kind = GLOVE    # handle inside / under the fist: reads as glove, so the grip looks short
 		elif cls[t] == "orange" and s < -0.6:
 			kind = SLEEVE
 		elif cls[t] == "brown" and s < -0.5:
