@@ -67,6 +67,12 @@ func _ready() -> void:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
 	player.weapon_changed.connect(func(_i, _w): _update_weapon())
+	player.weapon_added.connect(func(w: Node) -> void:
+		if w.has_signal("hit"):
+			w.hit.connect(_on_hit)
+		if w.has_signal("ammo_changed"):
+			w.ammo_changed.connect(func(_m, _r): _update_weapon())
+		_update_weapon())
 	_build_stations()
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
@@ -282,8 +288,10 @@ func _on_player_died() -> void:
 func _update_weapon() -> void:
 	var names := ["1  PISTOL (placeholder)", "2  KNIFE", "3  DAGGER (alt hand)"]
 	var text: String = names[player.weapon_index] if player.weapon_index < names.size() else ""
-	var gun := player.get_node_or_null("Head/Camera3D/TestGun")
-	if player.weapon_index == 0 and gun:
+	var gun: Node = player.current_weapon()
+	if gun and gun.get("display_name") != null:
+		text = "%d  %s" % [player.weapon_index + 1, gun.display_name]
+	if gun and gun.get("mag") != null:
 		text += "   %d / %d%s" % [gun.mag, gun.reserve, "  RELOADING" if gun.is_reloading() else ("  EMPTY" if gun.mag == 0 and gun.reserve == 0 else "")]
 	_hud["weapon"].text = text
 
@@ -296,7 +304,7 @@ func _update_wave_hud() -> void:
 		_hud["wave"].text = "WAVE %d IN %ds" % [wave + 1, ceili(_break_t)]
 	else:
 		_hud["wave"].text = "WAVE %d   ·   %d TO COME   ·   ZOMBIES %d" % [wave, _wave_left, alive]
-	if player.weapon_index == 0:
+	if player.current_weapon() and player.current_weapon().get("mag") != null:
 		_update_weapon()
 
 func _update_health() -> void:

@@ -24,6 +24,9 @@ To avoid stepping on each other, the owner has split the work:
   (`tools/build_shop.gd`, `tools/shop_decor.gd`, `tools/make_textures.gd`,
   `textures/`, enemy and vehicle looks).
 
+The shotgun asks game/sfx.gd for "shotgun", "pump" and "shell" sounds; sfx.gd
+plays silence for unknown names, so those are Codex's to add whenever.
+
 Shared files (`main.gd`, `player/player.gd`, README, this file): keep edits
 small, pull before you start, and commit often. If you need something in the
 other agent's area, make the smallest change that works and say so in the
@@ -45,6 +48,7 @@ commit message.
    - `enemies/lancer/lancer_model.tscn` and `lancer_*`: `tools/build_lancer.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `vehicles/*/` models, meshes, materials, albedos (school bus, armoured truck): `tools/build_vehicles.gd`
+   - `weapons/shotgun/shotgun_model.tscn`, `shotgun_hand_r.res`, `shotgun_hand_l.res`: `tools/build_shotgun.gd`
    - `fonts/pixel/pixel_font.tres`, `ui_theme.tres`: `tools/build_font.gd` (from the editable `fonts/pixel/glyphs.txt`)
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
@@ -64,6 +68,7 @@ commit message.
    godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/shotgun_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no
@@ -88,6 +93,7 @@ enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
 enemies/lancer   lancer.gd (behaviour), built model + animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
+weapons/shotgun  shotgun_weapon.gd (gameplay + code-animated viewmodel), built model and hands
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
 vehicles/        customer vehicles (school bus, armoured truck) built from source GLBs
 game/            the burger loop: economy, stations (store, grill, prep bench, drive-thru, terminal), customers, pixel icons, synth sounds
@@ -104,3 +110,4 @@ head hitboxes) · 5 player_clip · 6 interact (station look-zones, Area3D with m
 Weapons are children of `Player/Head/Camera3D` that implement
 `set_active(on: bool)`. The player collects them in order (slot 1 = pistol,
 slot 2 = knife, slot 3 = dagger alternative using the same knife script).
+Bought weapons join later through `player.add_weapon()` (slot 4 = the shotgun).

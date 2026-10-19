@@ -22,6 +22,16 @@ const AMMO_PACK := 24          # pistol rounds per purchase
 const AMMO_PRICE := 12
 const SUPPLY_PACK := 5         # buns + toppings per order: $8 a burger, as designed
 const SUPPLY_PRICE := 40
+const BULK_PACK := 15          # the big box: a little cheaper per burger
+const BULK_PRICE := 110
+const SHOTGUN_PRICE := 150     # weapon 4
+const SHELL_PACK := 12         # docs/GAME_DESIGN.md: 12 shells = $30
+const SHELL_PRICE := 30
+# Kitchen upgrades (docs/COOKING_DESIGN.md "Kitchen Upgrades")
+const TRAY_PRICE := 120        # Heated Holding Tray: keeps 2 cooked patties at their quality
+const TRAY_SLOTS := 2
+const BELL_PRICE := 100        # Drive-Through Bell System: customers wait 50% longer
+const BELL_PATIENCE := 1.5
 # Grill upgrades, in order: [name, slots, price, ready window s, burn delay x]
 const GRILLS := [
 	["Starter Grill", 2, 0, 12.0],
@@ -35,6 +45,8 @@ var stock := {"brown": 0, "blue": 0, "red": 0}   # stored mushrooms; one makes o
 var buns := 8
 var toppings := 8
 var grill_level := 0
+var has_tray := false
+var has_bell := false
 var earned := 0
 var served := 0
 
@@ -115,6 +127,20 @@ func upgrade_grill() -> bool:
 	if next.is_empty() or not spend(int(next[2])):
 		return false
 	grill_level += 1
+	changed.emit()
+	return true
+
+func buy_tray() -> bool:
+	if has_tray or not spend(TRAY_PRICE):
+		return false
+	has_tray = true
+	changed.emit()
+	return true
+
+func buy_bell() -> bool:
+	if has_bell or not spend(BELL_PRICE):
+		return false
+	has_bell = true
 	changed.emit()
 	return true
 

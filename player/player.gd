@@ -56,9 +56,11 @@ const DEFAULT_BINDINGS := {
 	"weapon_1": [KEY_1],
 	"weapon_2": [KEY_2],
 	"weapon_3": [KEY_3],
+	"weapon_4": [KEY_4],
 }
 
 signal weapon_changed(index: int, weapon: Node)
+signal weapon_added(weapon: Node)
 
 # Weapons are the children of Head/Camera3D that have set_active():
 # 0 = placeholder pistol, 1 = knife. 1/2 or the mouse wheel switch.
@@ -106,6 +108,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		switch_weapon(1)
 	elif event.is_action_pressed("weapon_3"):
 		switch_weapon(2)
+	elif event.is_action_pressed("weapon_4"):
+		switch_weapon(3)
 	elif event is InputEventMouseButton and event.pressed and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
 		if not weapons.is_empty():
 			var step := 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1
@@ -143,6 +147,28 @@ func switch_weapon(i: int) -> void:
 	for k in weapons.size():
 		weapons[k].set_active(k == i)
 	weapon_changed.emit(i, weapons[i])
+
+# A weapon bought later (the shotgun): goes on the camera in the next slot.
+func add_weapon(w: Node, equip := true) -> void:
+	camera.add_child(w)
+	w.owner = self
+	weapons.append(w)
+	w.set_active(false)
+	weapon_added.emit(w)
+	if equip:
+		switch_weapon(weapons.size() - 1)
+
+func has_weapon(display_name: String) -> bool:
+	for w in weapons:
+		if w.get("display_name") == display_name:
+			return true
+	return false
+
+func weapon_named(display_name: String) -> Node:
+	for w in weapons:
+		if w.get("display_name") == display_name:
+			return w
+	return null
 
 func current_weapon() -> Node:
 	return weapons[weapon_index] if weapon_index < weapons.size() else null
@@ -220,6 +246,8 @@ func close_menu() -> void:
 	menu_changed.emit()
 
 func choose(i: int) -> void:
+	if menu_station and menu_station.has_method("options"):
+		menu_options = menu_station.options(self)   # live: cash and stock may have changed
 	if not menu_station or i < 0 or i >= menu_options.size() or not menu_options[i]["enabled"]:
 		return
 	var action: Callable = menu_options[i]["action"]

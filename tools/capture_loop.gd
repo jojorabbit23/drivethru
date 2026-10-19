@@ -57,7 +57,7 @@ func _run() -> void:
 	main.grill.slots[1]["t"] = 3.5
 	main.grill.add_patty("red")
 	main.grill.slots[2]["t"] = 0.3
-	await stand_look(Vector3(2.1, 0, -3.25), main.grill.global_position + Vector3(0, 0.05, 0))
+	await stand_look(Vector3(2.1, 0, -3.25), main.grill.global_position + Vector3(0, 0.05, -0.3))   # the back edge: not a patty (E there flips it)
 	player.use_focus()
 	await wait(8)
 	await snap("loop1_grill_menu")
