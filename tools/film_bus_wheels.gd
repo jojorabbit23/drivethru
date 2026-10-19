@@ -1,5 +1,5 @@
-# Low roadside shot of the bus rolling past and stopping (needs a display):
-#   xvfb-run -a godot --path . --rendering-method gl_compatibility --fixed-fps 30 --write-movie wheels.avi --script res://tools/film_bus_wheels.gd
+# Low roadside shot of a customer vehicle rolling up and stopping (needs a display):
+#   xvfb-run -a godot --path . --rendering-method gl_compatibility --fixed-fps 30 --write-movie wheels.avi --script res://tools/film_bus_wheels.gd [-- armored_truck]
 extends SceneTree
 var main: Node3D
 var cam: Camera3D
@@ -23,6 +23,8 @@ func _setup() -> void:
 	fill.omni_range = 14.0
 	fill.position = Vector3(-6.5, 3.0, -12.5)
 	main.add_child(fill)
+	var args := OS.get_cmdline_user_args()
+	main.hatch.next_vehicle = args[0] if not args.is_empty() else "school_bus"
 	car = main.hatch.spawn_customer()
 	for c in main.get_children():
 		if c is CanvasLayer:

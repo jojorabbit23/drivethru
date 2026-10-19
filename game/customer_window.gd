@@ -21,6 +21,7 @@ var lane_stop := Vector3(-3, 0, -8)
 var lane_end := Vector3(38, 0, -8)
 var car: Node3D = null
 var next_order := ""                 # tests/films can force the next order
+var next_vehicle := ""               # ...and vehicle ("school_bus" / "armored_truck")
 var last_quality := ""
 const ORDER_WEIGHTS := {"brown": 0.55, "blue": 0.3, "red": 0.15}
 
@@ -60,7 +61,9 @@ func spawn_customer() -> Node3D:
 	c.name = "CustomerCar"
 	get_parent().add_child(c)
 	c.order = next_order if next_order != "" else pick_order()
+	c.vehicle = next_vehicle
 	next_order = ""
+	next_vehicle = ""
 	c.setup(lane_start, lane_stop, lane_end)
 	c.arrived.connect(func(): customer_arrived.emit(c))
 	c.left.connect(func(served: bool):

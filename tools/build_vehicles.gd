@@ -1,36 +1,54 @@
-# Builds the armoured school bus (the first customer vehicle) from the
-# owner's GLB in vehicles/school_bus/source/.
-#   godot --headless --path . --script res://tools/build_bus.gd   # first run writes the texture
+# Builds the customer vehicles from the owner's GLBs (vehicles/*/source/).
+#   godot --headless --path . --script res://tools/build_vehicles.gd   # first run writes textures
 #   godot --headless --path . --import
-#   godot --headless --path . --script res://tools/build_bus.gd
-# The source faces +Z (snow plough at the front). Output faces -Z like every
-# other model here, origin on the ground at the middle, LENGTH metres long,
-# Geometry and normals are kept as sculpted: simplifying it (as the knife is)
-# shredded the wheels, plough and roof cargo, so the bus is left whole.
-# Output: res://vehicles/school_bus/bus_model.tscn (+ bus_mesh.res, bus_material.tres, bus_albedo.png)
+#   godot --headless --path . --script res://tools/build_vehicles.gd
+# Each source faces +Z (snow plough at the front). Output faces -Z like every
+# other model here, origin on the ground at the middle, `length` metres long.
+# Geometry and normals are kept as sculpted (simplifying shredded the wheels).
+#
+# Each sculpt is one fused mesh. Its four tyres are cut out by shape so they
+# can roll: triangles whose corners all lie inside the tyre's cylinder
+# (source units: radius `r` about the axle below the axle line, a tighter
+# `r_up` above it where the mudguards sit, outboard of `in`, below `top`).
+# Output per vehicle: <dir><prefix>_model.tscn, _mesh.res, _wheel_*.res,
+# _material.tres, _albedo.png. The scene's meta "wheel_radius" (axle height,
+# m) is what customer_car.gd rolls them by.
 extends SceneTree
 
 const BlockyMesh = preload("res://tools/blocky_mesh.gd")
-const SRC := "res://vehicles/school_bus/source/armored_school_bus.glb"
-const OUT := "res://vehicles/school_bus/"
-const LENGTH := 6.0
 const TEX_SIZE := 2048
-# The sculpt is one fused mesh. The four tyres are cut out by shape so they
-# can roll: triangles whose corners all lie inside the tyre's cylinder
-# (source units: radius WHEEL_R about the axle, outboard of WHEEL_IN, below
-# WHEEL_TOP so the mudguards above stay on the body).
-const WHEELS := {"Wheel_RL": Vector3(1, 0.09, -0.283), "Wheel_RR": Vector3(-1, 0.09, -0.283),
-	"Wheel_FL": Vector3(1, 0.09, 0.258), "Wheel_FR": Vector3(-1, 0.09, 0.258)}
-const WHEEL_R := 0.12          # below the axle line (nothing else down there)
-const WHEEL_R_UP := 0.104      # above it, tighter: the mudguards sit just outside
-const WHEEL_IN := 0.09
-const WHEEL_TOP := 0.192
+const VEHICLES := [
+	{"name": "SchoolBus", "src": "res://vehicles/school_bus/source/armored_school_bus.glb", "dir": "res://vehicles/school_bus/", "prefix": "bus",
+		"length": 6.0, "axle_y": 0.09, "front_z": 0.258, "rear_z": -0.283, "r": 0.12, "r_up": 0.104, "in": 0.09, "top": 0.192},
+	{"name": "ArmoredTruck", "src": "res://vehicles/armored_truck/source/armored_truck.glb", "dir": "res://vehicles/armored_truck/", "prefix": "truck",
+		"length": 6.4, "axle_y": 0.075, "front_z": 0.243, "rear_z": -0.292, "r": 0.095, "r_up": 0.083, "in": 0.08, "top": 0.155},
+]
 
 func _initialize() -> void:
+	var waiting := false
+	for cfg in VEHICLES:
+		waiting = build(cfg) or waiting
+	if waiting:
+		print("wrote textures - run --import, then this script again")
+	quit()
+
+# Returns true if it only wrote the texture (needs an --import first).
+func build(cfg: Dictionary) -> bool:
+	var SRC: String = cfg["src"]
+	var OUT: String = cfg["dir"]
+	var PRE: String = cfg["prefix"]
+	var LENGTH: float = cfg["length"]
+	var WHEEL_R: float = cfg["r"]
+	var WHEEL_R_UP: float = cfg["r_up"]
+	var WHEEL_IN: float = cfg["in"]
+	var WHEEL_TOP: float = cfg["top"]
+	var ay: float = cfg["axle_y"]
+	var WHEELS := {"Wheel_RL": Vector3(1, ay, cfg["rear_z"]), "Wheel_RR": Vector3(-1, ay, cfg["rear_z"]),
+		"Wheel_FL": Vector3(1, ay, cfg["front_z"]), "Wheel_FR": Vector3(-1, ay, cfg["front_z"])}
 	var doc := GLTFDocument.new()
 	var st := GLTFState.new()
 	assert(doc.append_from_file(ProjectSettings.globalize_path(SRC), st) == OK)
-	var albedo := OUT + "bus_albedo.png"
+	var albedo := OUT + PRE + "_albedo.png"
 	if not FileAccess.file_exists(albedo):
 		for i in st.get_images().size():
 			var name: String = st.json["images"][i].get("name", "")
@@ -40,9 +58,8 @@ func _initialize() -> void:
 				img.convert(Image.FORMAT_RGB8)
 				img.resize(TEX_SIZE, TEX_SIZE, Image.INTERPOLATE_LANCZOS)
 				img.save_png(ProjectSettings.globalize_path(albedo))
-		print("wrote ", albedo, " - run --import, then this script again")
-		quit()
-		return
+		print("wrote ", albedo)
+		return true
 	var arr := (st.get_meshes()[0] as GLTFMesh).mesh.get_surface_arrays(0)
 	var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
 	var n: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
@@ -121,17 +138,17 @@ func _initialize() -> void:
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	mat.roughness = 0.8
 	mat.metallic_specular = 0.3
-	ResourceSaver.save(mat, OUT + "bus_material.tres")
-	mat.take_over_path(OUT + "bus_material.tres")
+	ResourceSaver.save(mat, OUT + PRE + "_material.tres")
+	mat.take_over_path(OUT + PRE + "_material.tres")
 	var size := aabb.size * s
 	var root_node := Node3D.new()
-	root_node.name = "SchoolBus"
+	root_node.name = cfg["name"]
 	var counts := []
 	for part in parts:
 		var m := ArrayMesh.new()
 		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, part[1])
 		m.surface_set_material(0, mat)
-		var path: String = OUT + ("bus_mesh.res" if part[0] == "Body" else "bus_%s.res" % (part[0] as String).to_lower())
+		var path: String = OUT + PRE + ("_mesh.res" if part[0] == "Body" else "_%s.res" % (part[0] as String).to_lower())
 		ResourceSaver.save(m, path)
 		m.take_over_path(path)
 		var mi := MeshInstance3D.new()
@@ -155,10 +172,10 @@ func _initialize() -> void:
 	body.add_child(cs)
 	cs.owner = root_node
 	root_node.set_meta("size", size)
-	root_node.set_meta("wheel_radius", WHEEL_R * s)
+	root_node.set_meta("wheel_radius", ay * s)   # axle height = rolling radius
 	var ps := PackedScene.new()
 	ps.pack(root_node)
-	var err := ResourceSaver.save(ps, OUT + "bus_model.tscn")
-	print("bus: %d triangles (%s), size %s m, wheel radius %.2f m, saved err=%d" % [before, ", ".join(counts), str(size.snapped(Vector3.ONE * 0.01)), WHEEL_R * s, err])
+	var err := ResourceSaver.save(ps, OUT + PRE + "_model.tscn")
+	print("%s: %d triangles (%s), size %s m, wheel radius %.2f m, saved err=%d" % [PRE, before, ", ".join(counts), str(size.snapped(Vector3.ONE * 0.01)), ay * s, err])
 	root_node.free()
-	quit()
+	return false
