@@ -6,9 +6,11 @@ E uses a station; 1–4 choose options while its menu is open. Otherwise 1 pisto
 
 Latest gameplay source integrated: GitHub main fefcb797c8c942749151d9783571c6aa90b8f2de. The custom pistol retains its existing 15-round magazine, 90 reserve and 2.1 s reload; the terminal adds 24 reserve rounds for $12. The cooking-loop test now exercises that actual animated pistol through player fire gates and its real reload timing. Gameplay and intro buses are separate owner-supplied assets.
 
-All 78 owned scripts parse; all 14 suites pass (validate, movement, zombie, ooze, knife, knife viewmodel, spawn, Scuttler, pickup, cooking loop, pistol, Crop Duster, menu and presentation). Rendered and inspected menu/video handoff, grill/customer stations and current weapon poses. The short capped performance check passed focus limits; it does not prove sustained 60 FPS under every load.
+All 84 owned scripts parse; all 15 suites pass (validate, movement, zombie, ooze, knife, knife viewmodel, spawn, Scuttler, pickup, cooking loop, pistol, Crop Duster, menu, presentation and kitchen visuals). Rendered and inspected menu/video handoff, grill/customer stations and current weapon poses. The short capped performance check passed focus limits; it does not prove sustained 60 FPS under every load.
 
 See docs/handover/FINAL_COMBINED.md for provenance, integration and verification. Esc now pauses; F1 toggles detailed controls. Audio, sensitivity and comfort settings persist between sessions. The kitchen uses calmer serving-room tiles and steel. See docs/handover/PRESENTATION_POLISH.md for this pass. Older sections below describe earlier development stages and may use superseded controls.
+
+Original sawn-off update: over-chamber reload hand, stronger recoil/report, brief vapor and 22 damage per pellet. Kitchen grinder/bin visuals and distant ambience are included. These props await Claude’s transaction/interaction wiring. See docs/handover/CODEX_SIDE_IMPLEMENTED.md and docs/video/sawn_off_updated.mp4.
 
 ---
 

@@ -9,6 +9,9 @@ var scan: float=0.0
 var states: Dictionary={}
 var serial: int=0
 var voices: int=0
+var distant_time: float=12.0
+var distant_index: int=0
+var distant_voice: AudioStreamPlayer3D
 var help_label: Label
 var expanded_help: bool=false
 var help_panel: PanelContainer
@@ -17,6 +20,8 @@ func _ready() -> void:
  actor=get_parent() as CharacterBody3D
  Prefs.configure()
  last=actor.global_position
+ var props: Node3D=preload("res://presentation/kitchen/visuals.gd").new()
+ add_child(props)
  if DisplayServer.get_name()=="headless":
   set_physics_process(false)
   return
@@ -28,6 +33,15 @@ func _ready() -> void:
  add_ambience("fridge",Vector3(5.2,1.0,-4.3),-8.0)
  add_ambience("fridge",Vector3(-5.1,1.0,-0.5),-12.0)
  add_ambience("air",Vector3(0,2,5),-6.0)
+ add_ambience("distant_drone",Vector3(10,3,10),-5.0)
+ distant_voice=AudioStreamPlayer3D.new()
+ distant_voice.bus="Ambience"
+ distant_voice.volume_db=-10.0
+ distant_voice.unit_size=16.0
+ distant_voice.max_distance=55.0
+ add_child(distant_voice)
+ distant_voice.top_level=true
+
 func route_tree(node: Node) -> void:
  route_audio(node)
  for child in node.get_children():route_tree(child)
@@ -48,7 +62,8 @@ func add_ambience(kind: String,position: Vector3,volume: float) -> void:
  source.stream=Sounds.sound(kind)
  source.volume_db=volume
  source.unit_size=3.0
- source.max_distance=18.0
+ source.max_distance=45.0 if kind=="distant_drone" else 18.0
+ if kind=="distant_drone":source.unit_size=12.0
  add_child(source)
  source.top_level=true
  source.global_position=position
@@ -72,6 +87,10 @@ func surface(position: Vector3) -> String:
  if (position.x>1.4 and position.x<3.8 and position.z> -4.05 and position.z< -3.4) or (position.x> -4.6 and position.x< -1.4 and position.z> -3.95 and position.z< -3.25):return "rubber"
  return "tile" if absf(position.x)<6.0 and position.z<0.0 and position.z> -4.75 else "grit"
 func _physics_process(delta: float) -> void:
+ distant_time-=delta
+ if distant_time<=0.0:
+  play_distant()
+  distant_time=12.0+float((distant_index*7)%9)
  actor.mouse_sensitivity=float(Prefs.values["sensitivity"])
  if not bool(Prefs.values["camera_roll"]):actor.camera.rotation.z=0.0
  var now: Vector3=actor.global_position
@@ -126,3 +145,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
   expanded_help=not expanded_help
   help_panel.visible=expanded_help
   get_viewport().set_input_as_handled()
+
+func play_distant() -> void:
+ if not is_instance_valid(distant_voice):return
+ var positions: Array[Vector3]=[Vector3(16,2,-9),Vector3(-16,2,7),Vector3(10,2,16),Vector3(-12,2,-12)]
+ distant_voice.global_position=positions[distant_index%positions.size()]
+ distant_voice.stream=Sounds.sound("distant_moan",distant_index%4)
+ distant_voice.play()
+ distant_index+=1
