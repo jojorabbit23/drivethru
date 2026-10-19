@@ -3,6 +3,7 @@ extends Node3D
 
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
+const LANCER := preload("res://enemies/lancer/lancer.tscn")
 const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 
 @export var auto_spawn := true      # tests switch this off
@@ -10,6 +11,8 @@ const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
 @export var max_zombies := 12        # alive at once; a spawn is skipped while at the cap
 @export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
+@export var lancer_every := 5        # from wave 2, every Nth spawn is a Lancer (0 = never; beats a Scuttler)
+@export var lancer_from_wave := 2
 @export var drop_delay := 0.6        # seconds after a kill before its mushroom pops out
 @export var wave_break := 20.0       # seconds between clearing a wave and the next
 @export var auto_collect := false    # accessibility: pickups fly to you from anywhere (F2)
@@ -124,7 +127,9 @@ func _physics_process(delta: float) -> void:
 			_spawn_t += wave_interval(wave)
 			_wave_left -= 1
 			var n := _spawned + 1
-			if scuttler_every > 0 and n % scuttler_every == 0:
+			if lancer_every > 0 and wave >= lancer_from_wave and n % lancer_every == 0:
+				spawn_lancer(_pick_window())
+			elif scuttler_every > 0 and n % scuttler_every == 0:
 				spawn_scuttler(_pick_window())
 			else:
 				spawn_zombie(_pick_window())
@@ -173,6 +178,9 @@ func in_break() -> bool:
 func spawn_scuttler(window: Node3D = null) -> Node:
 	return spawn_enemy(SCUTTLER, window)
 
+func spawn_lancer(window: Node3D = null) -> Node:
+	return spawn_enemy(LANCER, window)
+
 func spawn_zombie(window: Node3D = null) -> Node:
 	return spawn_enemy(SHAMBLER, window)
 
@@ -192,7 +200,7 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	z.died.connect(func(_z): _kills += 1; economy.add_cash(Economy.KILL_CASH); _update_health(); _drop_later(_z))
 	return z
 
-# Every dead Shambler or Scuttler drops one glowing mushroom.
+# Every dead enemy drops one glowing mushroom.
 func _drop_later(z: Node3D) -> void:
 	var at := z.global_position
 	var kind := drop_kind(z)
@@ -202,9 +210,13 @@ func _drop_later(z: Node3D) -> void:
 		drop_pickup(at, kind))
 
 # What each enemy drops (docs/COOKING_DESIGN.md: mushrooms are the livestock):
-# Shamblers mostly common brown, sometimes blue; Scuttlers blue, sometimes red.
+# Shamblers mostly common brown, sometimes blue; Scuttlers blue, sometimes red;
+# Lancers (the tough one) always red.
 func drop_kind(enemy: Node) -> String:
-	if enemy != null and (enemy.get_script() as Script).resource_path.ends_with("scuttler.gd"):
+	var path := "" if enemy == null else (enemy.get_script() as Script).resource_path
+	if path.ends_with("lancer.gd"):
+		return "red"
+	if path.ends_with("scuttler.gd"):
 		return "red" if randf() < 0.3 else "blue"
 	return "blue" if randf() < 0.2 else "brown"
 
@@ -226,6 +238,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				spawn_zombie()
 			KEY_X:
 				spawn_scuttler()
+			KEY_C:
+				spawn_lancer()
 			KEY_R:
 				get_tree().reload_current_scene()
 			KEY_F2:

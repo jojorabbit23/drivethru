@@ -2,9 +2,9 @@
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · C spawn a Lancer · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
 
-Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new zombie every **11 seconds**. Every third one is a **Scuttler** (set `scuttler_every`, or 0 to turn them off). Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
+Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new zombie every **11 seconds**. Every third one is a **Scuttler** (set `scuttler_every`, or 0 to turn them off). From wave 2, every fifth is a **Lancer** (`lancer_every`). Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
 
 The settings are on the `Main` node in `main.tscn`, and are easy to tweak: `spawn_interval` (11), `first_zombie_delay` (3) and `max_zombies` (12).
 
@@ -102,7 +102,7 @@ The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.
 | **Drive-thru window** (`game/customer_window.gd`) | the service hatch | Serve the burger you're holding. |
 | **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Ammo, supplies and grill upgrades. |
 
-- **Mushroom kinds** are the livestock. Shamblers drop **common brown** (20% blue). Scuttlers drop **blue** (30% red). Pickups, carried counts, stock, patties and orders are all colour-coded with matching pixel icons.
+- **Mushroom kinds** are the livestock. Shamblers drop **common brown** (20% blue). Scuttlers drop **blue** (30% red). Lancers always drop **red**. Pickups, carried counts, stock, patties and orders are all colour-coded with matching pixel icons.
 - **Orders:** a customer pulls up in the **armoured school bus** or the **armoured truck** ("ALL HAIL THE GRILL"), chosen at random. Both are built by `tools/build_vehicles.gd` from the owner's GLBs, at full detail with their tyres cut out so they roll by distance. The customer honks and shows a **pixel burger icon in its patty colour**, with no text: brown 55%, blue 30%, red 15%. They wait 50 s with a patience bar, and a missed order costs nothing. Clips: `docs/video/bus_wheels.mp4`, `docs/video/truck_customer.mp4`.
 - **Grill states**, per slot: RAW (0–1 s, grey) → COOKING (1–6 s, sizzle, steam, %) → READY (6–18 s, golden, bell, tick icon, countdown) → BURNT (black, smoke, cross icon, a repeating alarm). Each patty also shows its kind's mushroom. No state relies on colour alone.
 - **Quality** is set when you bag, by how long the patty sat READY. **Perfect** (≤ 4 s) pays $30 + $6, **Good** (≤ 8 s) $30 + $3, **Standard** $30. **Burnt salvage** pays $15 from any customer, so a mistake is recoverable. A burger of the wrong kind is refused.
@@ -229,9 +229,51 @@ Everything currently passes. Typical timeline: at the window at 10 s, boards gon
 
 It passed repeated runs. The clip `docs/video/scuttler_encounter.mp4` shows it in action.
 
+## The Lancer (third enemy)
+
+`enemies/lancer/` is built from your `stylized_creature_3d_model.glb`: a tall stalker with a morel cap for a head, bird-clawed feet and forearms that end in long bone lances. The original and its textures are kept in `source/`. It's the tough one: slow, but it hits hard and has reach.
+
+**Model:** `tools/build_lancer.gd` rigs the static T-pose:
+- It's 1.85 m tall, with 18 bones: hips, spine, chest, neck, head (cap), and per side an upper arm, forearm, lance, thigh, shin and foot.
+- Skin weights come straight from position, because the T-pose keeps the parts apart: arms by distance out from the shoulder (and never below the hip, so the wide clawed feet don't follow the arms), legs by side and height, and the torso by smooth height ramps. Every joint blends over a short band. No vertex is moved or dropped, so the mesh stays watertight.
+- One skinned surface, 9,764 triangles, with auto LODs down to about 1,450 for crowds. The albedo is baked to 1024 px with nearest filtering, so it matches the pixel look.
+
+**Animations:** 7 clips, authored in code (editable in Godot's animation editor):
+- `idle`: hunched breathing, lances twitching;
+- `stalk`: a long, deliberate 1.1 s stride, lances trailing;
+- `pry`: drives both lances between the boards and levers one off at 0.95 s;
+- `lunge`: rears back, then thrusts both lances level at chest height;
+- `climb`: hooks the sill and hauls itself through;
+- `flinch`;
+- `death`: the knees go and it pitches forward onto its cap.
+
+`docs/previews/lancer_animations.png` shows them all.
+
+**Behaviour** (`lancer.gd`, same interface as the Shambler):
+- **Lane:** stalks down the lane at 1.3 m/s.
+- **Breach:** pries boards off **from the top**, one every 1.4 s. That's slower than a 0.9 s repair, so holding E keeps it out.
+- **Its twist, reach:** once there's any gap in the boards, it stabs **through** the window at anyone within 2 m inside, for 12 damage, then has to pry again before the next stab. Repairing a Lancer's window can cost you health, unless you shut each gap promptly. Step back out of reach and it goes back to prying.
+- **Hunt:** follows you round the building at 1.6 m/s.
+- **Attack:** a two-lance lunge from 1.8 m that hits for 24. The wind-up is slow and easy to read; back off during it and it stabs air.
+- **Health:** 150. The cap is the weak spot (×2): three pistol headshots or five body shots, or two knife stabs. Only heavy hits (headshots, knife stabs) make it flinch.
+- **Drops:** always a **red** mushroom.
+- **Waves:** from wave 2, every 5th spawn is a Lancer (`lancer_every`, `lancer_from_wave`). Press **C** to spawn one.
+
+`tools/lancer_test.gd` covers:
+- the model: clips, bones, height, hitbox on the cap, red drop;
+- both lanes to four hiding spots: prying, climbing, then lancing you;
+- top-down prying, slower than a repair;
+- stabbing through gaps, stepping out of reach, and repair holding it off;
+- dodging the lunge;
+- pistol cap and body kills, knife stabs, flinching;
+- wave rules;
+- mixed crowds of 2 Lancers, a Scuttler and 3 Shamblers at two spots.
+
+The clip `docs/video/lancer_encounter.mp4` shows it in action: it stalks in, pries, stabs through the gap at you while you repair, climbs in, and goes down to the pistol.
+
 ## Mushroom drops
 
-Every Shambler and Scuttler drops one glowing mushroom when it dies. The model is the owner's pixelated mushroom (`pickups/mushroom/source/pixelated_mushroom_3d_model.glb`), scaled to 0.34 m tall. `tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res`, its material and textures.
+Every enemy drops one glowing mushroom when it dies. The model is the owner's pixelated mushroom (`pickups/mushroom/source/pixelated_mushroom_3d_model.glb`), scaled to 0.34 m tall. `tools/build_pickup.gd` writes `pickups/mushroom/mushroom_pickup_mesh.res`, its material and textures.
 
 - **Drop:** 0.6 s after the kill it pops out of the body in a little arc and lands hovering 0.42 m above the floor, a step to one side. It never lands inside a wall.
 - **Look:** it spins (about one turn every 3.5 s) and bobs gently. It has a faint warm self-glow, a thin amber halo outlines it (`pickup_glow.gdshader`, an additive rim pass), and a small amber light pulses on the floor beneath it.
@@ -321,9 +363,13 @@ godot --headless --path . --fixed-fps 60 --script res://tools/knife_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
 ```
 
 To rebuild the mushroom pickup, run `godot --headless --path . --script res://tools/build_pickup.gd`. On a fresh checkout it first writes its textures; run `--import`, then run it again.
+
+To rebuild the Lancer, run `godot --headless --path . --script res://tools/build_lancer.gd`. On a fresh checkout it first writes its albedo; run `--import`, then run it again.
 
 To rebuild the Scuttler after changing its bones, weights or clips, run `godot --headless --path . --script res://tools/build_scuttler.gd`.
 

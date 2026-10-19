@@ -23,6 +23,7 @@ The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_D
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
    - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`, `cleatimus_right_hand_mesh.res`, `dagger_viewmodel.tscn`, `cleatimus_dagger_hand_mesh.res`: `tools/build_knife_viewmodel.gd` (hand fit in `tools/knife_hand_mesh.gd`)
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
+   - `enemies/lancer/lancer_model.tscn` and `lancer_*`: `tools/build_lancer.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `vehicles/*/` models, meshes, materials, albedos (school bus, armoured truck): `tools/build_vehicles.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
@@ -42,6 +43,7 @@ The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_D
    godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no
@@ -64,6 +66,7 @@ The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_D
 core/            palette, ooze FX, window barricades, shared hitscan
 enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
+enemies/lancer   lancer.gd (behaviour), built model + animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
 vehicles/        customer vehicles (school bus, armoured truck) built from source GLBs
