@@ -70,6 +70,10 @@ func options(player: Node) -> Array:
 			var opts := [
 				_buy("%d pistol rounds  $%d" % [Economy.AMMO_PACK, Economy.AMMO_PRICE], Economy.AMMO_PRICE, "ammo", buy_ammo.bind(player), gun != null),
 			]
+			if player.has_weapon("SAWN-OFF"):
+				opts.append(_buy("%d sawn-off shells  $%d" % [Economy.SHELL_PACK,Economy.SHELL_PRICE],Economy.SHELL_PRICE,"shells",buy_sawn_shells.bind(player)))
+			else:
+				opts.append(_buy("Sawn-off (Crop Duster)  $%d" % Economy.SAWN_OFF_PRICE,Economy.SAWN_OFF_PRICE,"shotgun",buy_sawn_off.bind(player)))
 			if player.has_weapon("SHOTGUN"):
 				opts.append(_buy("%d shotgun shells  $%d" % [Economy.SHELL_PACK, Economy.SHELL_PRICE], Economy.SHELL_PRICE, "shells", buy_shells.bind(player)))
 			else:
@@ -129,6 +133,19 @@ func buy_shotgun(player: Node) -> bool:
 	sg.name = "Shotgun"
 	player.add_weapon(sg)
 	return _done(player, "shotgun")
+
+func buy_sawn_off(player: Node) -> bool:
+	var weapon: Node=player.get_node_or_null("Head/Camera3D/CropDuster")
+	if weapon==null or player.has_weapon("SAWN-OFF") or not economy().spend(Economy.SAWN_OFF_PRICE):return false
+	weapon.set_meta("purchased",true)
+	player.switch_weapon(player.weapons.find(weapon))
+	return _done(player,"sawn_off")
+
+func buy_sawn_shells(player: Node) -> bool:
+	var weapon: Node=player.weapon_named("SAWN-OFF")
+	if weapon==null or not economy().spend(Economy.SHELL_PRICE):return false
+	weapon.add_ammo(Economy.SHELL_PACK)
+	return _done(player,"sawn_shells")
 
 func buy_shells(player: Node) -> bool:
 	var sg: Node = player.weapon_named("SHOTGUN")

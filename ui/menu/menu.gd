@@ -162,7 +162,7 @@ func activate(index: int) -> void:
   1:return
   2:
    clear_panel("HOW TO PLAY")
-   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nE use station · 1–4 choose station option\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc pause / settings\nR restarts after death, or while using the knife.")
+   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nV cycle carried burgers · E tray / bin / station\n1–4 choose station option · Shotguns bought at shop\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc pause / settings\nR restarts after death, or while using the knife.")
   3:
    clear_panel("SETTINGS")
    var scroll:=ScrollContainer.new()

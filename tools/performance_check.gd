@@ -56,6 +56,7 @@ func run() -> void:
 	if OS.get_environment("FPS_PROFILE_NO_SHADOWS") == "1":
 		for light: Light3D in main.find_children("*", "Light3D", true, false): light.shadow_enabled = false
 	var player: CharacterBody3D = main.get_node("Player")
+	player.get_node("Head/Camera3D/CropDuster").set_meta("purchased",true)
 	player.set_process_unhandled_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	player.position = Vector3(1.4,0.05,-1.4)

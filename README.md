@@ -1,3 +1,5 @@
+Burger service update: V cycles carried burgers; E on an empty hatch-tray slot places the selected burger, E on a box retrieves it, and E at the hatch bin discards the selected item. Capacity starts at one and increases after clearing waves 3/6/9, to four. Burgers cool after 150 seconds including tray time; each cold item pays 50%. Both shotguns and separate shell packs are in the shop. See docs/handover/BURGER_INVENTORY_TRAY.md.
+
 Performance update: menu input targets 60 FPS, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
 
 # Current combined recovery — 2026-10-19

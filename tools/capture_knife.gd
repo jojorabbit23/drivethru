@@ -36,7 +36,7 @@ func _run() -> void:
 	await wait(5)
 	player.global_position = Vector3(1.4, 0.05, -1.4)
 	player.rotation.y = -PI / 2.0
-	player.switch_weapon(2 if dagger else 1)
+	player.switch_weapon(3 if dagger else 1)
 	await wait(12)
 	await snap("knife0_draw")
 	await wait(18)

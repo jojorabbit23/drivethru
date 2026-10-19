@@ -241,7 +241,7 @@ func _run() -> void:
 	check(top == ["Weapons and ammo", "Kitchen supplies", "Upgrades", "Close"], "top menu: %s" % str(top))
 	player.use_focus()            # E: the first page
 	var weapons_page: Array = shop_labels.call()
-	check(main.terminal.page == "weapons" and "pistol rounds" in weapons_page[0] and "Pump shotgun" in weapons_page[1] and weapons_page[2] == "Back", "weapons page: %s" % str(weapons_page))
+	check(main.terminal.page == "weapons" and "pistol rounds" in weapons_page[0] and "Sawn-off" in weapons_page[1] and "Pump shotgun" in weapons_page[2] and weapons_page[3] == "Back", "weapons page lists both shotguns: %s" % str(weapons_page))
 	var reserve: int = gun.reserve
 	before = econ.cash
 	player.use_focus()            # E: pistol rounds
@@ -249,14 +249,14 @@ func _run() -> void:
 	check(player.menu_station == main.terminal and main.terminal.page == "weapons", "the page stays open after buying")
 	econ.add_cash(150)
 	var n_weapons: int = player.weapons.size()
-	player.choose(1)
+	player.choose(2)
 	var sg: Node = player.weapon_named("SHOTGUN")
 	check(sg != null and player.weapons.size() == n_weapons + 1 and player.weapon_index == n_weapons, "the shotgun for $150 goes in slot %d and is drawn" % (n_weapons + 1))
 	check(sg != null and sg.mag == 6 and sg.reserve == 6, "it comes loaded: 6 in the tube, 6 spare")
 	econ.add_cash(30)
-	player.choose(1)
+	player.choose(2)
 	check(sg != null and sg.reserve == 18, "then the slot sells 12 shells for $30 (spare %d)" % (sg.reserve if sg else -1))
-	player.choose(2)              # Back
+	player.choose(3)              # Back
 	check(main.terminal.page == "" and player.menu_options.size() == 4, "Back returns to the top menu")
 	econ.add_cash(40 + 110)
 	var buns0: int = econ.buns

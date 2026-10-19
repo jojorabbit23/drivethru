@@ -27,6 +27,7 @@ const SUPPLY_PRICE := 40
 const BULK_PACK := 15          # the big box: a little cheaper per burger
 const BULK_PRICE := 110
 const SHOTGUN_PRICE := 150     # weapon 4
+const SAWN_OFF_PRICE := 90
 const SHELL_PACK := 12         # docs/GAME_DESIGN.md: 12 shells = $30
 const SHELL_PRICE := 30
 # Kitchen upgrades (docs/COOKING_DESIGN.md "Kitchen Upgrades")

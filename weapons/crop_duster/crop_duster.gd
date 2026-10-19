@@ -13,6 +13,14 @@ const RELOAD_TIME:=3.4
 var active:=false
 var loaded: Array[bool]=[true,true]
 var reserve:=24
+var display_name: String="SAWN-OFF"
+var mag: int:
+ get:return ammo
+func add_ammo(amount: int) -> void:
+ reserve+=amount
+ ammo_changed.emit()
+func is_reloading() -> bool:
+ return state=="reload"
 var ammo: int:
  get: return int(loaded[0])+int(loaded[1])
 var state:="idle"

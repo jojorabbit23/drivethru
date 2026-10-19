@@ -27,6 +27,9 @@ var CAB_FROM_CENTRE := 1.6
 
 @export var patience := 50.0
 var order := "brown"        # which burger: brown (common) | blue | red
+var quantity: int=1
+var received: int=0
+var _quantity_label: Label3D
 var state := "arriving"     # arriving | waiting | leaving
 var waited := 0.0
 var _t := 0.0
@@ -118,6 +121,15 @@ func _add_bubble(at: Vector3) -> void:
 	icon.position = Vector3(0, 0.04, 0.0)
 	icon.render_priority = 1
 	_bubble.add_child(icon)
+	if quantity>1:
+		var count:=Label3D.new()
+		_quantity_label=count
+		count.text="x%d" % quantity
+		count.position=Vector3(0.36,0.04,0.02)
+		count.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+		count.font_size=32
+		count.pixel_size=0.008
+		_bubble.add_child(count)
 	_bar = MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(0.5, 0.06)
@@ -129,6 +141,9 @@ func _add_bubble(at: Vector3) -> void:
 	_bar.position = Vector3(0, -0.36, 0)
 	_bubble.add_child(_bar)
 	_bubble.visible = false
+
+func refresh_order_quantity() -> void:
+	if _quantity_label:_quantity_label.text="x%d" % maxi(0,quantity-received)
 
 static func _bubble_texture() -> Texture2D:
 	var img := Image.create(24, 24, false, Image.FORMAT_RGBA8)
