@@ -28,6 +28,8 @@ const Grill = preload("res://game/grill.gd")
 const CustomerWindow = preload("res://game/customer_window.gd")
 const ShopTerminal = preload("res://game/shop_terminal.gd")
 const PrepBench = preload("res://game/prep_bench.gd")
+const HoldingTray = preload("res://game/holding_tray.gd")
+const OrderRail = preload("res://game/order_rail.gd")
 const MushroomPickupScript = preload("res://pickups/mushroom/mushroom_pickup.gd")
 
 var wave := 0
@@ -36,6 +38,8 @@ var _break_t := -1.0
 var economy: Node
 var grill: Node3D
 var hatch: Node3D
+var tray: Node3D
+var rail: Node3D
 var storage: Node3D
 var terminal: Node3D
 var bench: Node3D
@@ -104,8 +108,14 @@ func _build_stations() -> void:
 	hatch = _station(CustomerWindow, "DriveThruWindow", Vector3(-3.0, 1.0, -5.0), 0.0)
 	terminal = _station(ShopTerminal, "ShopTerminal", Vector3(-2.89, 0.77, iz - 0.29), 0.0)
 	bench = _station(PrepBench, "PrepBench", Vector3(0.79, 0.92, -iz + 0.325), 0.0)
+	# the pass above the counter: warming tray (once bought) and the ticket rail
+	tray = _station(HoldingTray, "WarmingTray", Vector3(1.38, 1.36, -iz + 0.17), 0.0)
+	tray.grill = grill
+	rail = _station(OrderRail, "OrderRail", Vector3(1.4, 2.15, -iz + 0.03), 0.0)
+	rail.hatch = hatch
 	bench.grill = grill
 	bench.hatch = hatch
+	bench.tray = tray
 	hatch.auto = auto_spawn
 	var m := shop.get_node_or_null("Markers")
 	if m:

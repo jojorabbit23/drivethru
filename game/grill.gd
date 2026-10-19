@@ -450,12 +450,12 @@ func add_patty(kind := "brown") -> bool:
 	_place(free, kind)
 	return true
 
-# Takes a patty off for the prep bench: the wanted kind if one is ready
-# (longest-waiting first), else any ready patty, else a burnt one (salvage).
-# Returns {kind, ready_for, burnt} or {} if nothing's done.
-func take_patty(want := "") -> Dictionary:
+# Which patty the prep bench (or the warming tray) would take: the wanted kind
+# if one is ready (longest-waiting first), else any ready patty, else a burnt
+# one (salvage) unless ready_only. -1 if nothing's done.
+func find_patty(want := "", ready_only := false) -> int:
 	var best := -1
-	for pass_i in 3:
+	for pass_i in (2 if ready_only else 3):
 		for i in slot_count():
 			var s := slots[i]
 			var ok: bool = (pass_i == 0 and s["state"] == "ready" and s["kind"] == want) \
@@ -464,10 +464,19 @@ func take_patty(want := "") -> Dictionary:
 				best = i
 		if best >= 0:
 			break
+	return best
+
+# {kind, ready_for, burnt} of slot i, without taking it.
+func describe(i: int) -> Dictionary:
+	var s := slots[i]
+	return {"kind": s["kind"], "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
+
+# Takes a patty off (see find_patty). Returns {kind, ready_for, burnt} or {}.
+func take_patty(want := "", ready_only := false) -> Dictionary:
+	var best := find_patty(want, ready_only)
 	if best < 0:
 		return {}
-	var s := slots[best]
-	var out := {"kind": s["kind"], "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
+	var out := describe(best)
 	_clear(best)
 	return out
 

@@ -1,7 +1,9 @@
 # Close-up contact sheets of the kitchen (needs a display):
-#   xvfb-run -a godot --path . --rendering-method gl_compatibility --script res://tools/capture_kitchen.gd
-# Writes docs/previews/kitchen_patties.png: a mushroom dropped, smashed,
-# cooking, flipped, ready and burnt, for each kind.
+#   xvfb-run -a godot --path . --rendering-method gl_compatibility --fixed-fps 30 --script res://tools/capture_kitchen.gd
+# Writes docs/previews/kitchen_patties.png (a mushroom dropped, smashed,
+# cooking, flipped, ready and burnt, for each kind) and kitchen_pass.png (the
+# counter with the ticket rail, the warming tray, the bench building a burger,
+# and the bell on the hatch).
 extends SceneTree
 
 const OUT := "res://docs/previews/"
@@ -91,4 +93,46 @@ func _run() -> void:
 	await wait(4)
 	await grab()
 	sheet("kitchen_patties", 3)
+	# --- the pass ---
+	for i in 3:
+		g.scrape()
+		g.take_patty()
+	econ.buy_tray()
+	econ.buy_bell()
+	main.hatch.next_order = "blue"
+	var car: Node3D = main.hatch.spawn_customer()
+	car.position = main.hatch.lane_stop
+	g.add_patty("red")
+	g.add_patty("blue")
+	g.add_patty("brown")
+	await wait(20)
+	g.slots[0]["t"] = 7.0
+	g.slots[1]["t"] = 6.5
+	g.slots[2]["t"] = 3.0
+	await wait(3)
+	main.tray.store_from_grill()
+	g.add_patty("red")
+	g.slots[0]["t"] = 2.0
+	await wait(30)
+	var stand := Vector3(1.75, 1.62, -2.95)
+	look(stand, Vector3(1.6, 1.25, -4.7), 62)
+	await wait(4)
+	await grab()
+	look(Vector3(1.4, 1.85, -3.5), Vector3(1.4, 1.8, -4.75), 55)
+	await wait(4)
+	await grab()
+	look(Vector3(1.2, 1.45, -3.7), main.bench.global_position + Vector3(0.3, 0.05, 0.05), 45)
+	await wait(2)
+	main.bench.bag(player)
+	await wait(7)
+	await grab()
+	await wait(6)
+	await grab()
+	look(main.hatch.global_position + Vector3(1.4, 0.65, 1.3), main.hatch.global_position + Vector3(0.62, 0.0, 0.12), 45)
+	await wait(4)
+	await grab()
+	look(stand + Vector3(-0.4, -0.05, 0.2), Vector3(1.4, 1.1, -4.7), 70)
+	await wait(4)
+	await grab()
+	sheet("kitchen_pass", 3)
 	quit()

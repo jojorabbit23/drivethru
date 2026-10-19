@@ -119,12 +119,26 @@ func _run() -> void:
 	check(not player.menu_options[0]["enabled"] and "grill full" in full[0], "two slots: now full %s" % str(full))
 	player.use_focus()   # only Cancel is enabled
 	check(player.menu_station == null, "E on a full grill picks Cancel")
+	check(main.grill.slots[0]["patty"].visible and is_equal_approx(main.grill.slots[0]["patty"].rotation.x, PI), "the patty is the mushroom itself, dropped on gills-up")
 	await wait(2.0)
 	check(main.grill.state_of(0) == "cooking", "cooking after a second")
-	var rang := [false]
-	main.grill.patty_state.connect(func(_i, st): if st == "ready": rang[0] = true)
-	await wait(4.2)
-	check(main.grill.state_of(0) == "ready" and rang[0], "ready at 6 s (bell)")
+	check(is_equal_approx(main.grill.slots[0]["patty"].scale.y, main.grill.SMASHED.y) or main.grill.slots[0]["patty"].scale.y < 0.8, "the spatula has pressed it down (scale y %.2f)" % main.grill.slots[0]["patty"].scale.y)
+	# look at the common patty (slot 1): E flips it
+	cam.look_at((main.grill.slots[1]["root"] as Node3D).global_position, Vector3.UP)
+	await physics_frame
+	check(main.grill.aimed_slot(player) == 1 and "flip the common patty" in main.grill.prompt(player), "looking at a cooking patty: '%s'" % main.grill.prompt(player))
+	var ready_at := {}
+	var t_flip := Time.get_ticks_msec()
+	main.grill.patty_state.connect(func(i, st): if st == "ready": ready_at[i] = true)
+	player.use_focus()
+	check(main.grill.slots[1]["flipped"] and player.menu_station == null, "E flips it (no menu)")
+	check(not main.grill.can_flip(1), "only once")
+	await wait(0.5)
+	check(is_equal_approx(main.grill.slots[1]["patty"].rotation.x, 0.0) or absf(main.grill.slots[1]["patty"].rotation.x) < 0.05 or absf(main.grill.slots[1]["patty"].rotation.x - TAU) < 0.05, "turned over: seared cap up (rot %.2f)" % main.grill.slots[1]["patty"].rotation.x)
+	await wait(2.0)
+	check(ready_at.has(1) and not ready_at.has(0), "the flipped one is ready first (1.6x for the rest of its cook)")
+	await wait(1.8)
+	check(main.grill.state_of(0) == "ready" and ready_at.has(0), "ready at 6 s (bell)")
 
 	print("== bag at the prep bench")
 	var car: Node3D
@@ -132,10 +146,16 @@ func _run() -> void:
 	car = main.hatch.spawn_customer()
 	check(car.order == "blue", "a customer pulls in wanting a BLUE burger")
 	f = await look_at_station(main.bench, Vector3(0.8, 0, -3.3))
-	check(f == main.bench and main.bench.prompt(player) == "E  bag burger", "at the prep bench: '%s'" % main.bench.prompt(player))
+	check(f == main.bench and main.bench.prompt(player) == "E  bag blue burger  ·  PERFECT", "at the prep bench it says what you'll get: '%s'" % main.bench.prompt(player))
 	player.use_focus()
 	check(player.held == "burger" and player.held_burger["kind"] == "blue" and player.held_burger["quality"] == "perfect", "one press bags the ordered blue patty, fresh: %s" % str(player.held_burger))
 	check(econ.buns == 7 and econ.toppings == 7 and main.grill.state_of(0) == "", "it used a bun, a topping and that patty")
+	var stack: Node = null
+	for c in main.bench.get_children():
+		if c.get_script() == main.bench.BurgerStack:
+			stack = c
+	check(stack != null, "and you see it built on the board")
+	check(main.rail.current_car() == car and main.rail._ticket.visible and "BLUE" in main.rail._name.text, "the ticket rail shows the order: '%s'" % main.rail._name.text)
 	await wait(5.5)
 
 	print("== serve")
@@ -263,6 +283,39 @@ func _run() -> void:
 	player.close_menu()
 	await wait(0.1)
 	check(main.terminal.page == "", "walking off resets the terminal to its top menu")
+
+	print("== warming tray")
+	check(main.tray.visible and main.tray.get_node("Zone").collision_layer == 32, "bought: the tray appears over the counter and can be used")
+	econ.stock = {"brown": 2, "blue": 2, "red": 2}
+	for k in ["brown", "red", "blue"]:
+		main.grill.add_patty(k)
+	main.grill.slots[0]["t"] = 6.5
+	main.grill.slots[1]["t"] = 7.0
+	main.grill.slots[2]["t"] = 6.2
+	await wait(0.1)
+	check("move 2 ready patties" in main.tray.prompt(player), "with 3 ready: '%s'" % main.tray.prompt(player))
+	check(main.tray.store_from_grill() == 2 and main.tray.held.size() == 2 and main.grill.count("ready") == 1, "E moves the two longest-waiting onto the tray")
+	check(main.tray.held[0]["kind"] == "red" and main.tray.held[1]["kind"] == "brown", "red (7 s) then common (6.5 s): %s" % str(main.tray.held.map(func(p): return p["kind"])))
+	await wait(10.0)
+	main.hatch.next_order = "brown"
+	if main.hatch.car != null and is_instance_valid(main.hatch.car):
+		main.hatch.car.queue_free()
+	main.hatch.car = null
+	var c2: Node3D = main.hatch.spawn_customer()
+	check(absf(c2.patience - 75.0) < 0.01, "with the bell, customers wait 75 s instead of 50 (%.0f)" % c2.patience)
+	check(main.hatch.get_node("Bell").visible, "and the bell sits on the hatch")
+	player.set_held("")
+	econ.add_supplies(2)
+	check("bag common burger" in main.bench.prompt(player) and "PERFECT" in main.bench.prompt(player) and "tray" in main.bench.prompt(player), "the bench takes the ordered kind from the tray, still perfect 10 s later: '%s'" % main.bench.prompt(player))
+	main.bench.bag(player)
+	check(player.held_burger.get("kind") == "brown" and player.held_burger.get("quality") == "perfect" and main.tray.held.size() == 1, "bagged: %s" % str(player.held_burger))
+	player.set_held("")
+	main.bench.bag(player)
+	check(player.held_burger.get("kind") == "red" and main.tray.held.is_empty(), "then what's left on the tray before the grill: %s" % str(player.held_burger))
+	player.set_held("")
+	main.grill.scrape()
+	while main.grill.take_patty() != {}:
+		pass
 
 	print("== ammo")
 	player.switch_weapon(0)

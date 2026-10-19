@@ -2,7 +2,8 @@
 # want as an icon (brown common, blue or red). Hold the right bagged burger,
 # look at the hatch, press E: $30 plus a tip for a fresh patty (perfect $6,
 # good $3), or $15 for burnt salvage. A missed customer just drives away - no
-# penalty, no payment.
+# penalty, no payment. With the drive-thru bell (shop upgrade) customers wait
+# 50% longer, and a brass bell sits on the sill.
 extends "res://game/station.gd"
 
 const Car = preload("res://game/customer_car.gd")
@@ -35,9 +36,41 @@ static func pick_order() -> String:
 
 var _next := 0.0
 
+var _bell: Node3D
+
 func _ready() -> void:
 	add_zone(Vector3(1.8, 1.0, 0.9), Vector3(0, 0.5, 0))
 	_next = first_delay
+	_bell = Node3D.new()
+	_bell.name = "Bell"
+	_bell.position = Vector3(0.62, 0.0, 0.12)
+	add_child(_bell)
+	add_box(Vector3(0.1, 0.012, 0.1), Vector3(0, 0.006, 0), P.WET_CHARCOAL, _bell)
+	var dome := MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	sm.radius = 0.045
+	sm.height = 0.05
+	sm.is_hemisphere = true
+	sm.radial_segments = 8
+	sm.rings = 3
+	dome.mesh = sm
+	var bm := flat(P.AMBER_GLOW.darkened(0.2), 0.3)
+	bm.metallic = 0.8
+	dome.material_override = bm
+	dome.position = Vector3(0, 0.012, 0)
+	_bell.add_child(dome)
+	add_box(Vector3(0.012, 0.02, 0.012), Vector3(0, 0.07, 0), P.WET_CHARCOAL, _bell)
+	_show_bell.call_deferred()
+
+func _show_bell() -> void:
+	var e := economy()
+	if e and not e.changed.is_connected(_show_bell):
+		e.changed.connect(_show_bell)
+	_bell.visible = e != null and e.has_bell
+
+func patience_scale() -> float:
+	var e := economy()
+	return Economy.BELL_PATIENCE if e and e.has_bell else 1.0
 
 func set_lane(start: Vector3, stop: Vector3, end: Vector3) -> void:
 	lane_start = start
@@ -61,6 +94,7 @@ func spawn_customer() -> Node3D:
 	c.name = "CustomerCar"
 	get_parent().add_child(c)
 	c.order = next_order if next_order != "" else pick_order()
+	c.patience *= patience_scale()
 	c.vehicle = next_vehicle
 	next_order = ""
 	next_vehicle = ""
