@@ -1,4 +1,6 @@
 extends Control
+const Prefs=preload("res://presentation/preferences.gd")
+const Sounds=preload("res://presentation/audio_library.gd")
 const P=preload("res://core/palette.gd")
 const SHEET=preload("res://ui/menu/menu_reference.png")
 const INTRO=preload("res://ui/menu/intro.ogv")
@@ -21,6 +23,7 @@ func atlas(rect: Rect2) -> AtlasTexture:
  a.region=rect
  return a
 func _ready() -> void:
+ Prefs.configure()
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
  Engine.max_fps=30
  var background:=ColorRect.new()
@@ -29,6 +32,7 @@ func _ready() -> void:
  add_child(background)
  video=VideoStreamPlayer.new()
  video.expand=true
+ video.bus="Cinematics"
  video.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(video)
  video.stream=INTRO
@@ -72,11 +76,12 @@ func _ready() -> void:
   line.size=Vector2(58,3)
   canvas.add_child(line)
  panel=PanelContainer.new()
+ panel.theme=Prefs.theme()
  panel.position=Vector2(450,130)
  panel.size=Vector2(690,450)
  canvas.add_child(panel)
  content=VBoxContainer.new()
- content.add_theme_constant_override("separation",16)
+ content.add_theme_constant_override("separation",8)
  panel.add_child(content)
  panel.hide()
  resized.connect(layout)
@@ -114,6 +119,7 @@ func _loop_bread() -> void:
  video.play()
 func select(index: int) -> void:
  if starting or index==1:return
+ if selected!=index:Sounds.ui(self,"select")
  selected=index
  for i in images.size():
   var ink: Color=P.AMBER_GLOW if i==selected else (P.CONCRETE_GREY if i==1 else P.WARM_CHALK)
@@ -150,27 +156,22 @@ func paragraph(value: String) -> void:
  content.add_child(label)
 func activate(index: int) -> void:
  if starting:return
+ if index!=1:Sounds.ui(self,"confirm")
  match index:
   0:_start_game()
   1:return
   2:
    clear_panel("HOW TO PLAY")
-   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nE use station · 1–4 choose station option\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc release mouse\nR restarts after death, or while using the knife.")
+   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nE use station · 1–4 choose station option\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc pause / settings\nR restarts after death, or while using the knife.")
   3:
    clear_panel("SETTINGS")
-   var fullscreen:=CheckButton.new()
-   fullscreen.text="Fullscreen"
-   fullscreen.button_pressed=DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN
-   fullscreen.toggled.connect(func(on: bool):DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if on else DisplayServer.WINDOW_MODE_WINDOWED))
-   content.add_child(fullscreen)
-   paragraph("Master volume")
-   var volume:=HSlider.new()
-   volume.min_value=0.0
-   volume.max_value=1.0
-   volume.step=0.01
-   volume.value=db_to_linear(AudioServer.get_bus_volume_db(0))
-   volume.value_changed.connect(func(value: float):AudioServer.set_bus_volume_db(0,linear_to_db(maxf(value,0.0001))))
-   content.add_child(volume)
+   var scroll:=ScrollContainer.new()
+   scroll.custom_minimum_size=Vector2(650,340)
+   content.add_child(scroll)
+   var controls:=VBoxContainer.new()
+   controls.add_theme_constant_override("separation",8)
+   scroll.add_child(controls)
+   Prefs.settings_controls(controls)
   4:
    clear_panel("CREDITS")
    var scroll:=ScrollContainer.new()
@@ -189,5 +190,9 @@ func activate(index: int) -> void:
   content.add_child(back)
 func _notification(what: int) -> void:
  if DisplayServer.get_name()=="headless":return
- if what==NOTIFICATION_APPLICATION_FOCUS_OUT:Engine.max_fps=15
- elif what==NOTIFICATION_APPLICATION_FOCUS_IN:Engine.max_fps=30
+ if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+  Engine.max_fps=15
+  Prefs.set_focused(false)
+ elif what==NOTIFICATION_APPLICATION_FOCUS_IN:
+  Engine.max_fps=30
+  Prefs.set_focused(true)
