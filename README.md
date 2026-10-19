@@ -347,6 +347,18 @@ The script **never overwrites an existing PNG** unless you pass `-- --force`. Yo
 
 Imports are set to lossless with mipmaps and nearest filtering, so pixels stay crisp.
 
+## Pixel font
+
+All in-game text (HUD, menus, prompts, 3D signs and the roof sign) uses the owner's chunky pixel lettering: cream letters with a dark outline, from the sheet in `fonts/pixel/source/lettering_sheet.png`.
+
+- `tools/slice_font_sheet.py` (one-off, Python) cut the sheet into glyphs and snapped each one to its pixel grid, writing `fonts/pixel/glyphs.txt`. That file is the editable source: one block per character, `#` outline, `o` fill, `.` clear. It overwrites hand edits if you run it again.
+- The sheet has A-Z, 0-9 and `. , ! ? : ; - + / ( ) $`. The colon and semicolon were redrawn, because their dots merged at grid size. Space and `% · [ ] | ' " = _` were added in the same style, because the game uses them. Lowercase shows as capitals.
+- `tools/build_font.gd` builds `fonts/pixel/pixel_font.tres` (a bitmap font) and `fonts/pixel/ui_theme.tres`, the project theme (`gui/theme/custom`), so every Label and Label3D gets it without setting anything. The fill is white, so a label's font colour tints it exactly, and the outline is baked in.
+- The native size is **18**, and the font only scales by whole steps (18, 36, 54...) so pixels stay square. Other sizes snap to the nearest step.
+- `tools/validate.gd` checks that every character the game shows has a glyph. `tools/capture_font.gd` renders `docs/previews/font.png`.
+
+To change a letter, edit `fonts/pixel/glyphs.txt`, then run `godot --headless --path . --script res://tools/build_font.gd`.
+
 ## Rebuilding
 
 Edit the layout constants at the top of `tools/build_shop.gd`, or the props in `tools/shop_decor.gd`. Don't edit `levels/shop/generated/`, because it's rebuilt every time. Then run:

@@ -17,6 +17,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/vsync/vsync_mode=1
 
+[gui]
+
+theme/custom="res://fonts/pixel/ui_theme.tres"
+
 [layer_names]
 
 3d_physics/layer_1="world"

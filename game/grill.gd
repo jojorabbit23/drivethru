@@ -62,9 +62,9 @@ func _make_slot() -> Dictionary:
 	var label := Label3D.new()
 	label.position = Vector3(0, 0.25, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.font_size = 30
-	label.pixel_size = 0.0015
-	label.outline_size = 8
+	label.font_size = 18           # the pixel font's native size (crisp)
+	label.pixel_size = 0.0022
+	label.outline_size = 0         # the pixel font has its outline baked in
 	label.outline_modulate = P.MIDNIGHT_TYNE
 	label.visible = false
 	root.add_child(label)
@@ -183,11 +183,11 @@ func _show(i: int) -> void:
 		"cooking":
 			var k := (t - RAW_TIME) / (COOK_TIME - RAW_TIME)
 			colour = raw_colour.lerp(tint.darkened(0.25), k)
-			label.text = "COOKING %d%%" % int(k * 100.0)
+			label.text = "COOKING\n%d%%" % int(k * 100.0)
 			label.modulate = P.AMBER_GLOW
 		"ready":
 			colour = tint.lerp(P.AMBER_GLOW, 0.35).darkened(0.2)
-			label.text = "READY  %ds" % ceili(burn_time() - t)
+			label.text = "READY\n%ds" % ceili(burn_time() - t)
 			label.modulate = P.ELECTRIC_TEAL
 		"burnt":
 			colour = P.WET_CHARCOAL.darkened(0.3)

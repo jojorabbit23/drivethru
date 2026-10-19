@@ -26,6 +26,7 @@ The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_D
    - `enemies/lancer/lancer_model.tscn` and `lancer_*`: `tools/build_lancer.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `vehicles/*/` models, meshes, materials, albedos (school bus, armoured truck): `tools/build_vehicles.gd`
+   - `fonts/pixel/pixel_font.tres`, `ui_theme.tres`: `tools/build_font.gd` (from the editable `fonts/pixel/glyphs.txt`)
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.
@@ -73,6 +74,7 @@ vehicles/        customer vehicles (school bus, armoured truck) built from sourc
 game/            the burger loop: economy, stations (store, grill, prep bench, drive-thru, terminal), customers, pixel icons, synth sounds
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene
+fonts/pixel      the pixel font (project theme): glyph source, built font, owner's lettering sheet
 tools/           build scripts, tests, capture/film scripts
 docs/            previews, videos, handover briefs
 ```

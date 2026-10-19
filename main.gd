@@ -380,17 +380,18 @@ func _build_hud() -> void:
 	layer.add_child(vignette)
 	var cross := Label.new()
 	cross.text = "+"
-	cross.add_theme_font_size_override("font_size", 22)
+	cross.add_theme_font_size_override("font_size", 18)
 	cross.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	cross.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cross.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cross.pivot_offset = cross.size * 0.5
 	layer.add_child(cross)
 	var help := Label.new()
-	help.text = "WASD move · Shift sprint · Space jump · 1/2/3 or wheel weapon · LMB fire / slash · RMB stab · E use / hold E repair · F2 auto-collect · Z/X spawn · R restart · Esc mouse"
-	help.add_theme_font_size_override("font_size", 13)
+	help.text = "WASD move · Shift sprint · Space jump · 1/2/3 or wheel weapon · LMB fire / slash · RMB stab\nE use / hold E repair · F2 auto-collect · Z/X/C spawn · R restart · Esc mouse"
+	help.add_theme_font_size_override("font_size", 18)
+	help.add_theme_constant_override("line_spacing", 0)
 	help.add_theme_color_override("font_color", Color("#E9E1D1", 0.6))
-	help.position = Vector2(16, 12)
+	help.position = Vector2(16, 8)
 	layer.add_child(help)
 	var health := Label.new()
 	health.add_theme_font_size_override("font_size", 18)
@@ -442,7 +443,7 @@ func _build_hud() -> void:
 	layer.add_child(wave_label)
 	# status row, top-left under the help line
 	var status := HBoxContainer.new()
-	status.position = Vector2(16, 36)
+	status.position = Vector2(16, 48)
 	status.add_theme_constant_override("separation", 6)
 	layer.add_child(status)
 	var cash := _label("$0", 26, P.AMBER_GLOW)

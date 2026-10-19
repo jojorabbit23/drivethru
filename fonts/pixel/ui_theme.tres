@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3]
+
+[ext_resource type="FontFile" path="res://fonts/pixel/pixel_font.tres" id="1_lc7d4"]
+
+[resource]
+default_font = ExtResource("1_lc7d4")
+default_font_size = 18
+Label/colors/font_color = Color(0.913725, 0.882353, 0.819608, 1)
