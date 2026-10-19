@@ -293,3 +293,5 @@ The playtest now opens the animated main menu. Use Up/Down and Enter or the mous
 This project also includes the Scuttler, recurring 11-second enemy spawns (every third a Scuttler), randomized lanes, next-enemy countdown, dropped glowing mushrooms with proximity collection and a mushroom counter, and Claude's sculpt-derived knife grip. Z spawns a Shambler; X spawns a Scuttler. The first automatic enemy arrives after three seconds. These were integrated from D:/zombys/versions/drivethru-main, retaining the current pistol, Crop Duster, menu and bus cinematic. Mushrooms are counted but not yet spent.
 
 Serving room refreshed from the owner's concept and atlas: room-specific tile finishes, teal cabinets, stock/packaging and poster art. Builder/rebuild notes and validation: docs/handover/SERVING_ROOM.md.
+
+Kitchen updated from the owner's two references and Kitchen_Texture_Pack.zip: stained tiles, steel cooking line, hood/utensils, labelled ingredient storage, teal fridge and sink. Live cooking and service mechanics retained. Builder/verification notes: docs/handover/KITCHEN.md.

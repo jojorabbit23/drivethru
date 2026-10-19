@@ -29,6 +29,7 @@
 extends SceneTree
 
 const Palette = preload("res://core/palette.gd")
+const Kitchen = preload("res://tools/kitchen_room.gd")
 const Serving = preload("res://tools/serving_room.gd")
 const Decor = preload("res://tools/shop_decor.gd")
 
@@ -66,7 +67,7 @@ const DELIVERY_DOOR := {"at": 3.0, "w": 1.4, "bottom": 0.0, "top": 2.3} # south 
 
 const ROOMS := [
 	{"name": "ShopFloor", "label": "SHOP FLOOR", "c": Vector2(-3.0, -2.4), "floor": "floor_tile", "light": 1.6},
-	{"name": "Kitchen", "label": "KITCHEN", "c": Vector2(3.0, -2.4), "floor": "floor_tile", "light": 1.5},
+	{"name": "Kitchen", "label": "KITCHEN", "c": Vector2(3.0, -2.4), "floor": "floor_tile", "light": 1.05},
 	{"name": "BackOffice", "label": "BACK OFFICE", "c": Vector2(-3.0, 2.4), "floor": "floor_concrete", "light": 1.6},
 	{"name": "Storeroom", "label": "STOREROOM", "c": Vector2(3.0, 2.4), "floor": "floor_concrete", "light": 1.35},
 ]
@@ -144,6 +145,7 @@ func make_materials() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(MAT_DIR))
 	var specs := material_specs()
 	specs.merge(Serving.material_specs())
+	specs.merge(Kitchen.material_specs())
 	var missing := []
 	for name in specs:
 		var spec: Dictionary = specs[name]
@@ -162,7 +164,7 @@ func make_materials() -> void:
 				missing.append(tpath)
 				m.albedo_color = Palette.CONCRETE_GREY
 		if spec.has("texture_path"):
-			assert(ResourceLoader.exists(spec["texture_path"]), "missing serving-room texture: " + str(spec["texture_path"]))
+			assert(ResourceLoader.exists(spec["texture_path"]), "missing room texture: " + str(spec["texture_path"]))
 			m.albedo_texture = load(spec["texture_path"])
 			m.uv1_scale = Vector3.ONE * float(spec.get("repeat", 1.0))
 		elif spec.has("atlas"):

@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://textures/floor_tile.png" id="1_mkwaw"]
+[ext_resource type="Texture2D" path="res://textures/floor_tile.png" id="1_ei62a"]
 
 [resource]
 resource_name = "floor_tile"
-albedo_texture = ExtResource("1_mkwaw")
+albedo_texture = ExtResource("1_ei62a")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

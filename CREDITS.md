@@ -24,3 +24,5 @@ The supplied pack and full licence are retained in addons/psx_firearms/. Adaptat
 - Serving-room reference and material/poster/packaging atlas: supplied by the project owner, kept in art/serving_room/. UV cell extraction, room construction and integration prepared for this game.
 
 - Serving_Room_Texture_Pack.zip: owner-supplied individual PNG textures; source README and native images retained in art/serving_room/pack/.
+
+- Kitchen_Texture_Pack.zip and two kitchen references: supplied by the project owner, kept in art/kitchen/. All 16 base-colour textures are used directly; kitchen layout/material integration prepared for this game.

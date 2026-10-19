@@ -1,6 +1,6 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://textures/palisade.png" id="1_c6bif"]
+[ext_resource type="Texture2D" path="res://textures/palisade.png" id="1_5uxa4"]
 
 [resource]
 resource_name = "palisade"
@@ -8,7 +8,7 @@ transparency = 2
 alpha_scissor_threshold = 0.5
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("1_c6bif")
+albedo_texture = ExtResource("1_5uxa4")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

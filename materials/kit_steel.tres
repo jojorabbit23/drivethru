@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/kitchen/pack/scratched_steel.png" id="1_hxob6"]
+
+[resource]
+resource_name = "kit_steel"
+albedo_texture = ExtResource("1_hxob6")
+metallic = 0.05
+metallic_specular = 0.25
+roughness = 0.78
+texture_filter = 2
