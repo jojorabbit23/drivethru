@@ -10,6 +10,25 @@ for the full tour; it describes every system that exists today.
 
 The game design is `docs/GAME_DESIGN.md`, with cooking detail in `docs/COOKING_DESIGN.md`. The burger loop is built; see README.
 
+## Who's working on what (two agents in parallel)
+
+To avoid stepping on each other, the owner has split the work:
+
+- **Claude:** the cooking system (`game/grill.gd`, `game/prep_bench.gd`, new
+  kitchen stations under `game/`, patty visuals), the shop terminal and
+  economy (`game/shop_terminal.gd`, `game/economy.gd`), and the shotgun
+  (`weapons/shotgun/`, slot 4, bought at the terminal).
+- **Codex:** quality-of-life improvements, audio (`game/sfx.gd` and any new
+  sounds), kitchen textures (calming the tiles; reuse the serving-room
+  ones), and tightening up the visuals of scenery and NPCs
+  (`tools/build_shop.gd`, `tools/shop_decor.gd`, `tools/make_textures.gd`,
+  `textures/`, enemy and vehicle looks).
+
+Shared files (`main.gd`, `player/player.gd`, README, this file): keep edits
+small, pull before you start, and commit often. If you need something in the
+other agent's area, make the smallest change that works and say so in the
+commit message.
+
 ## Hard rules
 
 1. **Godot 4.3, GDScript, statically typed.** When the right-hand side is a
