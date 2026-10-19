@@ -82,6 +82,16 @@ func run() -> void:
  check(right_ok and psx_right_faces == 0,"sculpted right hand replaces the PSX right arm (skinned to hand_r + lowerarm_r)")
  var hand_box: AABB = right_hand.get_aabb()
  check(hand_box.size.length() > 0.2 and pivot.find_children("*","MeshInstance3D",true,false).filter(func(m: MeshInstance3D) -> bool: return m.mesh != null and m.mesh.resource_path.contains("dagger")).is_empty(),"the supplied dagger is not in the viewmodel")
+ # alternative viewmodel: the sculpt's own dagger in its own hand (slot 3)
+ var dagger_weapon: Node3D = player.get_node("Head/Camera3D/Dagger")
+ var dagger_pivot: Node3D = dagger_weapon.get("_pivot")
+ var dagger_hand: MeshInstance3D = dagger_pivot.find_child("RightHand",true,false)
+ var native := false
+ for k: Vector2 in (dagger_hand.mesh.surface_get_arrays(0)[Mesh.ARRAY_TEX_UV2] as PackedVector2Array):
+  if k.x > 3.5:
+   native = true
+   break
+ check(native and dagger_pivot.find_child("Model",true,false) == null and dagger_weapon.get("_attack_kind") != null,"dagger alternative keeps the sculpt's own blade and uses the same knife gameplay script")
  var arms_mesh: MeshInstance3D = pivot.find_child("fp_arms_mesh",true,false)
  var active_material: ShaderMaterial = arms_mesh.mesh.surface_get_material(0)
  var active_albedo: Texture2D = active_material.get_shader_parameter("albedo_tex")

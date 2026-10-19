@@ -20,6 +20,8 @@ const OUT := "res://weapons/knife/"
 const LENGTH := 0.32        # a big survival knife, tip to pommel
 const GRIP_AT := 0.16       # grip centre, as a fraction of length from the pommel
 const TEX_SIZE := 512
+const KEEP_TRIANGLES := 0.5   # simplify to about half the source triangles
+const BlockyMesh = preload("res://tools/blocky_mesh.gd")
 
 func _initialize() -> void:
 	var doc := GLTFDocument.new()
@@ -167,6 +169,10 @@ func _initialize() -> void:
 	arr[Mesh.ARRAY_VERTEX] = nv
 	arr[Mesh.ARRAY_NORMAL] = nn
 	arr[Mesh.ARRAY_TANGENT] = null
+	# a little blockier, to sit with the voxel Shambler: fewer triangles, faceted
+	var before := BlockyMesh.triangle_count(arr)
+	arr = BlockyMesh.flat(BlockyMesh.simplify(arr, KEEP_TRIANGLES))
+	print("blocky: %d -> %d triangles, flat shaded" % [before, BlockyMesh.triangle_count(arr)])
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
 	var aabb := mesh.get_aabb()

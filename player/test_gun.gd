@@ -69,6 +69,10 @@ func set_active(on: bool) -> void:
  _flash.visible=false
  if not on: _sound.stop()
  _pose()
+func add_ammo(n: int) -> void:
+ reserve+=maxi(0,n)
+ ammo_changed.emit()
+func is_reloading() -> bool: return state=="reload"
 func is_busy() -> bool: return state!="idle" or _cooldown>0.0
 func _unhandled_input(event: InputEvent) -> void:
  if active and event is InputEventMouseMotion: sway+=(event as InputEventMouseMotion).relative*0.0001
@@ -175,7 +179,7 @@ func _play_sound(label: String) -> void:
 # Low-level scripted shot API retained for existing hitscan/ooze tests.
 # Player input uses request_fire(), which also enforces draw/reload/cooldown gates.
 func shoot() -> Dictionary:
- if not can_act() or ammo<=0: return {}
+ if not can_act() or ammo<=0 or state=="reload": return {}
  ammo-=1
  state="fire"
  clock=0.0

@@ -1,3 +1,17 @@
+# Current combined playtest — 19 October 2026
+
+Open Play_DriveThru.cmd in the parent outputs folder. The menu, intro and bus cinematic now load the same game containing cooking, customer service, economy, storage, grill, shop terminal, waves, Scuttlers and mushroom pickups, plus the animated custom pistol, Crop Duster and revised knife/dagger hands.
+
+E uses a station; 1–4 choose options while its menu is open. Otherwise 1 pistol, 2 knife, 3 Crop Duster, 4 dagger; mouse wheel also switches. R reloads firearms; F inspects. R restarts after death or while holding a knife. F2 toggles auto-collect. Z/X spawn Shambler/Scuttler. Kill → collect → store → cook → bag → serve → buy supplies. Continue remains disabled until saves exist.
+
+Latest gameplay source integrated: GitHub main fefcb797c8c942749151d9783571c6aa90b8f2de. The custom pistol retains its existing 15-round magazine, 90 reserve and 2.1 s reload; the terminal adds 24 reserve rounds for $12. The cooking-loop test now exercises that actual animated pistol through player fire gates and its real reload timing. Gameplay and intro buses are separate owner-supplied assets.
+
+All 68 owned scripts parse; all 13 suites pass (validate, movement, zombie, ooze, knife, knife viewmodel, spawn, Scuttler, pickup, cooking loop, pistol, Crop Duster and menu). Rendered and inspected menu/video handoff, grill/customer stations and current weapon poses. The short capped performance check passed focus limits; it does not prove sustained 60 FPS under every load.
+
+See docs/handover/FINAL_COMBINED.md for provenance, integration and verification. Older sections below describe earlier development stages and may use superseded controls.
+
+---
+
 # The Drive Thru — greybox prototype
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.

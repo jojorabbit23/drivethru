@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_mesh.res" id="1_jd41b"]
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_wheel_rl.res" id="2_gum1y"]
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_wheel_rr.res" id="3_a7axw"]
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_wheel_fl.res" id="4_gqa8q"]
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_wheel_fr.res" id="5_um3w3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1uu6l"]
+size = Vector3(2.67026, 2.72264, 5.1)
+
+[node name="SchoolBus" type="Node3D"]
+metadata/size = Vector3(3.14148, 3.4033, 6)
+metadata/wheel_radius = 0.735373
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_jd41b")
+
+[node name="Wheel_RL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.16138, 0.551529, 1.73425)
+mesh = ExtResource("2_gum1y")
+
+[node name="Wheel_RR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.17378, 0.551529, 1.73425)
+mesh = ExtResource("3_a7axw")
+
+[node name="Wheel_FL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.16877, 0.551529, -1.58105)
+mesh = ExtResource("4_gqa8q")
+
+[node name="Wheel_FR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15828, 0.551529, -1.58105)
+mesh = ExtResource("5_um3w3")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.53148, 0)
+shape = SubResource("BoxShape3D_1uu6l")

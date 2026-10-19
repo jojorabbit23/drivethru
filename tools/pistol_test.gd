@@ -11,7 +11,7 @@ func run() -> void:
  var player: CharacterBody3D=main.get_node("Player")
  var gun: Node3D=player.get_node("Head/Camera3D/TestGun")
  gun.set_physics_process(false)
- check(player.weapons.size()==3 and player.current_weapon()==gun,"pistol, knife and Crop Duster share the player loadout")
+ check(player.weapons.size()==4 and player.current_weapon()==gun,"pistol, knife, Crop Duster and dagger share the player loadout")
  check(not gun.request_fire() and gun.ammo==15,"draw gate prevents a premature shot")
  gun._update(0.4)
  check(gun.request_fire() and gun.ammo==14,"player can fire the restored pistol")

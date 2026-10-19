@@ -28,7 +28,9 @@ func run() -> void:
  await process_frame
  check(current_scene!=null and current_scene.name=="Main","Start Cooking loads game scene")
  var player: Node=current_scene.get_node("Player")
- check(player.weapons.size()==3,"all three weapons loaded from menu")
+ check(player.weapons.size()==4,"all four weapons loaded from menu")
+ check(current_scene.get("economy")!=null and current_scene.get("grill")!=null and current_scene.get("hatch")!=null,"menu loads cooking, economy and customer stations")
+ check(player.weapons[2].name=="CropDuster" and player.weapons[3].name=="Dagger","shotgun and dagger slot order preserved")
  current_scene.free()
  print("%d failure(s)" % failures)
  quit(failures)

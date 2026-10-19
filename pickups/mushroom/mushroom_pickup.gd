@@ -9,6 +9,10 @@ extends Node3D
 
 signal collected(pickup: Node3D)
 
+# Accessibility (docs/GAME_DESIGN.md "Auto Collect Pickups"): every pickup
+# flies to the player from anywhere once it has landed. main.gd toggles it (F2).
+static var auto_collect := false
+
 const MESH := preload("res://pickups/mushroom/mushroom_pickup_mesh.res")
 const Palette = preload("res://core/palette.gd")
 
@@ -91,7 +95,10 @@ func _process(delta: float) -> void:
 		if d < collect_range:
 			_collect(player)
 			return
-		if d < magnet_range and (_magnet or _sees(chest)):
+		if auto_collect:
+			_magnet = true
+			target = chest
+		elif d < magnet_range and (_magnet or _sees(chest)):
 			_magnet = true
 			target = chest
 			# below a window sill: rise until there's a clear line, then fly in
@@ -101,7 +108,7 @@ func _process(delta: float) -> void:
 			_magnet = false
 	else:
 		_magnet = false
-	var speed := 5.0 if _magnet else 2.5
+	var speed := (9.0 if auto_collect else 5.0) if _magnet else 2.5
 	global_position = global_position.move_toward(target, speed * delta)
 
 # Can it reach the player? Tried from its own height and from just above, so
