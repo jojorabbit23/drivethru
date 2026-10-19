@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="ArrayMesh" path="res://vehicles/school_bus/bus_mesh.res" id="1_7asrx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mn3ry"]
+size = Vector3(2.67026, 2.72264, 5.1)
+
+[node name="SchoolBus" type="Node3D"]
+metadata/size = Vector3(3.14148, 3.4033, 6)
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_7asrx")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.53148, 0)
+shape = SubResource("BoxShape3D_mn3ry")

@@ -24,6 +24,7 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    - `weapons/knife/knife_viewmodel.tscn`, `cleatimus_arms_*`, `cleatimus_right_hand_mesh.res`, `dagger_viewmodel.tscn`, `cleatimus_dagger_hand_mesh.res`: `tools/build_knife_viewmodel.gd` (hand fit in `tools/knife_hand_mesh.gd`)
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
+   - `vehicles/school_bus/bus_model.tscn`, `bus_*`: `tools/build_bus.gd`
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.
@@ -65,6 +66,7 @@ enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
+vehicles/        customer vehicles (school bus) built from source GLBs
 game/            the burger loop: economy, stations (store, grill, drive-thru, terminal), cars, pixel icons, synth sounds
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene

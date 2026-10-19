@@ -1,4 +1,6 @@
-# A drive-through customer: a blocky car that pulls up to the service hatch,
+# A drive-through customer: the armoured school bus (vehicles/school_bus,
+# built by tools/build_bus.gd) pulls up to the service hatch with its cab
+# beside it,
 # honks, shows its order as a pixel burger in a speech bubble with a patience
 # bar, waits, and drives off - paid or not (a missed order costs nothing).
 extends Node3D
@@ -14,6 +16,8 @@ signal left(served: bool)
 const DRIVE_IN := 5.0
 const DRIVE_OUT := 4.0
 const BODY_COLOURS := [P.OXIDISED_TEAL, P.BURNT_ORANGE, P.BLUE_SLATE, P.CONCRETE_GREY]
+const BUS := preload("res://vehicles/school_bus/bus_model.tscn")
+const CAB_FROM_CENTRE := 1.6     # driver's window, metres ahead of the bus's middle
 
 @export var patience := 50.0
 var order := "burger"
@@ -28,14 +32,22 @@ var _bar: MeshInstance3D
 var _wheels: Array[MeshInstance3D] = []
 
 func setup(from: Vector3, stop: Vector3, to: Vector3, colour_index := -1) -> void:
+	# it travels +X, so stop with the cab (not the middle) at the hatch
 	_from = from
-	_stop = stop
+	_stop = stop - Vector3(CAB_FROM_CENTRE, 0, 0)
 	_to = to
-	var colour: Color = BODY_COLOURS[colour_index if colour_index >= 0 else randi() % BODY_COLOURS.size()]
-	_build(colour)
+	_build_bus()
 	position = from
 	rotation.y = -PI / 2.0      # faces +X: its right side (driver, UK) faces the hatch
 
+var _body: Node3D
+
+func _build_bus() -> void:
+	_body = BUS.instantiate()
+	add_child(_body)
+	_add_bubble(Vector3(1.9, 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
+
+# Old placeholder car (kept for reference; unused).
 func _build(colour: Color) -> void:
 	# local: -Z forward, +X right
 	_box(Vector3(1.7, 0.55, 3.9), Vector3(0, 0.62, 0), colour)                 # body
@@ -72,9 +84,14 @@ func _build(colour: Color) -> void:
 	cs.position = Vector3(0, 0.8, 0)
 	body.add_child(cs)
 	add_child(body)
-	# speech bubble with the order, over the driver's side
+	_add_bubble(Vector3(1.1, 2.15, 0.2))
+
+var _bubble_y := 2.15
+
+func _add_bubble(at: Vector3) -> void:
 	_bubble = Node3D.new()
-	_bubble.position = Vector3(1.1, 2.15, 0.2)
+	_bubble.position = at
+	_bubble_y = at.y
 	add_child(_bubble)
 	var back := Icons.sprite("burger", 0.03)
 	back.texture = _bubble_texture()
@@ -138,7 +155,8 @@ func _process(delta: float) -> void:
 			_bar.scale.x = maxf(left_frac, 0.02)
 			var bm := _bar.material_override as StandardMaterial3D
 			bm.albedo_color = P.ELECTRIC_TEAL if left_frac > 0.66 else (P.AMBER_GLOW if left_frac > 0.33 else P.BURNT_ORANGE)
-			_bubble.position.y = 2.15 + sin(_t * 3.0) * 0.03
+			_bubble.position.y = _bubble_y + sin(_t * 3.0) * 0.03
+			_body.position.y = absf(sin(_t * 23.0)) * 0.012     # engine idling
 			if waited >= patience:
 				leave(false)
 		"leaving":
@@ -149,6 +167,9 @@ func _process(delta: float) -> void:
 				queue_free()
 
 func _roll(delta: float, speed: float) -> void:
+	if _body:
+		_body.position.y = absf(sin(_t * 9.0)) * 0.03 * speed
+		_body.rotation.z = sin(_t * 4.0) * 0.012 * speed
 	for w in _wheels:
 		w.rotate_object_local(Vector3.UP, -delta * 12.0 * speed)
 
