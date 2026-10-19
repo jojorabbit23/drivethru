@@ -1,5 +1,5 @@
 # Tiny generated sounds, so states never rely on colour alone and the project
-# needs no audio files: bell (patty ready), horn (car arrives), order chime,
+# needs no audio files: bell (patty ready), alarm (patty burnt), horn (car arrives), order chime,
 # till (cash), sizzle (loop on a cooking grill), click (empty gun), thunk.
 #   Sfx.play(node, "bell")            non-positional
 #   Sfx.play_at(node, "horn", pos)    3D
@@ -9,6 +9,8 @@ const RATE := 22050
 static var _cache := {}
 
 static func stream(name: String) -> AudioStreamWAV:
+	if name == "pistol":
+		return preload("res://weapons/pistol/audio/shot.wav")
 	if _cache.has(name):
 		return _cache[name]
 	var s := _make(name)
@@ -16,6 +18,7 @@ static func stream(name: String) -> AudioStreamWAV:
 	return s
 
 static func play(node: Node, name: String, volume_db := -6.0) -> void:
+	if DisplayServer.get_name() == "headless": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer.new()
@@ -26,6 +29,7 @@ static func play(node: Node, name: String, volume_db := -6.0) -> void:
 	p.play()
 
 static func play_at(node: Node, name: String, at: Vector3, volume_db := 0.0) -> void:
+	if DisplayServer.get_name() == "headless": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer3D.new()
@@ -71,6 +75,12 @@ static func _make(name: String) -> AudioStreamWAV:
 				last = last * 0.55 + n * 0.45      # soften
 				var crackle := (rng.randf_range(-1.0, 1.0) if rng.randf() < 0.004 else 0.0)
 				samples.append((n - last) * 0.25 + crackle * 0.6)
+		"alarm":   # burnt patty: two-tone beep-beep
+			for i in int(RATE * 0.6):
+				var t := float(i) / RATE
+				var on := 1.0 if fmod(t, 0.3) < 0.18 else 0.0
+				var f := 1568.0 if t < 0.3 else 1175.0
+				samples.append(on * signf(sin(TAU * f * t)) * 0.35)
 		"click":
 			for i in int(RATE * 0.06):
 				var t := float(i) / RATE

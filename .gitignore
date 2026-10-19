@@ -6,3 +6,4 @@ Thumbs.db
 *.tmp
 # raw movie-writer output (the encoded .mp4s in docs/video are kept)
 *.avi
+__pycache__/

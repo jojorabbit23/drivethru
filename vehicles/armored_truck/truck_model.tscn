@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="ArrayMesh" path="res://vehicles/armored_truck/truck_mesh.res" id="1_1b7t4"]
+[ext_resource type="ArrayMesh" path="res://vehicles/armored_truck/truck_wheel_rl.res" id="2_gejcf"]
+[ext_resource type="ArrayMesh" path="res://vehicles/armored_truck/truck_wheel_rr.res" id="3_46xi6"]
+[ext_resource type="ArrayMesh" path="res://vehicles/armored_truck/truck_wheel_fl.res" id="4_kt0t0"]
+[ext_resource type="ArrayMesh" path="res://vehicles/armored_truck/truck_wheel_fr.res" id="5_4cptj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0d1uv"]
+size = Vector3(2.24228, 2.62664, 5.44)
+
+[node name="ArmoredTruck" type="Node3D"]
+metadata/size = Vector3(2.63797, 3.2833, 6.4)
+metadata/wheel_radius = 0.488588
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_1b7t4")
+
+[node name="Wheel_RL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.989692, 0.488588, 1.90224)
+mesh = ExtResource("2_gejcf")
+
+[node name="Wheel_RR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.987523, 0.488588, 1.90224)
+mesh = ExtResource("3_46xi6")
+
+[node name="Wheel_FL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04726, 0.488588, -1.58303)
+mesh = ExtResource("4_kt0t0")
+
+[node name="Wheel_FR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03574, 0.488588, -1.58303)
+mesh = ExtResource("5_4cptj")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47749, 0)
+shape = SubResource("BoxShape3D_0d1uv")

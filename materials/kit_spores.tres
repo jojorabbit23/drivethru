@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://art/kitchen/pack/label_spores.png" id="1_gr4x6"]
+[ext_resource type="Texture2D" path="res://art/kitchen/pack/label_spores.png" id="1_enroq"]
 
 [resource]
 resource_name = "kit_spores"
-albedo_texture = ExtResource("1_gr4x6")
+albedo_texture = ExtResource("1_enroq")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

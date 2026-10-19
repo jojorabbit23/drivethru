@@ -8,6 +8,8 @@ The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Pro
 
 ## Project assets
 
+- Survivor pump-shotgun skin, Lancer, armoured truck and pixel lettering sheet: supplied by the project owner. Pump hands also adapt PSX Firearms Free, credited below.
+
 - Shambler zombie and survival knife models: supplied by the project owner (`enemies/shambler/source/`, `weapons/knife/source/`).
 - Shop, textures, rig, animations, ooze and tools: made for this project.
 
@@ -26,3 +28,5 @@ The supplied pack and full licence are retained in addons/psx_firearms/. Adaptat
 - Serving_Room_Texture_Pack.zip: owner-supplied individual PNG textures; source README and native images retained in art/serving_room/pack/.
 
 - Kitchen_Texture_Pack.zip and two kitchen references: supplied by the project owner, kept in art/kitchen/. All 16 base-colour textures are used directly; kitchen layout/material integration prepared for this game.
+
+Current pistol integration: the original textured pistol mesh is fitted to the newer sculpt-derived hands and wrist sockets from OpenCode, using PSX FPS Arms Free animated pistol nodes. Source models and licences remain intact.

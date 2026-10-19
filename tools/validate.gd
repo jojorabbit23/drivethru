@@ -94,5 +94,27 @@ func _run() -> void:
 	res = space.intersect_ray(q)
 	check(res.is_empty(), "eye-level gap between window B boards (y=1.8)")
 
+	print("Pixel font")
+	var theme := load(ProjectSettings.get_setting("gui/theme/custom", "")) as Theme
+	var font := theme.default_font if theme else null
+	check(font is FontFile and (font as FontFile).fixed_size == 18, "project theme uses the pixel font (native 18 px)")
+	if font:
+		# every character in the strings the game shows (game code, main, shop signs)
+		var missing := {}
+		var files: Array[String] = ["res://main.gd", "res://levels/shop/generated/shop_greybox.tscn"]
+		for f in DirAccess.get_files_at("res://game"):
+			if f.ends_with(".gd"):
+				files.append("res://game/" + f)
+		var re := RegEx.create_from_string('"((?:[^"\\\\]|\\\\.)*)"')
+		for f in files:
+			for m in re.search_all(FileAccess.get_file_as_string(f)):
+				var s := m.get_string(1)
+				if s.begins_with("res://") or s.begins_with("#") or s.begins_with("@") or s.contains("_") or (s.length() > 24 and not s.contains(" ")):
+					continue   # paths, colours, node names, packed data: never shown
+				for c in s.replace("\\n", "").replace("%d", "").replace("%s", ""):
+					if not (font as FontFile).has_char(c.unicode_at(0)):
+						missing[c] = s
+		check(missing.is_empty(), "every character the game shows is in the font%s" % ("" if missing.is_empty() else " (missing: %s)" % str(missing)))
+
 	print("\n%d failure(s)" % failures)
 	quit(1 if failures > 0 else 0)

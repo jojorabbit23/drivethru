@@ -80,3 +80,21 @@ head hitboxes) · 5 player_clip · 6 interact (station look-zones, Area3D with m
 Weapons are children of `Player/Head/Camera3D` that implement
 `set_active(on: bool)`. The player collects them in order (slot 1 = pistol,
 slot 2 = knife, slot 3 = Crop Duster, slot 4 = dagger alternative using the same knife script).
+
+## Integrated project (2026-10-19)
+
+The canonical project combines GitHub main's cooking/prep, purchases, vehicles and
+Lancer with the custom pistol, original Crop Duster, menu, room art and presentation.
+The purchased pump is appended as slot 5; use the wheel to select it. Never replace
+the Crop Duster or dagger when integrating it. The pistol combines OpenCode's new
+hand builder with the original textured pistol mesh; both pistol and pump emit
+two ammo_changed arguments. main.gd also accepts the older zero-argument signature.
+
+Rebuild room geometry/materials with tools/build_shop.gd. Keep its kitchen_room.gd
+and serving_room.gd delegates: using an older shop_decor.gd removes the owner art.
+Rebuild the pump model/hands with tools/build_shotgun.gd; keep the PSX Firearms licence.
+Also run every tools/*test.gd suite, including integration_test.gd, plus validate.gd.
+Render kitchen, serving room, pistol, knife and pump captures before shipping changes.
+Claude owns cooking/station rules; Codex owns presentation. Shared main/player changes
+must preserve both sets of APIs. Pull/merge before editing; do not replace whole files
+with a copy from another branch. Do not hand-edit generated scenes or materials.

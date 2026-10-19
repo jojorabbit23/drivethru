@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://art/serving_room/pack/burger_box_graphic.png" id="1_jusxl"]
+[ext_resource type="Texture2D" path="res://art/serving_room/pack/burger_box_graphic.png" id="1_n3642"]
 
 [resource]
 resource_name = "serve_carton"
-albedo_texture = ExtResource("1_jusxl")
+albedo_texture = ExtResource("1_n3642")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

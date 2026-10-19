@@ -21,10 +21,7 @@ func run() -> void:
   Engine.max_fps=30
   if frame==18 or frame==28: pistol.request_fire()
   if frame==40: pistol.reload()
-  if frame==110:
-   pistol.aim_weight=1.0
-   player.get_node("Head").rotation=Vector3.ZERO
-  if frame==136: pistol.aim_weight=0.0
+  if frame==110: player.get_node("Head").rotation=Vector3.ZERO
   if frame==140: player.switch_weapon(1)
   if frame==160: knife.request("slash")
   if frame==185: knife.request("stab")
@@ -34,7 +31,7 @@ func run() -> void:
   if frame==380:
    crop.state="inspect"
    crop.clock=0.0
-  pistol._update(1.0/30.0)
+  pistol._physics_process(1.0/30.0)
   crop._update(1.0/30.0)
   await process_frame
   OS.delay_usec(33334)

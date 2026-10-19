@@ -1,10 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://art/kitchen/pack/mushroom_cap.png" id="1_giwpc"]
+[ext_resource type="Texture2D" path="res://art/kitchen/pack/mushroom_cap.png" id="1_l14qy"]
 
 [resource]
 resource_name = "kit_cap"
-albedo_texture = ExtResource("1_giwpc")
+albedo_texture = ExtResource("1_l14qy")
 metallic_specular = 0.25
 roughness = 0.92
 texture_filter = 2

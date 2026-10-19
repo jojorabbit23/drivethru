@@ -1,5 +1,5 @@
-# A drive-through customer: the armoured school bus (vehicles/school_bus,
-# built by tools/build_bus.gd) pulls up to the service hatch with its cab
+# A drive-through customer: the armoured school bus or the armoured truck
+# (vehicles/, built by tools/build_vehicles.gd) pulls up to the hatch with its cab
 # beside it,
 # honks, shows its order as a pixel burger in a speech bubble with a patience
 # bar, waits, and drives off - paid or not (a missed order costs nothing).
@@ -16,11 +16,17 @@ signal left(served: bool)
 const DRIVE_IN := 5.0
 const DRIVE_OUT := 4.0
 const BODY_COLOURS := [P.OXIDISED_TEAL, P.BURNT_ORANGE, P.BLUE_SLATE, P.CONCRETE_GREY]
-const BUS := preload("res://vehicles/school_bus/bus_model.tscn")
-const CAB_FROM_CENTRE := 1.6     # driver's window, metres ahead of the bus's middle
+# Customer vehicles (tools/build_vehicles.gd). cab: the driver's window,
+# metres ahead of the vehicle's middle; side: half-width to the hatch side.
+const VEHICLES := {
+	"school_bus": {"scene": preload("res://vehicles/school_bus/bus_model.tscn"), "cab": 1.6, "side": 1.9},
+	"armored_truck": {"scene": preload("res://vehicles/armored_truck/truck_model.tscn"), "cab": 1.9, "side": 1.65},
+}
+var vehicle := ""                 # key of VEHICLES; random if left empty
+var CAB_FROM_CENTRE := 1.6
 
 @export var patience := 50.0
-var order := "burger"
+var order := "brown"        # which burger: brown (common) | blue | red
 var state := "arriving"     # arriving | waiting | leaving
 var waited := 0.0
 var _t := 0.0
@@ -34,6 +40,9 @@ var _wheels: Array[MeshInstance3D] = []
 func setup(from: Vector3, stop: Vector3, to: Vector3, colour_index := -1) -> void:
 	# it travels +X, so stop with the cab (not the middle) at the hatch
 	_from = from
+	if vehicle == "":
+		vehicle = VEHICLES.keys()[randi() % VEHICLES.size()]
+	CAB_FROM_CENTRE = VEHICLES[vehicle]["cab"]
 	_stop = stop - Vector3(CAB_FROM_CENTRE, 0, 0)
 	_to = to
 	_build_bus()
@@ -47,13 +56,13 @@ var _wheel_r := 0.7
 var _last_pos := Vector3.ZERO
 
 func _build_bus() -> void:
-	_body = BUS.instantiate()
+	_body = (VEHICLES[vehicle]["scene"] as PackedScene).instantiate()
 	add_child(_body)
 	_wheel_r = _body.get_meta("wheel_radius", 0.7)
 	for w in _body.get_children():
 		if w.name.begins_with("Wheel"):
 			_bus_wheels.append(w)
-	_add_bubble(Vector3(1.9, 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
+	_add_bubble(Vector3(VEHICLES[vehicle]["side"], 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
 
 # Old placeholder car (kept for reference; unused).
 func _build(colour: Color) -> void:
@@ -105,7 +114,7 @@ func _add_bubble(at: Vector3) -> void:
 	back.texture = _bubble_texture()
 	back.render_priority = 0
 	_bubble.add_child(back)
-	var icon := Icons.sprite(order, 0.026)
+	var icon := Icons.sprite("burger_" + order, 0.026)
 	icon.position = Vector3(0, 0.04, 0.0)
 	icon.render_priority = 1
 	_bubble.add_child(icon)

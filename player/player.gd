@@ -20,18 +20,36 @@ signal held_changed(item: String)
 @export var repair_reach := 1.4
 @export var repair_time := 0.9   # seconds per board while holding E
 
+@export_group("Movement feel")
+@export var deceleration := 10.0       # stopping is gentler than starting
+@export var air_control := 0.6          # the part of that control you keep off the ground
+@export var coyote_time := 0.12        # jump grace after walking off an edge
+@export var jump_buffer := 0.12        # jump grace before you land
+
+@export_group("View")
+@export var bob_amount := 0.022        # rise into each step
+@export var bob_lateral := 0.016       # sway across a stride pair
+@export var bob_speed := 1.9           # radians of step cycle per metre travelled
+@export var idle_sway := 0.0016        # breathing at rest, in metres
+@export var land_dip := 0.014          # view drop per m/s of landing speed
+@export var max_dip := 0.08
+@export var sprint_fov_boost := 3.5    # degrees wider while sprinting
+
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var health := 0.0
-var mushrooms := 0                 # glowing mushrooms picked up from dead enemies (carried)
+var mushrooms := 0                 # mushrooms carried, all kinds (see carried)
+var carried := {"brown": 0, "blue": 0, "red": 0}
 var held := ""                     # item in hand: "" or "burger" (a bagged burger)
+var held_burger := {}              # {kind, quality} of the bagged burger
 
 # Stations (game/station.gd) are looked at and used with E. A station may open
 # a small menu: options are {label, enabled, action: Callable, icon}; keys 1-4
 # pick one, E picks the first enabled one. Looking away closes it.
 const INTERACT_LAYER := 32         # physics layer 6 "interact"
+@export_group("")
 @export var interact_reach := 2.3
 var focus: Node = null
 var menu_station: Node = null
@@ -39,6 +57,21 @@ var menu_options: Array = []
 var repair_window: Node3D = null   # window currently in reach (for the HUD)
 var repair_progress := 0.0         # 0..1 toward the next board
 var _shake := 0.0
+
+# Movement feel. The view offsets below move the camera, never Head: the death
+# tween drops Head's y, and the head is where aiming pitch lives.
+const LAND_MIN_SPEED := 1.5        # a softer drop than this never dips the view
+var _coyote := 0.0
+var _jump_buffer := 0.0
+var _bob_t := 0.0                  # steps taken, in radians
+var _bob := Vector3.ZERO           # smoothed walk bob
+var _dip := 0.0                    # landing dip, easing back to level
+var _last_vy := 0.0                # last air speed, for the landing dip
+var _was_grounded := true
+var _idle_t := 0.0
+var _base_fov := 75.0
+var _sprint_fov := false
+var _weapon_home := {}             # weapon -> the transform the scene gave it
 
 # Default bindings are registered in code so the project works out of the box.
 # Move them into Project Settings > Input Map whenever you like; existing
@@ -58,6 +91,7 @@ const DEFAULT_BINDINGS := {
 }
 
 signal weapon_changed(index: int, weapon: Node)
+signal weapon_added(weapon: Node)
 
 # Weapons are the children of Head/Camera3D that have set_active():
 # 0 = placeholder pistol, 1 = knife. 1/2 or the mouse wheel switch.
@@ -82,11 +116,14 @@ func _ready() -> void:
 		InputMap.action_add_event("fire", mb)
 	if DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	_base_fov = camera.fov
 	for c in camera.get_children():
 		if c.has_method("set_active"):
 			weapons.append(c)
 	for i in weapons.size():
 		weapons[i].set_active(i == weapon_index)
+	for w in weapons:
+		_remember_weapon(w)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead():
@@ -117,15 +154,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-	elif Input.is_action_just_pressed("jump") and not is_dead():
+	var grounded := is_on_floor()
+	# Jump forgiveness: a short grace after walking off an edge, and a short
+	# buffer before you land, so a jump at the last moment isn't dropped.
+	if grounded:
+		_coyote = coyote_time
+	else:
+		_coyote = maxf(0.0, _coyote - delta)
+	_jump_buffer = maxf(0.0, _jump_buffer - delta)
+	if Input.is_action_just_pressed("jump") and not is_dead():
+		_jump_buffer = jump_buffer
+	if _jump_buffer > 0.0 and _coyote > 0.0 and not is_dead():
 		velocity.y = jump_velocity
+		_jump_buffer = 0.0
+		_coyote = 0.0
+		grounded = false
+	elif not grounded:
+		velocity.y -= gravity * delta
 
 	var input_dir := Vector2.ZERO if is_dead() else Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var dir := (transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
-	var speed := sprint_speed if Input.is_action_pressed("sprint") else walk_speed
-	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(dir * speed, acceleration * delta)
+	var sprinting := Input.is_action_pressed("sprint")
+	var speed := sprint_speed if sprinting else walk_speed
+	# You start quicker than you stop, and off the ground you keep only part of
+	# that control, so a jump carries its momentum.
+	var rate := acceleration if input_dir != Vector2.ZERO else deceleration
+	if not grounded:
+		rate *= air_control
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(dir * speed, rate * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 	move_and_slide()
@@ -136,6 +192,81 @@ func _physics_process(delta: float) -> void:
 		camera.rotation.z = sin(Time.get_ticks_msec() * 0.05) * _shake * 0.05
 	else:
 		camera.rotation.z = 0.0
+	var moved := Vector2(velocity.x, velocity.z).length()
+	# The view reads the floor as it is after the move, or a landing is missed.
+	_update_view(delta, is_on_floor(), moved)
+	_update_fov(delta, sprinting and moved > walk_speed * 0.9)
+	_update_weapon_idle(moved)
+
+# The view: a small bob as you walk, a dip when you land, and a slow breath at
+# rest. This is the only thing that moves the camera itself.
+func _update_view(delta: float, grounded: bool, speed: float) -> void:
+	# Landing: the faster you arrive, the deeper the drop, and it eases level
+	# again. The fall speed is the one from the frame before the floor stopped
+	# it, and a drop under LAND_MIN_SPEED (a step, a lip) doesn't count.
+	if grounded and not _was_grounded:
+		_dip = clampf((-_last_vy - LAND_MIN_SPEED) * land_dip, 0.0, max_dip)
+	_was_grounded = grounded
+	_last_vy = velocity.y
+	_dip = lerpf(_dip, 0.0, 1.0 - exp(-9.0 * delta))
+	# Walk bob: one sway across each stride pair, one rise per step. It fades
+	# out in the air, where the ground stops driving the feet.
+	var k := 0.0 if is_dead() else clampf(speed / walk_speed, 0.0, 1.35)
+	_bob_t += delta * speed * bob_speed
+	var target := Vector3(sin(_bob_t) * bob_lateral, sin(_bob_t * 2.0) * bob_amount, 0.0) * k
+	if not grounded:
+		target = Vector3.ZERO
+	_bob = _bob.lerp(target, 1.0 - exp(-14.0 * delta))
+	# Standing still: a body isn't a tripod, so the view breathes a millimetre.
+	_idle_t += delta
+	var idle := Vector3(sin(_idle_t * 0.61) * 0.5, sin(_idle_t * 0.83), 0.0) * idle_sway
+	if is_dead():
+		idle = Vector3.ZERO
+	else:
+		idle *= 1.0 / (1.0 + speed * 2.0)
+	# The camera's *rotation* is never touched here: it is the aim (weapons fire
+	# along camera.global_basis, the tests aim with camera.look_at). Position only.
+	camera.position = _bob + Vector3(0.0, -_dip, 0.0) + idle
+
+# Sprint opens the view up a little. Once it has kicked in it always eases back
+# to the scene's own fov, so nothing else's framing is fought over.
+func _update_fov(delta: float, sprinting: bool) -> void:
+	if sprinting:
+		_sprint_fov = true
+	if not _sprint_fov:
+		return
+	var target := _base_fov + (sprint_fov_boost if sprinting else 0.0)
+	camera.fov = lerpf(camera.fov, target, 1.0 - exp(-7.0 * delta))
+	if not sprinting and absf(camera.fov - _base_fov) < 0.05:
+		camera.fov = _base_fov
+		_sprint_fov = false
+
+# A held weapon isn't rigid: at rest it drifts and settles a few millimetres,
+# and every few seconds the grip shuffles. The weapon's slot seeds it, so no two
+# weapons breathe together, and it fades out as soon as you walk. The offset
+# goes on the weapon node, on top of the transform the scene gave it, so the
+# weapon's own animation (which drives a child pivot) is left alone.
+func _update_weapon_idle(speed: float) -> void:
+	var w := current_weapon()
+	if not (w is Node3D) or not _weapon_home.has(w):
+		return
+	var home: Transform3D = _weapon_home[w]
+	var k := 0.0 if is_dead() else 1.0 / (1.0 + speed * 1.5)
+	var seed := float(weapons.find(w)) * 0.37
+	var drift := Vector3(
+		sin(_idle_t * 0.43 + seed) * 0.0032 + sin(_idle_t * 0.19 + seed * 2.1) * 0.0018,
+		sin(_idle_t * 0.31 + seed * 2.9) * 0.0026 + sin(_idle_t * 0.11 + seed) * 0.0016,
+		0.0)
+	var tilt := Vector3(
+		sin(_idle_t * 0.37 + seed * 3.3) * 0.5,
+		sin(_idle_t * 0.23 + seed * 1.1) * 0.5,
+		sin(_idle_t * 0.29 + seed * 2.3) * 0.4)
+	var u := fposmod(_idle_t + seed * 2.0, 5.0 + seed * 3.0) / (5.0 + seed * 3.0)
+	if u < 0.09:                               # the shuffle: out and back
+		var s := sin(u / 0.09 * PI)
+		drift += Vector3(0.004, -0.003, 0.0) * s
+		tilt += Vector3(0.0, 0.7, -0.5) * s
+	(w as Node3D).transform = home * Transform3D(Basis.from_euler(tilt * k * PI / 180.0), drift * k)
 
 func switch_weapon(i: int) -> void:
 	if i == weapon_index or i < 0 or i >= weapons.size():
@@ -143,7 +274,40 @@ func switch_weapon(i: int) -> void:
 	weapon_index = i
 	for k in weapons.size():
 		weapons[k].set_active(k == i)
+		# Put the weapon we're leaving back exactly where the scene put it,
+		# rather than freezing it mid-shuffle.
+		if k != i and _weapon_home.has(weapons[k]):
+			(weapons[k] as Node3D).transform = _weapon_home[weapons[k]]
 	weapon_changed.emit(i, weapons[i])
+
+# A weapon bought later (the shotgun): goes on the camera in the next slot.
+func add_weapon(w: Node, equip := true) -> void:
+	camera.add_child(w)
+	w.owner = self
+	weapons.append(w)
+	_remember_weapon(w)
+	w.set_active(false)
+	weapon_added.emit(w)
+	if equip:
+		switch_weapon(weapons.size() - 1)
+
+# The idle shuffle offsets a weapon from where the scene put it, so remember the
+# transform each weapon came with.
+func _remember_weapon(w: Node) -> void:
+	if w is Node3D:
+		_weapon_home[w] = (w as Node3D).transform
+
+func has_weapon(display_name: String) -> bool:
+	for w in weapons:
+		if w.get("display_name") == display_name:
+			return true
+	return false
+
+func weapon_named(display_name: String) -> Node:
+	for w in weapons:
+		if w.get("display_name") == display_name:
+			return w
+	return null
 
 func current_weapon() -> Node:
 	return weapons[weapon_index] if weapon_index < weapons.size() else null
@@ -164,12 +328,21 @@ func take_damage(amount: float, from: Node3D = null) -> void:
 func is_dead() -> bool:
 	return health <= 0.0
 
-func add_mushrooms(n: int) -> void:
+func add_mushrooms(n: int, kind := "brown") -> void:
+	carried[kind] = int(carried[kind]) + n
 	mushrooms += n
 	mushrooms_changed.emit(mushrooms)
 
-func set_held(item: String) -> void:
+func drop_carried() -> Dictionary:
+	var out := carried.duplicate()
+	carried = {"brown": 0, "blue": 0, "red": 0}
+	mushrooms = 0
+	mushrooms_changed.emit(0)
+	return out
+
+func set_held(item: String, burger := {}) -> void:
 	held = item
+	held_burger = burger if item == "burger" else {}
 	held_changed.emit(item)
 
 # ----------------------------------------------------------- stations ----
@@ -212,6 +385,8 @@ func close_menu() -> void:
 	menu_changed.emit()
 
 func choose(i: int) -> void:
+	if menu_station and menu_station.has_method("options"):
+		menu_options = menu_station.options(self)   # live: cash and stock may have changed
 	if not menu_station or i < 0 or i >= menu_options.size() or not menu_options[i]["enabled"]:
 		return
 	var action: Callable = menu_options[i]["action"]

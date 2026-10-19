@@ -1,65 +1,61 @@
 extends SceneTree
-var failures:=0
+var failures: int = 0
 func _initialize() -> void: run.call_deferred()
 func check(ok: bool, label: String) -> void:
- print(("PASS " if ok else "FAIL ")+label)
- if not ok: failures+=1
+ print("PASS " if ok else "FAIL ", label)
+ if not ok: failures += 1
 func run() -> void:
  var main: Node3D=load("res://main.tscn").instantiate()
- main.set("auto_spawn",false)
+ main.auto_spawn=false
  root.add_child(main)
- var player: CharacterBody3D=main.get_node("Player")
+ var player: CharacterBody3D=main.player
  var gun: Node3D=player.get_node("Head/Camera3D/TestGun")
  gun.set_physics_process(false)
- check(player.weapons.size()==4 and player.current_weapon()==gun,"pistol, knife, Crop Duster and dagger share the player loadout")
- check(not gun.request_fire() and gun.ammo==15,"draw gate prevents a premature shot")
- gun._update(0.4)
- check(gun.request_fire() and gun.ammo==14,"player can fire the restored pistol")
- check(not gun.request_fire() and gun.ammo==14,"repeated input respects shot cooldown")
- gun._update(0.23)
- check(gun.request_fire() and gun.ammo==13,"pistol cycles for another shot")
- gun._update(0.23)
- check(gun.reload() and not gun.request_fire(),"reload blocks firing")
- gun._update(1.44)
- check(gun.ammo==13 and gun.reserve==90,"no ammunition transferred before magazine insertion")
- gun._update(0.02)
- check(gun.ammo==15 and gun.reserve==88,"insertion transfers only the missing rounds")
+ check(player.weapons.size()==4 and player.current_weapon()==gun,"OpenCode pistol starts in retained four-weapon loadout")
+ check(gun._pivot.visible and gun._view_anim.has_animation("reload"),"new model and reload animation load")
+ var slide: MeshInstance3D=gun._pivot.find_child("pistol_slide",true,false)
+ var finish: ShaderMaterial=slide.mesh.surface_get_material(0)
+ check(finish.get_shader_parameter("textured") and finish.get_shader_parameter("albedo_tex")!=null,"original textured pistol replaces stock gun in new hands")
+ check(not gun.request_fire() and gun.mag==12,"draw gate prevents premature shot")
+ gun._physics_process(0.4)
+ check(gun.request_fire() and gun.mag==11,"pistol fires one round")
+ check(not gun.request_fire() and gun.mag==11,"input respects cooldown")
+ gun._physics_process(0.23)
+ check(gun.request_fire() and gun.mag==10,"pistol cycles for another shot")
+ gun.reload()
+ check(gun.is_reloading() and not gun.request_fire(),"reload blocks firing")
+ gun._physics_process(0.5)
+ check(gun.mag==10 and gun.reserve==36,"reload has no early ammo grant")
+ check(gun._support.position.distance_to(gun._support_rest.origin)>0.1,"support hand releases the grip during reload")
  player.switch_weapon(1)
- gun._update(0.21)
- check(not gun.active and not gun.visible and gun.ammo==15,"holster hides the pistol and keeps inserted ammunition")
+ check(not gun.active and not gun._pivot.visible,"holstering hides the viewmodel")
+ gun._physics_process(1.2)
+ check(gun.mag==10 and gun.reserve==36,"holstering cancels incomplete reload")
  player.switch_weapon(0)
- gun._update(0.4)
- gun.ammo=5
- gun.reserve=10
+ gun._physics_process(0.4)
  gun.reload()
- gun._update(0.5)
- player.switch_weapon(2)
- gun._update(0.21)
- check(gun.ammo==5 and gun.reserve==10,"early reload cancellation cannot grant ammunition")
- player.switch_weapon(0)
- gun._update(0.4)
+ gun._physics_process(1.2)
+ check(gun.mag==12 and gun.reserve==34,"reload transfers only missing rounds")
+ gun.mag=5
+ gun.reserve=2
  gun.reload()
- gun._update(2.1)
- check(gun.ammo==15 and gun.reserve==0 and gun.state=="idle","limited reserve completes a valid reload")
- check(not gun.reload(),"full magazine prevents reload")
- gun.ammo=0
- check(not gun.request_fire() and gun.ammo==0,"empty pistol cannot shoot")
- check(not gun.reload(),"no reserve prevents empty reload")
- gun._pose()
- var slide: Node3D=gun.get("_slide")
- var native: Node3D=gun.get("_native_slide")
- check(absf(slide.position.z-native.position.z+0.035)<0.0001,"empty pistol visibly locks its slide back")
- gun.ammo=15
- gun._pose()
- check(slide.position.is_equal_approx(native.position),"loaded slide returns to battery")
+ gun._physics_process(1.2)
+ check(gun.mag==7 and gun.reserve==0,"limited reserve conserves ammo")
+ gun.mag=1
+ gun.reserve=3
+ gun.shoot()
+ check(gun.mag==0 and gun.is_reloading(),"last shot starts automatic reload")
+ check(gun._view_anim.current_animation=="reload","last shot does not overwrite reload clip with fire")
+ gun._physics_process(1.2)
+ check(gun.mag==3 and gun.reserve==0,"empty reload uses remaining reserve")
+ gun.mag=0
+ check(not gun.request_fire() and not gun.is_reloading(),"empty pistol with no reserve cannot fire")
+ gun.mag=12
  player.health=0.0
- check(not gun.request_fire() and not gun.reload(),"dead player cannot shoot or reload")
- var pivot: Node3D=gun.get("_pivot")
- check(pivot.find_children("*","CollisionObject3D",true,false).is_empty(),"pistol adds no world colliders")
- var shadows_off:=true
- for mesh: MeshInstance3D in pivot.find_children("*","MeshInstance3D",true,false):
-  if mesh.mesh!=null: shadows_off=shadows_off and mesh.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
- check(shadows_off,"pistol and hands cast no world shadows")
+ check(not gun.request_fire(),"dead player cannot fire")
+ gun.reload()
+ check(not gun.is_reloading(),"dead player cannot reload")
+ check(gun._pivot.find_children("*","CollisionObject3D",true,false).is_empty(),"viewmodel adds no player colliders")
  main.free()
  for i in 15: await process_frame
  print("%d failure(s)" % failures)

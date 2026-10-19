@@ -1,3 +1,17 @@
+# Current combined recovery — 2026-10-19
+
+Use `../Play_DriveThru.cmd` to play this combined project. Restored kitchen/serving
+art, GitHub main's newer cooking/prep/pump/Lancer/vehicles, OpenCode movement and
+new pistol hands, and the original textured pistol are integrated here. Original
+slots 1–4 remain; the purchased pump is appended and selectable with the wheel.
+R reloads firearms; Esc pauses. See docs/handover/RECOVERY_2026_10_19.md for provenance
+and verification. Older sections below record earlier stages of development.
+
+
+---
+
+Historical notes below (superseded by the recovery above).
+
 # Current combined playtest — 19 October 2026
 
 Open Play_DriveThru.cmd in the parent outputs folder. The menu, intro and bus cinematic now load the same game containing cooking, customer service, economy, storage, grill, shop terminal, waves, Scuttlers and mushroom pickups, plus the animated custom pistol, Crop Duster and revised knife/dagger hands.

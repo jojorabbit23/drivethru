@@ -22,6 +22,7 @@ const Palette = preload("res://core/palette.gd")
 @export var magnet_range := 2.6
 @export var collect_range := 0.75
 @export var value := 1
+@export var kind := "brown"        # brown (common), blue, red: which patty it makes
 
 var _t := randf() * TAU
 var _ready_to_collect := false
@@ -43,6 +44,12 @@ func _ready() -> void:
 	var mat := (MESH.surface_get_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
 	_halo = (mat.next_pass as ShaderMaterial).duplicate() as ShaderMaterial
 	mat.next_pass = _halo
+	# kind shows on the mushroom itself: brown as modelled, blue / red tinted,
+	# with the halo in the kind's colour (the light underneath stays amber)
+	const TINT := {"brown": Color(1, 1, 1), "blue": Color(0.55, 1.0, 1.0), "red": Color(1.0, 0.62, 0.45)}
+	const HALO := {"brown": Color("#F3A34D"), "blue": Color("#65C9C2"), "red": Color("#C96B35")}
+	mat.albedo_color = TINT.get(kind, Color.WHITE)
+	_halo.set_shader_parameter("glow_color", HALO.get(kind, Palette.AMBER_GLOW))
 	_model.material_override = mat
 	_light = OmniLight3D.new()
 	_light.name = "Glow"
@@ -126,7 +133,7 @@ func _clear_line(from: Vector3, to: Vector3) -> bool:
 func _collect(player: Node3D) -> void:
 	_taken = true
 	if player.has_method("add_mushrooms"):
-		player.add_mushrooms(value)
+		player.add_mushrooms(value, kind)
 	collected.emit(self)
 	remove_from_group("pickups")
 	var tw := create_tween().set_parallel(true)
