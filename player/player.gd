@@ -165,7 +165,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
-	if BurgerItems.tick(burgers, delta): held_changed.emit(held)
+	if BurgerItems.tick(burgers, delta, false, self): held_changed.emit(held)
 	var grounded := is_on_floor()
 	# Jump forgiveness: a short grace after walking off an edge, and a short
 	# buffer before you land, so a jump at the last moment isn't dropped.

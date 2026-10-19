@@ -28,7 +28,7 @@ func run() -> void:
 	for i in 4:
 		player.add_burger({"kind":["brown","blue","red","brown"][i],"quality":"perfect","hot_remaining":0.0 if i==1 else 140.0,"patties":["brown"]})
 		assert(main.serving_tray.deposit(player,i))
-	for kind in ["red","blue","brown"]:player.add_burger({"kind":kind,"quality":"perfect"})
+	for kind in ["red","blue","brown"]:player.add_burger({"kind":kind,"quality":"perfect","hot_remaining":{"red":150.0,"blue":70.0,"brown":20.0}[kind]})
 	player.selected_burger=0
 	player._sync_burger()
 	for i in 4:

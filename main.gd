@@ -30,6 +30,7 @@ const ShopTerminal = preload("res://game/shop_terminal.gd")
 const PrepBench = preload("res://game/prep_bench.gd")
 const HoldingTray = preload("res://game/holding_tray.gd")
 const OrderRail = preload("res://game/order_rail.gd")
+const DiscountBox = preload("res://game/discount_box.gd")
 const ServingTray = preload("res://game/serving_tray.gd")
 const BurgerBin = preload("res://game/burger_bin.gd")
 const BurgerItems = preload("res://game/burger_items.gd")
@@ -74,7 +75,7 @@ func _ready() -> void:
 	player.hurt.connect(func(_a, _f): _flash_damage())
 	player.died.connect(_on_player_died)
 	player.mushrooms_changed.connect(func(_n): _update_health())
-	wave_cleared.connect(player.unlock_burger_slots)
+	wave_started.connect(player.unlock_burger_slots)
 	for w in player.weapons:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
@@ -115,6 +116,8 @@ func _build_stations() -> void:
 	hatch = _station(CustomerWindow, "DriveThruWindow", Vector3(-3.0, 1.0, -5.0), 0.0)
 	serving_tray = _station(ServingTray,"ServingTray",Vector3(-3.0,1.02,-4.40),0.0)
 	burger_bin = _station(BurgerBin,"BurgerBin",Vector3(-1.82,0.20,-4.04),0.0)
+	var discount: Node=_station(DiscountBox,"DiscountBox",Vector3(-3.76,1.02,-4.40),0.0)
+	discount.tray=serving_tray
 	hatch.serving_tray=serving_tray
 	terminal = _station(ShopTerminal, "ShopTerminal", Vector3(-2.89, 0.77, iz - 0.29), 0.0)
 	bench = _station(PrepBench, "PrepBench", Vector3(0.79, 0.92, -iz + 0.325), 0.0)
@@ -357,6 +360,8 @@ func _update_status() -> void:
 		(entry.style as StyleBoxFlat).border_color=P.AMBER_GLOW if selected else P.BLUE_SLATE
 		(entry.icon as TextureRect).modulate=Color.WHITE if occupied else Color(1,1,1,0.22 if unlocked else 0.07)
 		(entry.icon as TextureRect).texture=Icons.texture("burger_"+String(player.burgers[i].get("kind","brown"))) if occupied else Icons.texture("burger")
+		(entry.badge as TextureRect).visible=occupied
+		if occupied:(entry.badge as TextureRect).texture=Icons.texture(BurgerItems.icon(player.burgers[i]))
 		(entry.label as Label).text=BurgerItems.timer(player.burgers[i]) if occupied else ("EMPTY" if unlocked else "W%d" % (i*3))
 		(entry.label as Label).modulate=P.AMBER_GLOW if occupied and BurgerItems.cold(player.burgers[i]) else P.WARM_CHALK
 	_hud["held_text"].text="V  SELECT  %d/%d" % [player.burgers.size(),player.burger_capacity]
@@ -525,7 +530,9 @@ func _build_hud() -> void:
 		column.add_child(label)
 		panel.add_child(column)
 		held.add_child(panel)
-		_burger_hud.append({"style":style,"icon":icon,"label":label})
+		var badge: TextureRect=_icon("freshness_fresh",20)
+		column.add_child(badge)
+		_burger_hud.append({"style":style,"icon":icon,"label":label,"badge":badge})
 	var held_icon: TextureRect=_burger_hud[0].icon
 	var held_text := _label("V  SELECT",14,P.ELECTRIC_TEAL)
 	held.add_child(held_text)

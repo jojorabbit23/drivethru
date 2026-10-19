@@ -101,9 +101,14 @@ with a copy from another branch. Do not hand-edit generated scenes or materials.
 
 Burger inventory update: use player.add_burger()/take_selected_burger(), not
 set_held(), for new gameplay. Burger dictionaries retain hot_remaining across
-inventory/tray transfers; never reset it on retrieval. Capacity unlocks after
-wave_cleared at 3/6/9, max four. ServingTray is boxed food, separate from the heated
+inventory/tray transfers; never reset it on retrieval. Capacity unlocks on
+wave_started at 3/6/9, max four. ServingTray is boxed food, separate from the heated
 patty tray. Sawn-off starts reserved in slot 3 but requires purchase; wheel skips it
 until bought. Both shotguns have independent ammo purchases. See
 docs/handover/BURGER_INVENTORY_TRAY.md; run burger_inventory_test.gd and the native
 capture_serving_inventory.gd interaction assertions alongside all existing checks.
+
+Rush shelf: age_seconds belongs to each burger; hot_remaining is a compatibility
+projection. Never reset either on transfer. Freshness stages and payments live in
+game/burger_items.gd. Discount Box shares the four tray spaces. The serving heater
+is separate from the patty warmer. See docs/handover/RUSH_SHELF.md.

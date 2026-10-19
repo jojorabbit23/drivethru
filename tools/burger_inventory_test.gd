@@ -17,7 +17,7 @@ func run() -> void:
 	main.serving_tray.set_physics_process(false)
 	check(player.burger_capacity==1,"one initial burger slot")
 	for wave in [3,6,9]:
-		main.wave_cleared.emit(wave)
+		main.wave_started.emit(wave)
 		check(player.burger_capacity==1+wave/3,"one additional slot every three waves")
 	player.unlock_burger_slots(30)
 	check(player.burger_capacity==4,"inventory caps at four slots")
@@ -79,6 +79,59 @@ func run() -> void:
 	check(main.bench.bag(player) and main.bench.bag(player) and player.burgers.size()==2 and main.economy.buns==buns-2,"two boxed burgers use two buns and occupy two slots")
 	player.burgers.clear();player._sync_burger()
 	check(not main.burger_bin.discard(player),"empty bin interaction consumes nothing")
+	# Rush shelf: precise state boundaries, irreversible age, and automatic sales.
+	var aged: Dictionary=item()
+	check(Items.state(aged)=="FRESH","fresh badge at pickup")
+	Items.tick([aged],50.0)
+	check(Items.state(aged)=="WARM","warm badge after 50 seconds")
+	Items.tick([aged],60.0)
+	check(Items.state(aged)=="COOLING","cooling badge after 110 seconds")
+	Items.tick([aged],40.0)
+	check(Items.state(aged)=="COLD" and Items.payment(aged)==[15,3],"cold at 150 seconds pays half")
+	Items.tick([aged],150.0)
+	check(Items.state(aged)=="VERY COLD" and Items.payment(aged)==[7,1],"very cold at 300 seconds pays quarter rounded down")
+	Items.tick([aged],150.0)
+	check(Items.spoiled(aged) and Items.payment(aged)==[0,0],"spoiled at 450 seconds has no sale value")
+	for i in 4:tray.items[i]={}
+	tray.items[0]=item("brown",0)
+	tray.items[1]=item("brown",150)
+	check(not Items.cold(tray.take_matching("brown")) and not tray.items[0].is_empty(),"fresh matching box is sold before cold matching box")
+	tray.items[1]=aged
+	check(tray.take_matching("red").is_empty(),"spoiled or wrong unmarked items cannot satisfy customer")
+	tray.items[0].discount=true
+	check(not tray.take_matching("red").is_empty(),"marked clearance burger can sell as discounted substitute")
+	for i in 4:tray.items[i]={}
+	main.economy.cash=1000
+	check(main.terminal.buy_serving_heater(player),"heated serving tray upgrade can be purchased")
+	check(not main.terminal.buy_serving_heater(player),"heater cannot be purchased twice")
+	var heated: Dictionary=item()
+	Items.tick([heated],299.0,true)
+	check(not Items.cold(heated),"heated shelf keeps a new burger hot for almost 300 seconds")
+	Items.tick([heated],1.0,true)
+	check(Items.cold(heated),"heated shelf reaches cold at 300 seconds")
+	Items.tick([heated],150.0,true)
+	check(Items.state(heated)=="VERY COLD","heater never reheats cold food")
+	tray.items[0]=item("brown",0)
+	tray._physics_process(20.0)
+	check(tray.warning_count==1,"cold tray produces one warning tick every twenty seconds")
+	for i in 4:tray.items[i]={}
+	car.free()
+	main.hatch.car=null
+	main.hatch.next_order="red"
+	for i in 3:tray.items[i]=item("red")
+	car=main.hatch.spawn_customer(3)
+	car.state="waiting"
+	cash=main.economy.cash
+	car.arrived.emit()
+	check(car.received==3 and car.state=="leaving","arrival automatically buys three pre-stocked burgers")
+	check(main.economy.cash-cash==114,"pre-stocked perfect burgers receive 25 percent tip bonus rounded to dollars")
+	check(main.hatch.collect_from_tray()==0,"arrival sale cannot duplicate payment")
+	player.burgers.clear();player._sync_burger()
+	player.add_burger(item("blue",0))
+	var discount: Node=main.get_node("DiscountBox")
+	check(discount.deposit(player) and tray.items[0].get("discount",false),"discount box puts selected cold item into shared tray space")
+	check(tray.pick_up(player,0) and Items.cold(player.held_burger),"clearance item can be retrieved for disposal without reheating")
+	check(main.burger_bin.discard(player),"clearance item can be binned")
 	main.free()
 	for i in 4:await process_frame
 	print("%d failure(s)" % failures)

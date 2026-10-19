@@ -1,3 +1,12 @@
+## Rush shelf update
+
+Burger slots and tray boxes now show freshness icons. Customers buy matching stock
+automatically, freshest first, with up to three burgers per late-game order. Pre-stocked
+hot food earns a 25% quality-tip bonus. Cold/very-cold food pays 50%/25%; spoiled food
+must be binned. The Discount Box shares the four tray spaces. A $180 heated serving
+tray upgrade doubles the hot period while shelved. Inventory unlocks at waves 3/6/9.
+See [rules and verification](docs/handover/RUSH_SHELF.md).
+
 Burger service update: V cycles carried burgers; E on an empty hatch-tray slot places the selected burger, E on a box retrieves it, and E at the hatch bin discards the selected item. Capacity starts at one and increases after clearing waves 3/6/9, to four. Burgers cool after 150 seconds including tray time; each cold item pays 50%. Both shotguns and separate shell packs are in the shop. See docs/handover/BURGER_INVENTORY_TRAY.md.
 
 Performance update: menu input targets 60 FPS, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.

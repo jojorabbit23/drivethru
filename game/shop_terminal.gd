@@ -86,6 +86,8 @@ func options(player: Node) -> Array:
 				_buy("Big box: %d + %d  $%d" % [Economy.BULK_PACK, Economy.BULK_PACK, Economy.BULK_PRICE], Economy.BULK_PRICE, "crate", buy_bulk.bind(player)),
 				back,
 			]
+		"serving":
+			return [_buy("Heated serving tray: 300s hot  $180",Economy.SERVING_HEATER_PRICE,"tray",buy_serving_heater.bind(player),not e.has_serving_heater,"Heated serving tray (installed)"),back]
 		"upgrades":
 			var opts := []
 			var next: Array = e.next_grill()
@@ -96,7 +98,7 @@ func options(player: Node) -> Array:
 				opts.append(_buy("%s (%s)  $%d" % [next[0], what, next[2]], int(next[2]), "cooking", buy_grill.bind(player)))
 			opts.append(_buy("Warming tray: holds %d patties  $%d" % [Economy.TRAY_SLOTS, Economy.TRAY_PRICE], Economy.TRAY_PRICE, "tray", buy_tray.bind(player), not e.has_tray, "Warming tray (installed)"))
 			opts.append(_buy("Drive-thru bell: customers wait longer  $%d" % Economy.BELL_PRICE, Economy.BELL_PRICE, "bell", buy_bell.bind(player), not e.has_bell, "Drive-thru bell (installed)"))
-			opts.append(back)
+			opts.append({"label":"More upgrades","enabled":true,"icon":"upgrade","action":_go.bind(player,"serving")})
 			return opts
 	return [
 		{"label": "Weapons and ammo", "enabled": true, "icon": "shotgun", "action": _go.bind(player, "weapons")},
@@ -183,3 +185,9 @@ func buy_bell(player: Node = null) -> bool:
 	if not economy().buy_bell():
 		return false
 	return _done(player, "bell")
+
+func buy_serving_heater(player: Node=null) -> bool:
+	if economy().has_serving_heater or not economy().spend(Economy.SERVING_HEATER_PRICE):return false
+	economy().has_serving_heater=true
+	economy().changed.emit()
+	return _done(player,"serving_heater")

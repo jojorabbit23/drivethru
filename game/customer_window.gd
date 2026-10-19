@@ -92,7 +92,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_next -= delta
 	if _next <= 0.0:
-		spawn_customer(randi_range(1,2))
+		spawn_customer(randi_range(1,3 if int(get_parent().get("wave"))>=6 else 2))
 
 func spawn_customer(quantity: int=1) -> Node3D:
 	if car != null and is_instance_valid(car):
@@ -103,13 +103,20 @@ func spawn_customer(quantity: int=1) -> Node3D:
 	get_parent().add_child(c)
 	var e := economy()
 	c.order = next_order if next_order != "" else Recipes.pick(e.served if e else 0)
-	c.quantity=clampi(quantity,1,2)
+	c.quantity=clampi(quantity,1,3)
 	c.patience *= patience_scale()
 	c.vehicle = next_vehicle
 	next_order = ""
 	next_vehicle = ""
 	c.setup(lane_start, lane_stop, lane_end)
-	c.arrived.connect(func(): customer_arrived.emit(c))
+	c.arrived.connect(func():
+		var stocked: Array=[]
+		if serving_tray!=null:
+			for b: Dictionary in serving_tray.items:
+				if not b.is_empty():BurgerItems.prepare(b);stocked.append(b.burger_id)
+		c.set_meta("prepared_ids",stocked)
+		customer_arrived.emit(c)
+		collect_from_tray())
 	c.left.connect(func(served: bool):
 		_next = randf_range(gap_min, gap_max)
 		if not served:
@@ -133,12 +140,13 @@ func prompt(player: Node) -> String:
 	if c.quantity-c.received>1:want+=" x%d" % (c.quantity-c.received)
 	if player.held == "burger":
 		var b: Dictionary = player.held_burger
+		if BurgerItems.spoiled(b):return "SPOILED BURGER  ·  use the kitchen bin"
 		if b.get("quality", "") == "burnt":
 			return "E  serve burnt salvage  ·  $%d%s" % [int(BurgerItems.payment(b)[0]),"  COLD (-50%)" if BurgerItems.cold(b) else ""]
 		if b.get("kind", "") != c.order:
 			return "WRONG BURGER  ·  they want %s" % want
 		var pay := BurgerItems.payment(b)
-		return "E  serve %s burger  ·  %s  $%d%s" % [want, "COLD (-50%)" if BurgerItems.cold(b) else (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
+		return "E  serve %s burger  ·  %s  $%d%s" % [want, (BurgerItems.state(b)+" (-75%)" if BurgerItems.age(b)>=300.0 else "COLD (-50%)") if BurgerItems.cold(b) else (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
 	return "DRIVE-THRU  ·  wants %s  ·  %ds" % [want, left]
 
 func interact(player: Node) -> void:
@@ -151,6 +159,7 @@ func serve(player: Node) -> bool:
 	if c == null or player.held != "burger":
 		return false
 	var b: Dictionary = player.held_burger
+	if BurgerItems.spoiled(b):return false
 	var quality: String = b.get("quality", "standard")
 	if quality != "burnt" and b.get("kind", "brown") != c.order:
 		Sfx.play(self, "click", -6.0)
@@ -166,12 +175,15 @@ func collect_from_tray() -> int:
 	while c.state=="waiting" and c.received<c.quantity:
 		var item: Dictionary=serving_tray.take_matching(c.order)
 		if item.is_empty():break
-		_pay(c,item)
+		_pay(c,item,true)
 		taken+=1
 	return taken
 
-func _pay(c: Node3D,b: Dictionary) -> void:
+func _pay(c: Node3D,b: Dictionary,from_tray: bool=false) -> void:
 	var pay: Array=BurgerItems.payment(b)
+	BurgerItems.prepare(b)
+	if from_tray and not BurgerItems.cold(b) and c.waited<=3.0 and b.burger_id in c.get_meta("prepared_ids",[]):
+		pay[1]=roundi(float(pay[1])*1.25)
 	var e := economy()
 	e.add_cash(int(pay[0]) + int(pay[1]))
 	c.received+=1
