@@ -10,7 +10,9 @@ width 2.5 m, height 2.03 m. Rolling radius 0.47 m. Cab offset -0.20 m aligns the
 actual driver-side window with the hatch rather than the car's bonnet.
 
 The cube driver's centre is local (0.68,1.40,0.20) inside the open driver window.
-The head is a 27 cm black cube with exactly two 4 cm white dots. Unshaded materials
+The head is a 27 cm black cube with exactly two 4 cm white dots. A fixed black
+rectangular torso (30 x 52 x 38 cm) sits beneath it in the chair, overlapping the
+head slightly so turning never opens a floating gap. Only the head tracks. Unshaded materials
 keep them plain black/white without adding lights or emission. The head smoothly
 turns towards the player's camera, so the dots follow their movement; pitch is
 limited to prevent tipping through the roof. Driver and dots cast no extra shadows.

@@ -10,6 +10,16 @@ func _ready() -> void:
 	var black:=StandardMaterial3D.new()
 	black.albedo_color=Color.BLACK
 	black.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+	# Seated torso stays fixed in the chair while only the head tracks the player.
+	var torso:=MeshInstance3D.new()
+	torso.name="SeatedBody"
+	var body_box:=BoxMesh.new()
+	body_box.size=Vector3(0.30,0.52,0.38)
+	torso.mesh=body_box
+	torso.position=Vector3(0,-0.36,0.015)
+	torso.material_override=black
+	torso.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(torso)
 	var cube:=MeshInstance3D.new()
 	cube.name="BlackCube"
 	var box:=BoxMesh.new()
