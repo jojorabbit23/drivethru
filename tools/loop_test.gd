@@ -3,6 +3,8 @@
 # kill -> collect -> store -> cook -> bag -> serve -> cash -> buy ammo -> waves
 extends SceneTree
 
+const Recipes = preload("res://game/recipes.gd")
+
 const DT := 1.0 / 60.0
 var main: Node3D
 var player: CharacterBody3D
@@ -314,6 +316,71 @@ func _run() -> void:
 	check(player.held_burger.get("kind") == "red" and main.tray.held.is_empty(), "then what's left on the tray before the grill: %s" % str(player.held_burger))
 	player.set_held("")
 	main.grill.scrape()
+	while main.grill.take_patty() != {}:
+		pass
+
+	print("== doubles and specials")
+	var early := {}
+	var later := {}
+	for i in 400:
+		early[Recipes.pick(0)] = true
+		later[Recipes.pick(3)] = true
+	check(early.keys().all(func(k): return Recipes.is_single(k)), "before 3 burgers are served, only singles: %s" % str(early.keys()))
+	check(later.has("double_brown") and later.has("special") and later.has("blue"), "after that, doubles and the special too: %s" % str(later.keys()))
+	if main.hatch.car != null and is_instance_valid(main.hatch.car):
+		main.hatch.car.queue_free()
+	main.hatch.car = null
+	main.hatch.next_order = "double_blue"
+	var dc: Node3D = main.hatch.spawn_customer()
+	dc.position = main.hatch.lane_stop
+	econ.stock = {"brown": 0, "blue": 5, "red": 2}
+	econ.add_supplies(4)
+	main.grill.add_patty("blue")
+	main.grill.slots[0]["t"] = 6.5
+	await wait(0.1)
+	check("double blue needs a ready blue patty too" in main.bench.prompt(player) and not main.bench.bag(player), "one blue ready isn't enough for a double: '%s'" % main.bench.prompt(player))
+	main.grill.add_patty("blue")
+	main.grill.slots[1]["t"] = 8.0
+	await wait(0.1)
+	check(main.bench.prompt(player) == "E  bag double blue burger  ·  PERFECT", "two are: '%s'" % main.bench.prompt(player))
+	check(main.bench.bag(player) and player.held_burger.get("kind") == "double_blue" and (player.held_burger.get("patties") as Array).size() == 2 and main.grill.count("ready") == 0, "it takes both: %s" % str(player.held_burger))
+	await wait(4.0)
+	if dc.state != "waiting":
+		dc.state = "waiting"
+	before = econ.cash
+	check(main.hatch.serve(player) and econ.cash - before == 50 + 6, "a double pays $50 (+$6 tip): got $%d" % (econ.cash - before))
+	await wait(0.2)
+	main.hatch.car = null
+	main.hatch.next_order = "special"
+	var spc: Node3D = main.hatch.spawn_customer()
+	spc.state = "waiting"
+	main.grill.add_patty("red")
+	main.grill.slots[0]["t"] = 7.0
+	await wait(0.1)
+	main.tray.store_from_grill()
+	main.grill.add_patty("blue")
+	main.grill.slots[0]["t"] = 6.2
+	main.grill.add_patty("blue")
+	main.grill.slots[1]["t"] = 6.1
+	await wait(0.1)
+	check("bag special burger" in main.bench.prompt(player) and "tray" in main.bench.prompt(player), "the special: red from the tray + blue from the grill: '%s'" % main.bench.prompt(player))
+	main.bench.bag(player)
+	check(player.held_burger.get("kind") == "special" and main.tray.held.is_empty() and main.grill.count("ready") == 1, "bagged: %s (tray %d, grill ready %d)" % [str(player.held_burger), main.tray.held.size(), main.grill.count("ready")])
+	var stack2: Node = null
+	for c in main.bench.get_children():
+		if c.get_script() == main.bench.BurgerStack:
+			stack2 = c
+	check(stack2 != null and stack2.get_child_count() >= 6, "built with two patties on the board")
+	before = econ.cash
+	check(main.hatch.serve(player) and econ.cash - before >= 60, "the special pays $60 + tip (got $%d)" % (econ.cash - before))
+	main.hatch.car = null
+	main.hatch.next_order = "double_red"
+	var wc: Node3D = main.hatch.spawn_customer()
+	wc.state = "waiting"
+	check(not main.bench.bag(player) and "double red needs 2 red patties" in main.bench.prompt(player), "with a double red on the ticket, the bench waits for 2 reds: '%s'" % main.bench.prompt(player))
+	player.set_held("burger", {"kind": "red", "quality": "perfect", "patties": ["red"]})
+	check("WRONG BURGER" in main.hatch.prompt(player) and not main.hatch.serve(player), "and a double red customer won't take a single red")
+	player.set_held("")
 	while main.grill.take_patty() != {}:
 		pass
 

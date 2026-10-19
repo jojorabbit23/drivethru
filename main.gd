@@ -30,6 +30,7 @@ const ShopTerminal = preload("res://game/shop_terminal.gd")
 const PrepBench = preload("res://game/prep_bench.gd")
 const HoldingTray = preload("res://game/holding_tray.gd")
 const OrderRail = preload("res://game/order_rail.gd")
+const Recipes = preload("res://game/recipes.gd")
 const MushroomPickupScript = preload("res://pickups/mushroom/mushroom_pickup.gd")
 
 var wave := 0
@@ -336,7 +337,7 @@ func _update_status() -> void:
 		var b: Dictionary = player.held_burger
 		(_hud["held_icon"] as TextureRect).texture = Icons.texture("burger_" + String(b.get("kind", "brown")))
 		var q: String = b.get("quality", "standard")
-		_hud["held_text"].text = "%s %s" % [Economy.KIND_NAME[b.get("kind", "brown")].to_upper(), "SALVAGE" if q == "burnt" else q.to_upper()]
+		_hud["held_text"].text = "%s %s" % [Recipes.name_of(String(b.get("kind", "brown"))).to_upper(), "SALVAGE" if q == "burnt" else q.to_upper()]
 
 func _update_menu() -> void:
 	var box: VBoxContainer = _hud["menu"]

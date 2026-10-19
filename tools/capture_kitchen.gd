@@ -3,7 +3,8 @@
 # Writes docs/previews/kitchen_patties.png (a mushroom dropped, smashed,
 # cooking, flipped, ready and burnt, for each kind) and kitchen_pass.png (the
 # counter with the ticket rail, the warming tray, the bench building a burger,
-# and the bell on the hatch).
+# and the bell on the hatch) and kitchen_recipes.png (the special's bubble,
+# a double's ticket, a double being built).
 extends SceneTree
 
 const OUT := "res://docs/previews/"
@@ -135,4 +136,45 @@ func _run() -> void:
 	await wait(4)
 	await grab()
 	sheet("kitchen_pass", 3)
+	# --- recipes: the special's bubble, a double's ticket, a double being built ---
+	player.set_held("")
+	main.hatch.car.queue_free()
+	main.hatch.car = null
+	await wait(2)
+	main.hatch.next_order = "special"
+	var sp: Node3D = main.hatch.spawn_customer()
+	sp.position = main.hatch.lane_stop
+	await wait(30)
+	sp.state = "waiting"
+	sp.position = main.hatch.lane_stop - Vector3(sp.CAB_FROM_CENTRE, 0, 0)
+	look(Vector3(-3.0, 1.62, -3.7), main.hatch.global_position + Vector3(0, 0.75, -1.6), 60)
+	await wait(4)
+	await grab()
+	sp.queue_free()
+	main.hatch.car = null
+	await wait(2)
+	main.hatch.next_order = "double_blue"
+	var db: Node3D = main.hatch.spawn_customer()
+	db.position = main.hatch.lane_stop
+	econ.store_mushrooms(4, "blue")
+	for i in 4:
+		g.take_slot(i)
+	g.add_patty("blue")
+	g.add_patty("blue")
+	await wait(20)
+	g.slots[0]["t"] = 6.5
+	g.slots[1]["t"] = 6.8
+	await wait(10)
+	look(Vector3(1.4, 1.85, -3.5), Vector3(1.4, 1.8, -4.75), 55)
+	await wait(4)
+	await grab()
+	look(Vector3(1.2, 1.45, -3.7), main.bench.global_position + Vector3(0.3, 0.05, 0.05), 45)
+	await wait(2)
+	main.bench.bag(player)
+	await wait(9)
+	await grab()
+	look(stand, Vector3(1.6, 1.25, -4.7), 62)
+	await wait(4)
+	await grab()
+	sheet("kitchen_recipes", 2)
 	quit()

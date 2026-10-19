@@ -1,6 +1,6 @@
 # Pixel-art icons drawn in code from the 9-colour palette (16x16, nearest
 # filtered): order bubbles, grill states, HUD.
-#   Icons.texture("burger")   burger | raw | cooking | ready | burnt | mushroom | bun | ammo
+#   Icons.texture("burger")   burger | burger_double | burger_special | raw | cooking | ready | burnt | mushroom | bun | ammo
 #                             | topping | grill | cancel | shotgun | shells | tray | bell
 #                             | crate | upgrade | back
 # Kinds: "burger_blue", "mushroom_red", ... recolour the patty / the cap:
@@ -21,6 +21,7 @@ const KEY := {
 # [rows to recolour, {from: to}] per base icon and kind
 const KIND_SWAP := {
 	"burger": {"rows": [8, 9, 10], "brown": {}, "blue": {"c": "s", "o": "e"}, "red": {"c": "o", "o": "a"}},
+	"burger_double": {"rows": [5, 6, 8, 9, 10], "brown": {}, "blue": {"c": "s", "o": "e"}, "red": {"c": "o", "o": "a"}},
 	"mushroom": {"rows": [1, 2, 3, 4, 5, 6], "brown": {"o": "b", "a": "o"}, "blue": {"o": "t", "a": "e"}, "red": {}},
 }
 
@@ -40,6 +41,40 @@ const ART := {
 		".cccccccccccccc.",
 		".cooooccccooooc.",
 		".cccccccccccccc.",
+		"..aaaaaaaaaaaa..",
+		"..oaaaaaaaaaao..",
+		"...oooooooooo...",
+		"................",
+		"................"],
+	"burger_double": [
+		"................",
+		".....aaaaaa.....",
+		"...aawaaawaaa...",
+		"..aaaaaaaaawaa..",
+		"..oooooooooooo..",
+		".cccccccccccccc.",
+		".cooooccccooooc.",
+		"..tetetetetete..",
+		".cccccccccccccc.",
+		".cooooccccooooc.",
+		".cccccccccccccc.",
+		"..aaaaaaaaaaaa..",
+		"..oaaaaaaaaaao..",
+		"...oooooooooo...",
+		"................",
+		"................"],
+	"burger_special": [
+		".......a........",
+		".....aaaaaa.....",
+		"...aawaaawaaa...",
+		"..aaaaaaaaawaa..",
+		"..oooooooooooo..",
+		".oooooooooooooo.",
+		".oaaaaooooaaaao.",
+		"..tetetetetete..",
+		".ssssssssssssss.",
+		".seeeesssseeees.",
+		".ssssssssssssss.",
 		"..aaaaaaaaaaaa..",
 		"..oaaaaaaaaaao..",
 		"...oooooooooo...",

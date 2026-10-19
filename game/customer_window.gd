@@ -7,6 +7,7 @@
 extends "res://game/station.gd"
 
 const Car = preload("res://game/customer_car.gd")
+const Recipes = preload("res://game/recipes.gd")
 
 signal customer_arrived(car: Node)
 signal customer_served(cash: int, tip: int)
@@ -93,7 +94,8 @@ func spawn_customer() -> Node3D:
 	c.set_script(Car)
 	c.name = "CustomerCar"
 	get_parent().add_child(c)
-	c.order = next_order if next_order != "" else pick_order()
+	var e := economy()
+	c.order = next_order if next_order != "" else Recipes.pick(e.served if e else 0)
 	c.patience *= patience_scale()
 	c.vehicle = next_vehicle
 	next_order = ""
@@ -119,14 +121,14 @@ func prompt(player: Node) -> String:
 			return "DRIVE-THRU  ·  customer pulling in"
 		return "DRIVE-THRU  ·  no customer yet"
 	var left := ceili(c.patience - c.waited)
-	var want: String = Economy.KIND_NAME[c.order].to_upper()
+	var want: String = Recipes.name_of(c.order).to_upper()
 	if player.held == "burger":
 		var b: Dictionary = player.held_burger
 		if b.get("quality", "") == "burnt":
 			return "E  serve burnt salvage  ·  $%d" % Economy.SALVAGE_PRICE
 		if b.get("kind", "") != c.order:
 			return "WRONG BURGER  ·  they want %s" % want
-		var pay := Economy.payment(b["quality"])
+		var pay := Economy.payment(b["quality"], c.order)
 		return "E  serve %s burger  ·  %s  $%d%s" % [want, (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
 	return "DRIVE-THRU  ·  wants %s  ·  %ds" % [want, left]
 
@@ -144,7 +146,7 @@ func serve(player: Node) -> bool:
 	if quality != "burnt" and b.get("kind", "brown") != c.order:
 		Sfx.play(self, "click", -6.0)
 		return false
-	var pay := Economy.payment(quality)
+	var pay := Economy.payment(quality, c.order)
 	player.set_held("")
 	var e := economy()
 	e.add_cash(int(pay[0]) + int(pay[1]))

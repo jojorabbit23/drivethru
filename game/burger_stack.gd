@@ -3,7 +3,7 @@
 # the patty (a pressed mushroom in its kind's colour, or charred), the topping
 # and the top bun drop onto the board one after another, a paper wrap folds up
 # round them, and the bag lifts away toward you.
-#   var s := BurgerStack.new(); bench.add_child(s); s.play(kind, burnt)
+#   var s := BurgerStack.new(); bench.add_child(s); s.play([kinds...], burnt)
 extends Node3D
 
 const P = preload("res://core/palette.gd")
@@ -14,14 +14,18 @@ const PATTY_SHADER := preload("res://game/patty.gdshader")
 
 const STEP := 0.11       # seconds between layers
 
-func play(kind: String, burnt := false) -> void:
-	var layers := [
-		_bun(false),
-		_patty(kind, burnt),
-		_topping(),
-		_bun(true),
-	]
-	var heights := [0.0, 0.03, 0.058, 0.07]
+func play(kinds: Array, burnt := false) -> void:
+	var layers := [_bun(false)]
+	var heights := [0.0]
+	var h := 0.03
+	for k: String in kinds:
+		layers.append(_patty(k, burnt))
+		heights.append(h)
+		h += 0.03
+	layers.append(_topping())
+	heights.append(h - 0.002)
+	layers.append(_bun(true))
+	heights.append(h + 0.01)
 	var tw := create_tween()
 	for i in layers.size():
 		var n: Node3D = layers[i]
@@ -31,7 +35,7 @@ func play(kind: String, burnt := false) -> void:
 		tw.tween_callback(func() -> void: n.visible = true)
 		tw.tween_property(n, "position:y", heights[i], STEP).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	# the wrap folds up round the stack
-	var wrap := _box(Vector3(0.15, 0.085, 0.15), Vector3(0, 0.045, 0), P.WARM_CHALK)   # a paper clamshell
+	var wrap := _box(Vector3(0.15, 0.06 + h, 0.15), Vector3(0, 0.03 + h * 0.5, 0), P.WARM_CHALK)   # a paper clamshell
 	wrap.scale = Vector3(1, 0.01, 1)
 	wrap.visible = false
 	tw.tween_callback(func() -> void: wrap.visible = true)

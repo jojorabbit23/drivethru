@@ -2,7 +2,7 @@
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · C spawn a Lancer · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 / 3 / 4 or mouse wheel switch weapon (4 = the shotgun, once bought) · LMB shoot (pistol, shotgun) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a Shambler · X spawn a Scuttler · C spawn a Lancer · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
 
 Zombies come in waves: the first Shambler arrives 3 seconds after you start, then a new zombie every **11 seconds**. Every third one is a **Scuttler** (set `scuttler_every`, or 0 to turn them off). From wave 2, every fifth is a **Lancer** (`lancer_every`). Each one comes down either the east lane (to Window A, in the kitchen) or the west lane (to Window B, in the back office), picked at random but never three in a row from the same side. The HUD (top right) counts down to the next one. Up to 12 can be alive at once; past that a spawn is skipped. Spawning stops when you die.
 
@@ -97,17 +97,22 @@ The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.
 | Station | Where | What E does |
 |---|---|---|
 | **Mushroom store** (`game/storage_bin.gd`) | storeroom, by the doorway | Stores everything you're carrying. The sign shows stock per kind. |
-| **Grill** (`game/grill.gd`) | kitchen flat-top | Patty menu: **Common xN / Blue xN / Red xN / Cancel**. The patty goes on the first free slot. You can also scrape off a burnt patty. |
-| **Prep bench** (`game/prep_bench.gd`) | left of the grill | One press: bun + topping + cooked patty = wrapped burger. It bags the ordered kind if one is ready, else the patty that's been waiting longest, else a burnt one as salvage. |
+| **Grill** (`game/grill.gd`) | kitchen flat-top | Patty menu: **Common xN / Blue xN / Red xN / Cancel**. The patty goes on the first free slot. You can also scrape off a burnt patty. **Look at a cooking patty and E flips it** (once): it cooks the rest 1.6× faster. |
+| **Prep bench** (`game/prep_bench.gd`) | left of the grill | One press: bun + topping + cooked patty (or two) = wrapped burger, built on the board in front of you. It makes what's on the order ticket and says what you'll get first ("bag blue burger · PERFECT"). |
+| **Warming tray** (`game/holding_tray.gd`) | the shelf over the counter, under a heat lamp | Once bought: moves up to 2 ready patties off the grill and keeps them at their quality. The bench uses them first. |
+| **Order rail** (`game/order_rail.gd`) | the wall above the counter | Not a station: it shows the current customer's ticket (burger, name, patience bar), so you can cook without walking to the hatch. |
 | **Drive-thru window** (`game/customer_window.gd`) | the service hatch | Serve the burger you're holding. |
-| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Ammo, supplies and grill upgrades. |
+| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Three pages: **Weapons and ammo**, **Kitchen supplies**, **Upgrades**. A page stays open after you buy, so you can buy twice. |
 
 - **Mushroom kinds** are the livestock. Shamblers drop **common brown** (20% blue). Scuttlers drop **blue** (30% red). Lancers always drop **red**. Pickups, carried counts, stock, patties and orders are all colour-coded with matching pixel icons.
-- **Orders:** a customer pulls up in the **armoured school bus** or the **armoured truck** ("ALL HAIL THE GRILL"), chosen at random. Both are built by `tools/build_vehicles.gd` from the owner's GLBs, at full detail with their tyres cut out so they roll by distance. The customer honks and shows a **pixel burger icon in its patty colour**, with no text: brown 55%, blue 30%, red 15%. They wait 50 s with a patience bar, and a missed order costs nothing. Clips: `docs/video/bus_wheels.mp4`, `docs/video/truck_customer.mp4`.
-- **Grill states**, per slot: RAW (0–1 s, grey) → COOKING (1–6 s, sizzle, steam, %) → READY (6–18 s, golden, bell, tick icon, countdown) → BURNT (black, smoke, cross icon, a repeating alarm). Each patty also shows its kind's mushroom. No state relies on colour alone.
+- **Orders:** a customer pulls up in the **armoured school bus** or the **armoured truck** ("ALL HAIL THE GRILL"), chosen at random. Both are built by `tools/build_vehicles.gd` from the owner's GLBs, at full detail with their tyres cut out so they roll by distance. The customer honks and shows a **pixel burger icon in its patty colour**, with no text: brown 55%, blue 30%, red 15%. They wait 50 s with a patience bar (75 s with the bell), and a missed order costs nothing. The same ticket slides down the kitchen's order rail.
+- **Recipes** (`game/recipes.gd`, from docs/COOKING_DESIGN.md "Later Recipes"): after you've served 3 burgers, customers also order a **Double** (two patties of one kind, $50) or the **Special** (a red and a blue patty, $60), each with its own icon. A double needs all its patties ready (the bench says what's missing: "the double red needs 2 red patties") and is only as good as its older patty. Tips as below. Clips: `docs/video/bus_wheels.mp4`, `docs/video/truck_customer.mp4`.
+- **The patty is the mushroom** (`game/patty.gdshader`): a whole one drops onto the plate gills-up (stalk showing, its cap in the kind's colour), the spatula presses it down, grease spits while it sizzles, and it browns, goldens, then chars. A flip turns it onto its gills, showing the seared cap.
+- **Grill states**, per slot: RAW (0–1 s) → COOKING (1–6 s, sizzle, steam, %) → READY (6–18 s, golden, bell, tick icon, countdown) → BURNT (charred, smoke, cross icon, a repeating alarm). The label says the kind and the number ("BLUE / 75%"). No state relies on colour alone.
 - **Quality** is set when you bag, by how long the patty sat READY. **Perfect** (≤ 4 s) pays $30 + $6, **Good** (≤ 8 s) $30 + $3, **Standard** $30. **Burnt salvage** pays $15 from any customer, so a mistake is recoverable. A burger of the wrong kind is refused.
-- **Grill upgrades** (terminal): Starter 2 slots → **Reinforced** 3 ($90) → **Restaurant** 4 ($180) → **Apocalypse** 4 with a 20 s ready window ($300).
-- **Supplies:** buns and toppings come in packs of 5 + 5 for $40 ($8 a burger, as designed). You start with 8 of each and 12 + 36 pistol rounds; ammo is 24 rounds for $12.
+- **Upgrades** (terminal): grills, Starter 2 slots → **Reinforced** 3 ($90) → **Restaurant** 4 ($180) → **Apocalypse** 4 with a 20 s ready window ($300); the **Warming tray** ($120, holds 2 cooked patties without losing quality); the **Drive-thru bell** ($100, customers wait 50% longer; a brass bell appears on the sill).
+- **Supplies:** buns and toppings come 5 + 5 for $40 ($8 a burger, as designed) or in the big box, 15 + 15 for $110. You start with 8 of each. The prep bench's bun tray and topping tub show what's left.
+- **Weapons and ammo:** pistol rounds, 24 for $12 (you start with 12 + 36); the **pump shotgun** for $150 (slot 4, see below), then 12 shells for $30.
 - **Cash:** $2 per kill. Pistol: 12-round magazine, 1.1 s reload, a reserve topped up at the terminal.
 - **Waves:** wave *n* sends 4 + 2*n* enemies, one every max(5, 12 − *n*) s, then a 20 s break.
 - **Auto-collect (F2):** pickups fly to you from anywhere.
@@ -116,7 +121,9 @@ The designs are `docs/GAME_DESIGN.md` (the whole loop) and `docs/COOKING_DESIGN.
 
 `tools/loop_test.gd` plays all of this headless. `tools/capture_loop.gd` renders `docs/previews/loop1..7*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
 
-**Not yet:** the double and special (red + blue) burgers, the heated holding tray / prep station / bun dispenser / bell system upgrades, deliveries and the supply runner, traps and power-ups.
+`tools/capture_kitchen.gd` renders `docs/previews/kitchen_patties.png` (the drop, press, flip and states), `kitchen_pass.png` (rail, tray, bench, bell) and `kitchen_recipes.png`.
+
+**Not yet:** the commercial prep station and bun dispenser upgrades, cheeseburgers, deliveries and the supply runner, traps and power-ups.
 
 ## The Shambler (first zombie)
 
@@ -339,6 +346,18 @@ The knife, arms and watch all use the same view-space depth shrink (same screen 
 
 The clip `docs/video/knife_kill.mp4` shows it in action.
 
+## The shotgun
+
+A pump-action shotgun, bought at the shop terminal for $150. It goes in **slot 4** (key 4 or the wheel) and comes with 6 shells in the tube and 6 spare; more are 12 for $30.
+
+- **Fire (LMB):** 8 pellets in a 3.5° cone, 15 damage each up to 6 m, falling to 35% by 20 m. Pellets that hit the same zombie add up into one body hit and one head hit, so one close blast kills a Shambler, and one to a Lancer's cap staggers it.
+- **Pump:** automatic after every shot, a 0.8 s cycle. Hold LMB to keep firing.
+- **Loading:** a 6-shell tube, loaded one shell every 0.45 s: when it runs dry, or by itself after 1.5 s without firing. Firing interrupts a reload if there's a shell in.
+- **Viewmodel:** `tools/build_shotgun.gd` builds a blocky pump gun in palette colours, and reuses Cleatimus's sculpted glove from the knife: on the pistol grip, and mirrored on the pump. The sleeves are stretched so the forearms run off the bottom of the screen. The kick, the pump (the left hand rides the fore-end) and shell loading (the gun rolls, the left hand feeds a shell) are animated in code in `weapons/shotgun/shotgun_weapon.gd`.
+- **Sound:** it asks `game/sfx.gd` for "shotgun", "pump" and "shell"; those play silence until they're added.
+
+`tools/shotgun_test.gd` covers buying and switching, pellet damage and falloff, a one-shot Shambler kill up close, the pump cycle, shell-by-shell loading, interrupting and topping up, spread at 4 m, and the Lancer. `tools/capture_shotgun_fp.gd` renders `docs/previews/shotgun_fp.png` (idle, kick, pump, loading) and `tools/capture_shotgun.gd` `docs/previews/shotgun_model.png`.
+
 ## Textures
 
 `tools/make_textures.gd` paints 23 small pixel textures into `textures/` using only palette colours. World-mapped surfaces use 64 px per 2 m.
@@ -377,7 +396,10 @@ godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tools/lancer_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tools/shotgun_test.gd
 ```
+
+To rebuild the shotgun's model and hands, run `godot --headless --path . --script res://tools/build_shotgun.gd`.
 
 To rebuild the mushroom pickup, run `godot --headless --path . --script res://tools/build_pickup.gd`. On a fresh checkout it first writes its textures; run `--import`, then run it again.
 
@@ -406,9 +428,9 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Not done yet
 
-- Deliveries, extra patty types, toppings, upgrades and traps are still to come (see the burger loop section). Zombies arrive on a steady 11 s clock rather than in escalating waves.
+- Deliveries, toppings, some kitchen upgrades and traps are still to come (see the burger loop section). Zombies arrive on a steady 11 s clock rather than in escalating waves.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
-- The player is a plain capsule with a camera and an invisible placeholder pistol. The PSX arms pack hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
+- The player is a plain capsule with a camera and an invisible placeholder pistol (the knife and the shotgun have proper viewmodels). The PSX arms pack's pistol hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.
 - There's no monster truck at the hatch.
 - The Shambler's rig is automatic and its animations are hand-keyed in code. They read well at game distance, but an animator pass in Blender would add polish, especially to the death and climb. Because the normal arm and the shirt are one continuous surface, lifting that arm high still stretches the armpit a little, so the clips keep it below about 65°.

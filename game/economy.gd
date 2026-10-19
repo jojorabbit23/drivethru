@@ -3,6 +3,8 @@
 # child of main (group "economy").
 extends Node
 
+const Recipes = preload("res://game/recipes.gd")
+
 signal changed
 
 # Mushroom kinds. Each makes its own patty and its own burger order.
@@ -154,8 +156,8 @@ static func quality_for(ready_for: float, burnt: bool) -> String:
 		return "good"
 	return "standard"
 
-# Payment for a burger of `quality`: [price, tip]
-static func payment(quality: String) -> Array:
+# Payment for a burger of `quality` (and recipe, game/recipes.gd): [price, tip]
+static func payment(quality: String, order := "brown") -> Array:
 	if quality == "burnt":
 		return [SALVAGE_PRICE, 0]
-	return [BURGER_PRICE, int(TIP.get(quality, 0))]
+	return [Recipes.price(order), int(TIP.get(quality, 0))]

@@ -22,7 +22,7 @@ const SLEEVE_STRETCH := 1.6
 # Hand sockets on the gun: position, and rotation in degrees (applied Y, X, Z).
 # The right hand's thumb runs up the pistol grip; the left hand's along the pump.
 const GRIP_SOCKET := [Vector3(0.0, 0.01, 0.015), Vector3(70.0, 0.0, 0.0), 0.0]   # pos, rot (x, y, z), roll about the handle
-const PUMP_SOCKET := [Vector3(0.0, 0.0, -0.07), Vector3(0.0, 0.0, 0.0), 74.0]
+const PUMP_SOCKET := [Vector3(0.0, 0.0, -0.07), Vector3(0.0, -8.0, 0.0), 62.0]
 
 var metal := StandardMaterial3D.new()
 var dark := StandardMaterial3D.new()

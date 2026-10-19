@@ -132,6 +132,14 @@ func take(want := "") -> Dictionary:
 	_refresh()
 	return {"kind": p["kind"], "ready_for": p["ready_for"], "burnt": false}
 
+func take_at(i: int) -> Dictionary:
+	if i < 0 or i >= held.size():
+		return {}
+	var p: Dictionary = held[i]
+	held.remove_at(i)
+	_refresh()
+	return {"kind": p["kind"], "ready_for": p["ready_for"], "burnt": false}
+
 func has_kind(kind: String) -> bool:
 	for p in held:
 		if p["kind"] == kind:

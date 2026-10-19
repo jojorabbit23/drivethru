@@ -1,6 +1,6 @@
 # The kitchen's ticket rail: a steel strip on the wall above the counter. When
 # a customer pulls in, a paper ticket slides down with their burger on it (the
-# kind's pixel icon and its name) and a bar that shrinks as their patience
+# recipe's pixel icon and its name) and a bar that shrinks as their patience
 # runs out, turning orange near the end. So you can see what to cook without
 # walking to the hatch. Not a station: it only shows.
 extends Node3D
@@ -9,6 +9,7 @@ const P = preload("res://core/palette.gd")
 const Icons = preload("res://game/icons.gd")
 const Economy = preload("res://game/economy.gd")
 const Sfx = preload("res://game/sfx.gd")
+const Recipes = preload("res://game/recipes.gd")
 
 var hatch: Node = null
 var _ticket: Node3D
@@ -29,7 +30,7 @@ func _ready() -> void:
 	_box(Vector3(0.03, 0.03, 0.01), Vector3(0, -0.01, 0.025), P.WET_CHARCOAL, _ticket)       # clip
 	_icon = Icons.sprite("burger", 0.0075)
 	_icon.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-	_icon.position = Vector3(0, -0.12, 0.024)
+	_icon.position = Vector3(0, -0.105, 0.024)
 	_ticket.add_child(_icon)
 	_name = Label3D.new()
 	_name.font_size = 18
@@ -37,7 +38,8 @@ func _ready() -> void:
 	_name.outline_size = 0
 	_name.modulate = P.WET_CHARCOAL
 	_name.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	_name.position = Vector3(0, -0.22, 0.024)
+	_name.position = Vector3(0, -0.205, 0.024)
+	_name.line_spacing = -2.0
 	_ticket.add_child(_name)
 	_bar_bg = _box(Vector3(0.16, 0.016, 0.004), Vector3(0, -0.255, 0.024), P.CONCRETE_GREY, _ticket)
 	_bar = _box(Vector3(0.16, 0.016, 0.004), Vector3(0, -0.255, 0.026), P.OXIDISED_TEAL, _ticket)
@@ -78,7 +80,7 @@ func _process(delta: float) -> void:
 		_shown_car = c
 		if c:
 			_icon.texture = Icons.texture("burger_" + String(c.order))
-			_name.text = "%s BURGER" % String(Economy.KIND_NAME[c.order]).to_upper()
+			_name.text = Recipes.name_of(c.order).to_upper().replace(" ", "\n")
 			_drop = 1.0
 			Sfx.play_at(self, "click", global_position, -10.0)
 	_ticket.visible = c != null

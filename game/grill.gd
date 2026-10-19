@@ -480,6 +480,14 @@ func take_patty(want := "", ready_only := false) -> Dictionary:
 	_clear(best)
 	return out
 
+# Takes slot i off, whatever it is. {} if empty.
+func take_slot(i: int) -> Dictionary:
+	if i < 0 or i >= slots.size() or slots[i]["state"] == "":
+		return {}
+	var out := describe(i)
+	_clear(i)
+	return out
+
 func scrape() -> bool:
 	var i := first("burnt")
 	if i < 0:
