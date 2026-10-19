@@ -349,6 +349,8 @@ func _update_menu() -> void:
 	# refresh live (patty counts, cash) while open
 	if player.menu_station.has_method("options"):
 		player.menu_options = player.menu_station.options(player)
+	if player.menu_station.has_method("menu_title"):
+		box.add_child(_label(player.menu_station.menu_title(), 18, P.ELECTRIC_TEAL))
 	var first := true
 	for i in player.menu_options.size():
 		var o: Dictionary = player.menu_options[i]

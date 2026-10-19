@@ -423,6 +423,9 @@ func prompt(player: Node) -> String:
 		return "E  place patty  ·  %d free slot%s" % [count(""), "" if count("") == 1 else "s"]
 	return "GRILL FULL  ·  bag ready patties at the prep bench"
 
+func menu_title() -> String:
+	return "GRILL  ·  %d of %d free" % [count(""), slot_count()]
+
 func interact(player: Node) -> void:
 	if flip(aimed_slot(player)):
 		return

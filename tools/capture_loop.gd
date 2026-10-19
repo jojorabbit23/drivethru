@@ -105,6 +105,7 @@ func _run() -> void:
 	# 6. shop terminal
 	await stand_look(Vector3(-2.9, 0, 3.4), main.terminal.global_position + Vector3(0, 0.18, 0))
 	player.use_focus()
+	player.use_focus()          # the weapons page
 	await wait(8)
 	await snap("loop6_terminal")
 	player.close_menu()

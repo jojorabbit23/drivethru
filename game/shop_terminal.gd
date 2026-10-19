@@ -41,6 +41,10 @@ func _refresh() -> void:
 	var title := "SHOP" if page == "" else page.to_upper()
 	_screen.text = "%s\n$%d" % [title, e.cash if e else 0]
 
+func menu_title() -> String:
+	var names := {"": "SHOP", "weapons": "SHOP  ·  WEAPONS AND AMMO", "supplies": "SHOP  ·  KITCHEN SUPPLIES", "upgrades": "SHOP  ·  UPGRADES"}
+	return "%s  ·  $%d" % [names.get(page, "SHOP"), economy().cash]
+
 func prompt(_player_node: Node) -> String:
 	return "E  SHOP TERMINAL  ·  $%d" % economy().cash
 
