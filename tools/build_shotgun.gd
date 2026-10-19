@@ -16,8 +16,12 @@ extends SceneTree
 const Palette = preload("res://core/palette.gd")
 const OUT := "res://weapons/shotgun/"
 const KNIFE_VM := "res://weapons/knife/knife_viewmodel.tscn"
-const SLEEVE_FROM := 0.14     # handle-space z where the sleeve starts stretching
-const SLEEVE_STRETCH := 1.6
+const SKIN := "res://weapons/shotgun/source/Shotgun_Survivor_Skin.glb"
+const CUT := 0.14              # along the forearm: keep the glove and cuff up to here
+const SLEEVE_R0 := 0.045       # new sleeve radius at the cuff ...
+const SLEEVE_R1 := 0.058       # ... and at the elbow
+const SLEEVE_LEN := 0.62
+const SLEEVE_UV := Vector2(0.0, 0.2)   # the sleeve fabric on the arms atlas
 
 # Hand sockets on the gun: position, and rotation in degrees (applied Y, X, Z).
 # The right hand's thumb runs up the pistol grip; the left hand's along the pump.
@@ -50,60 +54,151 @@ func build_hands() -> Array:
 	var inv := knife0.affine_inverse()
 	var out := []
 	for mirror in [false, true]:
-		var a := src.surface_get_arrays(0)
-		var v: PackedVector3Array = PackedVector3Array(a[Mesh.ARRAY_VERTEX])
-		var n: PackedVector3Array = PackedVector3Array(a[Mesh.ARRAY_NORMAL])
-		# the knife hand's sleeve is a short stub: stretch it along its own
-		# direction so the forearm runs off the bottom of the screen
-		var arm_dir := Vector3.ZERO
-		for i in v.size():
-			var q: Vector3 = inv * v[i]
-			if q.z > 0.2:
-				arm_dir += q
-		arm_dir = arm_dir.normalized()
+		var a := _unindexed(src.surface_get_arrays(0))
+		var v: PackedVector3Array = a[Mesh.ARRAY_VERTEX]
+		var n: PackedVector3Array = a[Mesh.ARRAY_NORMAL]
 		for i in v.size():
 			v[i] = inv * v[i]
-			if v[i].z > SLEEVE_FROM:
-				v[i] += arm_dir * (v[i].z - SLEEVE_FROM) * SLEEVE_STRETCH
 			n[i] = (inv.basis * n[i]).normalized()
 			if mirror:
 				v[i].x = -v[i].x
 				n[i].x = -n[i].x
-		a[Mesh.ARRAY_VERTEX] = v
-		a[Mesh.ARRAY_NORMAL] = n
-		a[Mesh.ARRAY_BONES] = null
-		a[Mesh.ARRAY_WEIGHTS] = null
-		a[Mesh.ARRAY_TANGENT] = null
+		# The knife hand's sleeve is a short cone that tapers to a point. Keep
+		# the glove and its cuff (up to CUT along the forearm), drop the cone,
+		# and grow a proper sleeve out of the cuff instead.
+		var arm_dir := Vector3.ZERO
+		for q in v:
+			if q.z > 0.2:
+				arm_dir += q
+		arm_dir = arm_dir.normalized()
+		var cuff := Vector3.ZERO
+		var nc := 0
+		for q in v:
+			var t := q.dot(arm_dir)
+			if t > CUT - 0.03 and t < CUT:
+				cuff += q
+				nc += 1
+		cuff /= maxf(nc, 1)
+		var keep := PackedInt32Array()
+		for tri in range(0, v.size(), 3):
+			if v[tri].dot(arm_dir) <= CUT and v[tri + 1].dot(arm_dir) <= CUT and v[tri + 2].dot(arm_dir) <= CUT:
+				keep.append(tri)
+		a = _take_triangles(a, keep)
+		v = a[Mesh.ARRAY_VERTEX]
 		if mirror:
-			# mirroring turns the triangles inside out: swap their winding
-			var idx = a[Mesh.ARRAY_INDEX]
-			if idx != null:
-				var ix := PackedInt32Array(idx)
-				for t in range(0, ix.size(), 3):
-					var k := ix[t + 1]
-					ix[t + 1] = ix[t + 2]
-					ix[t + 2] = k
-				a[Mesh.ARRAY_INDEX] = ix
-			else:
-				for arr_i in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
-					if a[arr_i] == null:
-						continue
-					var arr = a[arr_i]
-					for t in range(0, arr.size(), 3):
-						var k = arr[t + 1]
-						arr[t + 1] = arr[t + 2]
-						arr[t + 2] = k
-					a[arr_i] = arr
+			_flip_winding(a)
 		var m := ArrayMesh.new()
 		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, a)
 		m.surface_set_material(0, src.surface_get_material(0))
+		# the sleeve starts tucked inside the cuff, so there's no seam to see
+		var start := cuff - arm_dir * 0.02
+		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _sleeve(start, arm_dir, a))
+		m.surface_set_material(1, src.surface_get_material(0))
 		var path := OUT + ("shotgun_hand_l.res" if mirror else "shotgun_hand_r.res")
 		ResourceSaver.save(m, path)
 		m.take_over_path(path)
-		print("hand %s: %d vertices, aabb %s" % ["left" if mirror else "right", v.size(), m.get_aabb()])
+		print("hand %s: %d glove vertices kept, sleeve from %s along %s" % ["left" if mirror else "right", v.size(), start, arm_dir])
 		out.append(m)
 	vm.queue_free()
 	return out
+
+# An 8-sided sleeve: SLEEVE_R0 at the cuff widening to SLEEVE_R1 at the elbow,
+# SLEEVE_LEN long (well off the bottom of the screen). Its UVs sit in the
+# sleeve's fabric on the arms atlas; its vertex colour is the cuff's average.
+func _sleeve(start: Vector3, dir: Vector3, glove: Array) -> Array:
+	var side := dir.cross(Vector3.UP).normalized()
+	if side.length() < 0.1:
+		side = dir.cross(Vector3.RIGHT).normalized()
+	var up := side.cross(dir).normalized()
+	var col := Color(1, 1, 1)
+	if glove[Mesh.ARRAY_COLOR] != null:
+		var cs: PackedColorArray = glove[Mesh.ARRAY_COLOR]
+		var gv: PackedVector3Array = glove[Mesh.ARRAY_VERTEX]
+		var acc := Color(0, 0, 0, 0)
+		var k := 0
+		for i in gv.size():
+			if gv[i].dot(dir) > CUT - 0.04:
+				acc += cs[i]
+				k += 1
+		if k > 0:
+			col = acc / k
+	var verts := PackedVector3Array()
+	var norms := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var cols := PackedColorArray()
+	const SEG := 8
+	var rings := [[0.0, SLEEVE_R0], [SLEEVE_LEN * 0.5, (SLEEVE_R0 + SLEEVE_R1) * 0.5], [SLEEVE_LEN, SLEEVE_R1]]
+	for r in rings.size() - 1:
+		var a0: Array = rings[r]
+		var a1: Array = rings[r + 1]
+		for s in SEG:
+			var quad := []
+			for corner in [[a0, s], [a1, s], [a1, s + 1], [a0, s + 1]]:
+				var ring: Array = corner[0]
+				var ang: float = TAU * float(corner[1]) / SEG + PI / SEG
+				var radial: Vector3 = side * cos(ang) + up * sin(ang)
+				quad.append([start + dir * float(ring[0]) + radial * float(ring[1]), radial, Vector2(SLEEVE_UV.x + 0.08 * float(corner[1]) / SEG, SLEEVE_UV.y + 0.25 * float(ring[0]) / SLEEVE_LEN)])
+			for idx in [0, 2, 1, 0, 3, 2]:
+				var c: Array = quad[idx]
+				verts.append(c[0])
+				norms.append((c[1] as Vector3))
+				uvs.append(c[2])
+				cols.append(col)
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = verts
+	arr[Mesh.ARRAY_NORMAL] = norms
+	arr[Mesh.ARRAY_TEX_UV] = uvs
+	arr[Mesh.ARRAY_TEX_UV2] = uvs
+	arr[Mesh.ARRAY_COLOR] = cols
+	return arr
+
+# Arrays with ARRAY_INDEX expanded, bones/weights/tangents dropped.
+static func _unindexed(a: Array) -> Array:
+	var out := []
+	out.resize(Mesh.ARRAY_MAX)
+	var idx = a[Mesh.ARRAY_INDEX]
+	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
+		if a[k] == null:
+			continue
+		if idx == null:
+			out[k] = a[k].duplicate()
+		else:
+			var src = a[k]
+			var dst = src.duplicate()
+			dst.resize(0)
+			for i: int in idx:
+				dst.append(src[i])
+			out[k] = dst
+	return out
+
+static func _take_triangles(a: Array, starts: PackedInt32Array) -> Array:
+	var out := []
+	out.resize(Mesh.ARRAY_MAX)
+	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
+		if a[k] == null:
+			continue
+		var src = a[k]
+		var dst = src.duplicate()
+		dst.resize(0)
+		for s: int in starts:
+			dst.append(src[s])
+			dst.append(src[s + 1])
+			dst.append(src[s + 2])
+		out[k] = dst
+	return out
+
+# mirroring turns the triangles inside out: swap their winding
+static func _flip_winding(a: Array) -> void:
+	for k in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_TEX_UV2, Mesh.ARRAY_COLOR]:
+		if a[k] == null:
+			continue
+		var arr = a[k]
+		for t in range(0, arr.size(), 3):
+			var tmp = arr[t + 1]
+			arr[t + 1] = arr[t + 2]
+			arr[t + 2] = tmp
+		a[k] = arr
 
 # ------------------------------------------------------------- model ----
 func build_model(hand_r: Mesh, hand_l: Mesh) -> void:
@@ -148,10 +243,42 @@ func build_model(hand_r: Mesh, hand_l: Mesh) -> void:
 	socket(gun, gun, "GripSocket", GRIP_SOCKET, hand_r, "RightHand")
 	marker(gun, "MuzzleTip", Vector3(0, 0.072, -0.72))
 	marker(gun, "LoadPort", Vector3(0, 0.0, -0.085))
+	apply_skin(gun)
 	var ps := PackedScene.new()
 	ps.pack(gun)
 	var err := ResourceSaver.save(ps, OUT + "shotgun_model.tscn")
 	print("saved shotgun_model.tscn err=%d" % err)
+
+# The owner's "survivor" skin (weapons/shotgun/source/Shotgun_Survivor_Skin.glb):
+# the same parts, re-UV'd and textured. Each part here takes the skin's mesh,
+# material and transform by name; textures stay nearest-filtered (pixel look).
+func apply_skin(gun: Node3D) -> void:
+	if not ResourceLoader.exists(SKIN):
+		print("no skin at %s: flat colours" % SKIN)
+		return
+	var skin: Node = (load(SKIN) as PackedScene).instantiate()
+	var n := 0
+	for src: Node in skin.find_children("*", "MeshInstance3D", true, false):
+		var mi := src as MeshInstance3D
+		var dst := gun.find_child(mi.name, true, false) as MeshInstance3D
+		if dst == null:
+			continue
+		# own copies (saved into the scene); textures stay the skin's PNGs
+		var mesh := mi.mesh.duplicate() as ArrayMesh
+		for si in mesh.get_surface_count():
+			var src_mat := mesh.surface_get_material(si) as BaseMaterial3D
+			if src_mat:
+				var mat := src_mat.duplicate() as BaseMaterial3D
+				mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+				mat.metallic = 0.0
+				mat.roughness = 0.85
+				mesh.surface_set_material(si, mat)
+		dst.mesh = mesh
+		dst.material_override = null
+		dst.transform = mi.transform
+		n += 1
+	skin.free()
+	print("skin applied to %d parts" % n)
 
 func box(parent: Node3D, n: String, size: Vector3, pos: Vector3, mat: Material, own: Node = null) -> MeshInstance3D:
 	var m := MeshInstance3D.new()

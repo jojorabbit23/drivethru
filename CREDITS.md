@@ -8,6 +8,7 @@ The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Pro
 
 ## Project assets
 
+- Shotgun survivor skin (`weapons/shotgun/source/Shotgun_Survivor_Skin.glb` and its textures): supplied by the project owner.
 - Pixel lettering sheet (`fonts/pixel/source/lettering_sheet.png`), the source of the game font: supplied by the project owner.
 - Shambler, Scuttler, Lancer (`stylized_creature.glb`), armoured school bus and armoured truck (`vehicles/*/source/`), mushroom pickup, survival knife and knife-hand (`reference_hand_with_dagger.glb`, its dagger removed at build time) models: supplied by the project owner (`enemies/*/source/`, `pickups/mushroom/source/`, `weapons/knife/source/`).
 - Shop, textures, rig, animations, ooze and tools: made for this project.
