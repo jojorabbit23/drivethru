@@ -22,6 +22,9 @@ func _ready() -> void:
  last=actor.global_position
  var props: Node3D=preload("res://presentation/kitchen/visuals.gd").new()
  add_child(props)
+ var shadows: Node=preload("res://presentation/shadow_budget.gd").new()
+ shadows.name="ShadowBudget"
+ add_child(shadows)
  if DisplayServer.get_name()=="headless":
   set_physics_process(false)
   return

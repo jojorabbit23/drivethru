@@ -2,7 +2,7 @@
 extends RefCounted
 const PATH: String="user://presentation.cfg"
 static var initialized: bool=false
-static var values: Dictionary={"master":0.85,"effects":0.85,"ambience":0.45,"cinematics":0.85,"ui":0.80,"sensitivity":0.0025,"fullscreen":false,"camera_roll":true,"mute_unfocused":true}
+static var values: Dictionary={"master":0.85,"effects":0.85,"ambience":0.45,"cinematics":0.85,"ui":0.80,"sensitivity":0.0025,"fullscreen":false,"camera_roll":true,"mute_unfocused":true,"full_shadows":false}
 static var focused: bool=true
 static var ui_theme: Theme
 static func interactive() -> bool:
@@ -80,7 +80,7 @@ static func settings_controls(container: VBoxContainer) -> void:
   row.add_child(slider)
   row.add_child(readout)
   container.add_child(row)
- for pair: Array in [["Fullscreen","fullscreen"],["Camera damage roll","camera_roll"],["Mute audio when unfocused","mute_unfocused"]]:
+ for pair: Array in [["Fullscreen","fullscreen"],["Full lighting shadows (higher GPU cost)","full_shadows"],["Camera damage roll","camera_roll"],["Mute audio when unfocused","mute_unfocused"]]:
   var toggle:=CheckButton.new()
   toggle.text=pair[0]
   toggle.button_pressed=bool(values[pair[1]])

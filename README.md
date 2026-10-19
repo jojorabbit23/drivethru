@@ -1,3 +1,5 @@
+Performance update: menu input targets 60 FPS, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
+
 # Current combined recovery — 2026-10-19
 
 Use `../Play_DriveThru.cmd` to play this combined project. Restored kitchen/serving

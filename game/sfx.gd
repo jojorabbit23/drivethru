@@ -18,7 +18,7 @@ static func stream(name: String) -> AudioStreamWAV:
 	return s
 
 static func play(node: Node, name: String, volume_db := -6.0) -> void:
-	if DisplayServer.get_name() == "headless": return
+	if DisplayServer.get_name() == "headless" and name == "pistol": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer.new()
@@ -29,7 +29,6 @@ static func play(node: Node, name: String, volume_db := -6.0) -> void:
 	p.play()
 
 static func play_at(node: Node, name: String, at: Vector3, volume_db := 0.0) -> void:
-	if DisplayServer.get_name() == "headless": return
 	if not node.is_inside_tree():
 		return
 	var p := AudioStreamPlayer3D.new()
