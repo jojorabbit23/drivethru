@@ -16,3 +16,5 @@ The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Pro
 PSX Firearms Free by heyheythere - https://heyheythere.itch.io/psx-firearms-free - CC BY 4.0
 
 The supplied pack and full licence are retained in addons/psx_firearms/. Adaptations use its pistol/shotgun hands and animation hierarchy, remove its weapon geometry, apply the project HD glove/sleeve textures, and fit the project owner's custom pistol and Crop Duster. Crop Duster breech textures and 1024px game-view texture copies are derived from the owner-supplied model; its source remains intact. The custom pistol and synthetic audio are restored from the earlier project FPS prototype.
+
+- Main menu lettering and zombie/burger intro clips: supplied by the project owner. Menu uses cropped atlas regions of the supplied overlay; video editing/alignment and final-frame hovering loop prepared for this project.
