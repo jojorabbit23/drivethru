@@ -2,7 +2,7 @@
 
 Godot 4.3+ project. Open `project.godot` and press **F5** to walk around the shop.
 
-**Controls:** WASD move · Shift sprint · Space jump · 1 / 2 or mouse wheel switch weapon · LMB shoot (pistol) or slash (knife) · RMB stab (knife) · hold E at a window to repair · Z spawn a zombie · R restart · L show/hide room labels · Esc free the mouse (click to recapture)
+**Controls:** WASD move · Shift sprint · Space jump · 1 pistol / 2 knife / 3 Crop Duster (or mouse wheel) · LMB fire / slash · RMB aim / stab · R reload firearms (restart after death, or while holding knife) · F inspect firearms · hold E repair · Z spawn zombie · L labels · Esc release mouse (click to recapture)
 
 The first Shambler comes down Window A's lane (east, kitchen side) three seconds after you start.
 
