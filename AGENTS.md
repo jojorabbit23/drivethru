@@ -8,7 +8,7 @@ A Godot **4.3** first-person zombie-siege game set in a roadside drive-through.
 The player is Cleatimus Maximus, a redneck mushroom farmer. Read `README.md`
 for the full tour; it describes every system that exists today.
 
-The current task brief is `docs/handover/KNIFE_HANDS.md`.
+The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the burger loop) is built; see README.
 
 ## Hard rules
 
@@ -40,6 +40,7 @@ The current task brief is `docs/handover/KNIFE_HANDS.md`.
    godot --headless --path . --fixed-fps 60 --script res://tools/spawn_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/scuttler_test.gd
    godot --headless --path . --fixed-fps 60 --script res://tools/pickup_test.gd
+   godot --headless --path . --fixed-fps 60 --script res://tools/loop_test.gd
    ```
    The harmless engine message `Parameter "m" is null` in headless runs can be ignored.
 4. **Check visuals by rendering, not by assuming.** Headless runs have no
@@ -64,6 +65,7 @@ enemies/shambler shambler.gd (behaviour), built model + animations, source GLB
 enemies/scuttler scuttler.gd (behaviour), built model + IK animations, source GLB
 weapons/knife    knife_weapon.gd (gameplay), built model, source GLB
 pickups/mushroom glowing mushroom dropped by dead enemies (script, glow shader, built mesh)
+game/            the burger loop: economy, stations (store, grill, drive-thru, terminal), cars, pixel icons, synth sounds
 player/          player.gd (movement, health, repair, weapon switching), test_gun.gd
 levels/shop      generated shop scene
 tools/           build scripts, tests, capture/film scripts
@@ -71,7 +73,7 @@ docs/            previews, videos, handover briefs
 ```
 
 Physics layers: 1 world · 2 barricades · 3 player · 4 enemies (bodies and
-head hitboxes) · 5 player_clip.
+head hitboxes) · 5 player_clip · 6 interact (station look-zones, Area3D with meta "station").
 
 Weapons are children of `Player/Head/Camera3D` that implement
 `set_active(on: bool)`. The player collects them in order (slot 1 = pistol,

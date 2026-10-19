@@ -7,10 +7,19 @@ const Hitscan = preload("res://core/hitscan.gd")
 
 signal hit(target: Node, headshot: bool, killed: bool)
 signal fired
+signal ammo_changed(mag: int, reserve: int)
 
 @export var damage := 34.0
 @export var fire_interval := 0.22
 @export var reach := 60.0
+@export var mag_size := 12
+@export var reload_time := 1.1
+@export var start_reserve := 36   # 12 + 36 to start; buy more at the shop terminal
+@export var infinite_ammo := false
+
+var mag := 12
+var reserve := 36
+var _reloading := 0.0
 
 var _cooldown := 0.0
 var active := true
@@ -22,6 +31,8 @@ func set_active(on: bool) -> void:
 var _flash: OmniLight3D
 
 func _ready() -> void:
+	mag = mag_size
+	reserve = start_reserve
 	_flash = OmniLight3D.new()
 	_flash.light_color = Color("#F3A34D")
 	_flash.light_energy = 0.0
@@ -32,6 +43,13 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_cooldown -= delta
+	if _reloading > 0.0:
+		_reloading -= delta
+		if _reloading <= 0.0:
+			var n := mini(mag_size - mag, reserve)
+			mag += n
+			reserve -= n
+			ammo_changed.emit(mag, reserve)
 	_flash.light_energy = maxf(0.0, _flash.light_energy - delta * 40.0)
 	_flash.visible = _flash.light_energy > 0.0
 	var player := owner as Node
@@ -40,8 +58,37 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed("fire") and _cooldown <= 0.0 and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		shoot()
 
+func add_ammo(n: int) -> void:
+	reserve += n
+	if mag == 0 and _reloading <= 0.0:
+		reload()
+	ammo_changed.emit(mag, reserve)
+
+func reload() -> void:
+	if _reloading > 0.0 or mag >= mag_size or reserve <= 0:
+		return
+	_reloading = reload_time
+	ammo_changed.emit(mag, reserve)
+
+func is_reloading() -> bool:
+	return _reloading > 0.0
+
 # Public so tests and future weapons can call it directly.
+# Returns {} without firing when the magazine is empty (and starts a reload).
 func shoot() -> Dictionary:
+	if not infinite_ammo:
+		if _reloading > 0.0:
+			return {}
+		if mag <= 0:
+			_cooldown = fire_interval
+			const Sfx = preload("res://game/sfx.gd")
+			Sfx.play(self, "click", -8.0)
+			reload()
+			return {}
+		mag -= 1
+		ammo_changed.emit(mag, reserve)
+		if mag == 0:
+			reload()
 	_cooldown = fire_interval
 	_flash.light_energy = 3.0
 	_flash.visible = true

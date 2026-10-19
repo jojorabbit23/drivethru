@@ -1,11 +1,11 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" path="res://textures/steel.png" id="1_ui5xq"]
+[ext_resource type="Texture2D" path="res://textures/steel.png" id="1_d4ksk"]
 
 [resource]
 resource_name = "steel"
 albedo_color = Color(0.82, 0.9, 0.96, 1)
-albedo_texture = ExtResource("1_ui5xq")
+albedo_texture = ExtResource("1_d4ksk")
 metallic = 0.35
 metallic_specular = 0.25
 roughness = 0.92

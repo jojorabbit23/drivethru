@@ -7,6 +7,9 @@ signal health_changed(health: float, max_health: float)
 signal hurt(amount: float, from: Node3D)
 signal died
 signal mushrooms_changed(count: int)
+signal focus_changed(station: Node)
+signal menu_changed
+signal held_changed(item: String)
 
 @export var walk_speed := 4.2
 @export var sprint_speed := 6.5
@@ -22,7 +25,17 @@ signal mushrooms_changed(count: int)
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var health := 0.0
-var mushrooms := 0                 # glowing mushrooms picked up from dead enemies
+var mushrooms := 0                 # glowing mushrooms picked up from dead enemies (carried)
+var held := ""                     # item in hand: "" or "burger" (a bagged burger)
+
+# Stations (game/station.gd) are looked at and used with E. A station may open
+# a small menu: options are {label, enabled, action: Callable, icon}; keys 1-4
+# pick one, E picks the first enabled one. Looking away closes it.
+const INTERACT_LAYER := 32         # physics layer 6 "interact"
+@export var interact_reach := 2.3
+var focus: Node = null
+var menu_station: Node = null
+var menu_options: Array = []
 var repair_window: Node3D = null   # window currently in reach (for the HUD)
 var repair_progress := 0.0         # 0..1 toward the next board
 var _shake := 0.0
@@ -81,6 +94,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
+	elif menu_station and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_4:
+		choose(event.physical_keycode - KEY_1)
+	elif event.is_action_pressed("interact") and focus:
+		use_focus()
 	elif event.is_action_pressed("weapon_1"):
 		switch_weapon(0)
 	elif event.is_action_pressed("weapon_2"):
@@ -109,6 +126,7 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 	move_and_slide()
+	_update_focus()
 	_update_repair(delta)
 	if _shake > 0.0:
 		_shake = maxf(0.0, _shake - delta * 3.0)
@@ -147,10 +165,60 @@ func add_mushrooms(n: int) -> void:
 	mushrooms += n
 	mushrooms_changed.emit(mushrooms)
 
+func set_held(item: String) -> void:
+	held = item
+	held_changed.emit(item)
+
+# ----------------------------------------------------------- stations ----
+func _update_focus() -> void:
+	var found: Node = null
+	if not is_dead():
+		var from := camera.global_position
+		var q := PhysicsRayQueryParameters3D.create(from, from - camera.global_basis.z * interact_reach, 1 | INTERACT_LAYER, [get_rid()])
+		q.collide_with_areas = true
+		var hit := get_world_3d().direct_space_state.intersect_ray(q)
+		if not hit.is_empty() and hit["collider"] is Area3D and (hit["collider"] as Area3D).has_meta("station"):
+			found = (hit["collider"] as Area3D).get_meta("station")
+	if found != focus:
+		focus = found
+		if menu_station and menu_station != focus:
+			close_menu()
+		focus_changed.emit(focus)
+
+# E on the focused station: pick from its open menu, or let it act.
+func use_focus() -> void:
+	if not focus or is_dead():
+		return
+	if menu_station == focus:
+		for i in menu_options.size():
+			if menu_options[i]["enabled"]:
+				choose(i)
+				return
+		close_menu()
+		return
+	focus.interact(self)
+
+func open_menu(station: Node, options: Array) -> void:
+	menu_station = station
+	menu_options = options
+	menu_changed.emit()
+
+func close_menu() -> void:
+	menu_station = null
+	menu_options = []
+	menu_changed.emit()
+
+func choose(i: int) -> void:
+	if not menu_station or i < 0 or i >= menu_options.size() or not menu_options[i]["enabled"]:
+		return
+	var action: Callable = menu_options[i]["action"]
+	close_menu()
+	action.call()
+
 # ------------------------------------------------------------ repair ----
 func _update_repair(delta: float) -> void:
 	repair_window = null
-	if is_dead():
+	if is_dead() or focus:
 		return
 	var best := repair_reach
 	for w in get_tree().get_nodes_in_group("windows"):

@@ -88,6 +88,30 @@ Bullets and enemies ignore this layer. The player's mask is `1 | 2 | 16`. Add cl
 - If you slide along a wall past an open doorway, you drift in and brush the far frame. That's normal physics, not a snag.
 - The windows can't be climbed. Their sills sit just above jump height, and the opening is shorter than the player even with the boards gone. If you raise `jump_velocity` above about 4.2, rerun the test.
 
+## The burger loop (first playable slice)
+
+The design is in `docs/GAME_DESIGN.md`. This is its "first playable vertical slice": **kill → collect → store → cook → serve → cash → buy ammo → survive waves**. Look at a station and press **E**. Menus list numbered options: press **1–4** for a specific option, or **E** for the first available one.
+
+| Station | Where | What E does |
+|---|---|---|
+| **Mushroom store** (`game/storage_bin.gd`) | storeroom, by the doorway | Stores every mushroom you're carrying. The sign and the heap show the stock. |
+| **Grill** (`game/grill.gd`) | kitchen flat-top | Menu: bag a ready burger (uses a bun), scrape a burnt patty, or put a common patty on (uses a stored mushroom). |
+| **Drive-thru window** (`game/customer_window.gd`) | the service hatch | With a bagged burger in hand: serve the waiting car. |
+| **Shop terminal** (`game/shop_terminal.gd`) | the back-office CRT | Buy 24 pistol rounds for $12, or 10 buns for $40. |
+
+- **Grill states:** each of the 3 slots runs RAW (grey, 1 s) → COOKING (browning, steam, sizzle, % shown; done at 6 s) → READY (golden, bell, tick icon, countdown) → BURNT at 18 s (black, heavy smoke, cross icon). Every state has its own colour, icon, word, particles and sound, so none relies on colour alone.
+- **Customers:** a car drives up the road to the hatch, honks and plays an order chime. A pixel-burger speech bubble shows its order, with a patience bar (teal → amber → orange, 50 s). Correctly served, it pays **$30** plus a speed tip: **$6** in the first third, **$2** in the second, nothing after. A missed customer drives away with no penalty and no payment. Then the next car comes after 18–32 s.
+- **Cash:** **$2 per kill**, plus burger sales (`game/economy.gd` holds all the prices). You start with $0, 12 buns and 12 + 36 pistol rounds.
+- **Pistol ammo:** 12-round magazine, automatic 1.1 s reload, and a reserve you top up at the terminal. An empty gun clicks.
+- **Waves:** wave *n* sends 4 + 2*n* enemies (every third one is a Scuttler), one every max(5, 12 − *n*) s. That's 6 enemies 11 s apart in wave 1. Clearing a wave gives a 20 s break before the next.
+- **Auto-collect (F2):** the accessibility option from the design. Every dropped mushroom flies to you from anywhere.
+- **HUD:** cash, carried mushrooms, mushrooms in store, buns and what you're holding (top left); the wave (top right); ammo (bottom right); the station prompt and menu (bottom centre); announcements (top centre).
+- **Art and sound:** icons are 16×16 pixel art drawn in code from the 9 palette colours (`game/icons.gd`). Sounds (bell, horn, chime, till, sizzle, click) are synthesised in code (`game/sfx.gd`), so there are no asset files.
+
+`tools/loop_test.gd` plays the whole loop headless (38 checks). `tools/capture_loop.gd` renders `docs/previews/loop1..6*.png`, and `tools/film_loop.gd` films `docs/video/burger_loop.mp4`.
+
+**Not yet** (the design's "after this loop feels good" list): blue, red and rare patties, double patties, cheese and toppings, defended delivery runs, building upgrades, traps and power-ups.
+
 ## The Shambler (first zombie)
 
 `enemies/shambler/` is built from your `voxel_zombie_3d_model.glb`. The original is kept in `source/`.
@@ -318,7 +342,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Not done yet
 
-- No customers, deliveries, stock or economy. Mushrooms are counted but nothing spends them yet. Zombies arrive on a steady 11 s clock rather than in escalating waves.
+- Deliveries, extra patty types, toppings, upgrades and traps are still to come (see the burger loop section). Zombies arrive on a steady 11 s clock rather than in escalating waves.
 - The delivery door is a closed `StaticBody3D`, hinged at its west edge so it can be animated open later.
 - The player is a plain capsule with a camera and an invisible placeholder pistol. The PSX arms pack hasn't been wired in. `Head/Camera3D` is where it goes; the near clip is already 0.01 to suit it.
 - The upgraded "redneck fortress" exterior isn't built yet. The concept's neon, floodlights, sandbag walls, fire barrels, plated windows and spikes are a natural next tier.

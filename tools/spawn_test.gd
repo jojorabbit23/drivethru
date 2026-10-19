@@ -35,8 +35,9 @@ func _run() -> void:
 				spawns.append([t, (z.window as Node).name, z, (z as Node3D).global_position])
 	var times := spawns.map(func(s): return "%.1f" % s[0])
 	print("  spawns at: ", ", ".join(times))
-	var expected := int((120.0 - main.first_zombie_delay) / interval) + 1
-	check(spawns.size() == expected, "%d zombies in 2 minutes (expected %d)" % [spawns.size(), expected])
+	# waves: nobody kills them here, so wave 1 never clears and its size caps the count
+	var expected := mini(main.wave_size(1), int((120.0 - main.first_zombie_delay) / interval) + 1)
+	check(spawns.size() == expected, "%d zombies in 2 minutes: all of wave 1 (expected %d)" % [spawns.size(), expected])
 	check(absf(spawns[0][0] - main.first_zombie_delay) < 0.1, "first one at %.1f s" % spawns[0][0])
 	var gaps_ok := true
 	for i in range(1, spawns.size()):

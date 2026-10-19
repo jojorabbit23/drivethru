@@ -388,8 +388,7 @@ func kitchen() -> void:
 	b.box(g, "steel", Vector3(1.5, 0, z0), Vector3(2.7, 0.85, z1), true)
 	b.box(g, "metal", Vector3(1.52, 0.85, z0 + 0.02), Vector3(2.68, 0.92, z1 - 0.02), true)
 	b.box(g, "steel", Vector3(1.5, 0.92, z0), Vector3(2.7, 1.15, z0 + 0.05), false)
-	for i in 4:
-		b.prism(g, "patty", Vector3(1.75 + i * 0.27, 0.92, z0 + 0.3 + (i % 2) * 0.15), 0.09, 0.03, 8)
+	# (the griddle starts empty: patties are cooked on it in play, game/grill.gd)
 	b.box(g, "steel", Vector3(2.7, 0, z0), Vector3(3.6, 0.92, z1), true)
 	for k in 2:
 		var fx := 2.78 + k * 0.42

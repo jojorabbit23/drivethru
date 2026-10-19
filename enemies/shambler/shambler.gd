@@ -163,13 +163,28 @@ func _breach(delta: float) -> void:
 	velocity.z = 0.0
 	_face(-window.outward(), delta)
 	if window.is_breached():
-		_start_climb()
+		if not _window_busy():
+			_start_climb()
+		else:
+			_play("idle")
 		return
 	_play("rip")
 	var p := anim.current_animation_position
 	if _anim_prev_pos < RIP_MOMENT and p >= RIP_MOMENT:
 		window.rip_board()
 	_anim_prev_pos = p
+
+# One at a time through a window: two climbing together landed on the same
+# spot, and two capsules started exactly inside each other never separate.
+func _window_busy() -> bool:
+	for z in get_tree().get_nodes_in_group("zombies"):
+		if z == self or not (z is CharacterBody3D) or z.get("window") != window:
+			continue
+		if z.get("state") == State.CLIMB:
+			return true
+		if z.get("state") == State.HUNT and (z as Node3D).global_position.distance_to(window.repair_point()) < 0.6:
+			return true
+	return false
 
 func _start_climb() -> void:
 	state = State.CLIMB
