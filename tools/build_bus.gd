@@ -5,7 +5,8 @@
 #   godot --headless --path . --script res://tools/build_bus.gd
 # The source faces +Z (snow plough at the front). Output faces -Z like every
 # other model here, origin on the ground at the middle, LENGTH metres long,
-# a little blockier (fewer triangles, flat shaded) to sit with the zombies.
+# Geometry and normals are kept as sculpted: simplifying it (as the knife is)
+# shredded the wheels, plough and roof cargo, so the bus is left whole.
 # Output: res://vehicles/school_bus/bus_model.tscn (+ bus_mesh.res, bus_material.tres, bus_albedo.png)
 extends SceneTree
 
@@ -13,8 +14,7 @@ const BlockyMesh = preload("res://tools/blocky_mesh.gd")
 const SRC := "res://vehicles/school_bus/source/armored_school_bus.glb"
 const OUT := "res://vehicles/school_bus/"
 const LENGTH := 6.0
-const TEX_SIZE := 1024
-const KEEP := 0.5
+const TEX_SIZE := 2048
 
 func _initialize() -> void:
 	var doc := GLTFDocument.new()
@@ -52,12 +52,11 @@ func _initialize() -> void:
 	keep[Mesh.ARRAY_TEX_UV] = arr[Mesh.ARRAY_TEX_UV]
 	keep[Mesh.ARRAY_INDEX] = arr[Mesh.ARRAY_INDEX]
 	var before := BlockyMesh.triangle_count(keep)
-	keep = BlockyMesh.flat(BlockyMesh.simplify(keep, KEEP))
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, keep)
 	var mat := StandardMaterial3D.new()
 	mat.albedo_texture = load(albedo)
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	mat.roughness = 0.8
 	mat.metallic_specular = 0.3
 	ResourceSaver.save(mat, OUT + "bus_material.tres")
