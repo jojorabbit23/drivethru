@@ -30,7 +30,14 @@ var _arms_anim: AnimationPlayer
 var _gun_anim: AnimationPlayer
 var _left_hand: Node3D
 var _pump: Node3D
-var _support_offset:=Vector3.ZERO
+var _grip_in_hand:=Vector3.ZERO
+var _support_basis_in_gun:=Basis.IDENTITY
+var _holster_start:=Transform3D.IDENTITY
+var _reload_requested:=false
+var _reload_plan: Array[bool]=[true,true]
+var _reload_initial_loaded: Array[bool]=[false,false]
+var _left_forearm: Node3D
+var _forearm_direction:=Vector3(0.12,-0.20,-0.23).normalized()
 var _flash: OmniLight3D
 var _sound: AudioStreamPlayer
 var _shell_materials: Array[ShaderMaterial]=[]
@@ -49,8 +56,10 @@ func _ready() -> void:
  _pump=_arms.find_child("fp_pump_shotgun_pump",true,false)
  _arms_anim.play("idle")
  _arms_anim.seek(0.0,true)
- _pump.position=Vector3(0,0.055,0.257)
- _support_offset=_gun.to_local(_left_hand.global_position)-Vector3(0.015,0.24,0.18)
+ _pump.position=Vector3(0,0.078,0.280)
+ _grip_in_hand=_left_hand.to_local(_gun.to_global(Vector3(0.015,0.24,0.18)))
+ _support_basis_in_gun=_gun.global_basis.orthonormalized().inverse()*_left_hand.global_basis.orthonormalized()
+ _left_forearm=_arms.find_child("fp_pump_shotgun_forearm_l",true,false)
  var mesh: MeshInstance3D=_gun.find_child("Shotgun_SkinnedMesh",true,false)
  for surface in range(5,11):
   var mat: ShaderMaterial=mesh.mesh.surface_get_material(surface).duplicate()
@@ -70,6 +79,8 @@ func _ready() -> void:
  _pose(0.0)
 func set_active(on: bool) -> void:
  var was_active: bool=active
+ if was_active and not on: _holster_start=_pivot.transform
+ _reload_requested=false
  active=on
  visible=on or was_active
  state="draw" if on else ("holster" if was_active else "idle")
@@ -105,16 +116,30 @@ func _physics_process(delta: float) -> void:
  _update(delta)
 func reload() -> bool:
  if not can_act() or state!="idle" or ammo==2 or reserve<=0: return false
+ if cooldown>0.0:
+  _reload_requested=true
+  return true
+ _reload_requested=false
+ _reload_initial_loaded.assign(loaded)
+ var available: int=reserve
+ for i in 2:
+  _reload_plan[i]=not loaded[i] and available>0
+  if _reload_plan[i]: available-=1
  state="reload"
  clock=0.0
  _click()
  return true
 func _update(delta: float) -> void:
  if not active and state!="holster": return
+ var remaining_cooldown: float=cooldown
+ var action_delta: float=delta
  cooldown=maxf(0.0,cooldown-delta)
  recoil=move_toward(recoil,0.0,delta*4.5)
+ if _reload_requested and cooldown<=0.0:
+  reload()
+  action_delta=maxf(0.0,delta-remaining_cooldown)
  var previous: float=clock
- clock+=delta
+ clock+=action_delta
  idle_time+=delta
  sway=sway.lerp(Vector2.ZERO,1.0-exp(-10.0*delta))
  if state=="reload":
@@ -148,6 +173,7 @@ func shoot() -> bool:
   return false
  var barrel: int=0 if loaded[0] else 1
  loaded[barrel]=false
+ _flash.position.x=-0.044 if barrel==0 else 0.044
  cooldown=0.42
  recoil=1.0
  ammo_changed.emit()
@@ -185,6 +211,13 @@ func shoot() -> bool:
  return true
 func _pose(_delta: float) -> void:
  if _gun==null: return
+ if state=="holster":
+  # Freeze the current grip and open action while the whole weapon lowers.
+  # Reversing draw here would snap an interrupted reload closed on screen.
+  var lower: float=smoothstep(0.0,0.22,clock)
+  _pivot.transform=_holster_start
+  _pivot.position+=Vector3(0,-0.50*lower,0.12*lower)
+  return
  var reload_t: float=clock if state=="reload" else 0.0
  var clip: String="idle"
  var sample: float=fmod(idle_time,3.0)
@@ -203,6 +236,9 @@ func _pose(_delta: float) -> void:
  elif cooldown>0.15:
   clip="fire"
   sample=clampf((0.42-cooldown)/0.27,0.0,1.0)*0.2666667
+ _left_hand.position=Vector3(0.0312899,-0.0274160,-0.0141472)
+ _left_hand.rotation=Vector3.ZERO
+ _left_forearm.transform=Transform3D.IDENTITY
  _arms_anim.play(clip,0.0)
  _arms_anim.seek(sample,true)
  var reload_weight: float=smoothstep(0.0,0.4,reload_t)*(1.0-smoothstep(2.95,3.4,reload_t))
@@ -212,28 +248,49 @@ func _pose(_delta: float) -> void:
  _pivot.position+=anchor-_pivot.basis*anchor+Vector3(0,0.02,0)*reload_weight
  _gun_anim.play("reload_empty" if state=="reload" else "idle",0.0)
  _gun_anim.seek(minf(reload_t,RELOAD_TIME),true)
- _pump.position=Vector3(0,0.055,0.257)
+ if state=="reload":
+  for i in 2:
+   if _reload_initial_loaded[i]:
+    # Leave an unfired shell in its chamber instead of ejecting it like a spent case.
+    var bone: int=_mechanics.find_bone("shell_left" if i==0 else "shell_right")
+    var seated: Transform3D=_mechanics.get_bone_rest(bone)
+    _mechanics.set_bone_pose_position(bone,seated.origin)
+    _mechanics.set_bone_pose_rotation(bone,seated.basis.get_rotation_quaternion())
+ _pump.position=Vector3(0,0.078,0.280)
  var support:=Vector3(0.015,0.24,0.18)
  var hinge: Transform3D=_mechanics.get_bone_global_pose(_mechanics.find_bone("barrel_hinge"))
  var rest: Transform3D=_mechanics.get_bone_global_rest(_mechanics.find_bone("barrel_hinge"))
  var moving: Vector3=(hinge*rest.affine_inverse())*support
  var left_point: Vector3=moving
  if state=="reload":
-  var shell_l: Vector3=_gun.to_local(_mechanics.to_global(_mechanics.get_bone_global_pose(_mechanics.find_bone("shell_left")).origin))
-  var shell_r: Vector3=_gun.to_local(_mechanics.to_global(_mechanics.get_bone_global_pose(_mechanics.find_bone("shell_right")).origin))
+  var shell_l: Vector3=_shell_grip_point(0)
+  var shell_r: Vector3=_shell_grip_point(1)
+  if not _reload_plan[0]: shell_l=Vector3(-0.12,-0.10,-0.12)
+  if not _reload_plan[1]: shell_r=moving
   var keys: Array=[ [0.0,moving],[0.45,moving],[0.85,Vector3(-0.13,0.11,-0.08)],[1.35,Vector3(-0.12,-0.10,-0.12)],[1.75,shell_l],[1.95,shell_l],[2.12,Vector3(-0.12,-0.10,-0.12)],[2.28,shell_r],[2.45,shell_r],[2.7,moving],[3.4,moving] ]
   for i in keys.size()-1:
    if reload_t<=float(keys[i+1][0]):
     var u: float=smoothstep(float(keys[i][0]),float(keys[i+1][0]),reload_t)
     left_point=(keys[i][1] as Vector3).lerp(keys[i+1][1],u)
     break
- _left_hand.global_position=_gun.to_global(left_point+_support_offset)
+ # A palm-space anchor keeps the grasp on the fore-end/shell as the wrist rotates.
+ _left_hand.global_basis=_gun.global_basis.orthonormalized()*(hinge.basis*rest.basis.inverse()).orthonormalized()*_support_basis_in_gun
+ _left_hand.global_position=_gun.to_global(left_point)-_left_hand.global_basis*_grip_in_hand
+ # Keep the sleeve coming from below-left instead of following the barrel's full tilt.
+ var elbow: Vector3=camera.to_global(Vector3(-0.36,-0.50,0.05))
+ var direction: Vector3=_left_hand.global_basis.inverse()*(elbow-_left_hand.global_position).normalized()
+ var turn:=Quaternion(_forearm_direction,direction.normalized())
+ _left_forearm.quaternion=Quaternion.IDENTITY.slerp(turn,0.65)
  var sight: Vector3=camera.to_local(_gun.to_global(Vector3(0,0.36,-0.02)))
  _pivot.position+=Vector3(-sight.x,-sight.y-0.015,0)*aim_weight
  _update_shell_visibility()
+func _shell_grip_point(index: int) -> Vector3:
+ var bone: int=_mechanics.find_bone("shell_left" if index==0 else "shell_right")
+ var shell: Transform3D=_mechanics.get_bone_global_pose(bone)
+ return _gun.to_local(_mechanics.to_global(shell*Vector3(0,0,0.012)))
 func _update_shell_visibility() -> void:
  for i in 2:
-  var approaching: bool=state=="reload" and reserve>0 and clock>=(1.45 if i==0 else 2.05)
+  var approaching: bool=state=="reload" and _reload_plan[i] and clock>=(1.45 if i==0 else 2.05)
   var show_shell: bool=loaded[i] or approaching or (state=="reload" and clock<0.75)
   for part in 3:
    _shell_materials[i*3+part].set_shader_parameter("visible_part",show_shell)

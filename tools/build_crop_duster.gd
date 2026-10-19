@@ -17,6 +17,32 @@ static func recolour(original: ArrayMesh, kind: int, wrist: Vector3=Vector3.ZERO
  mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
  mesh.surface_set_material(0,load("res://weapons/knife/cleatimus_arms_material.tres"))
  return mesh
+# Change vertex geometry only: node scales would also enlarge the held gun and
+# move the animation anchors. Equal positions receive equal offsets at UV seams.
+static func bulk_up(original: ArrayMesh, origin: Vector3, axis: Vector3, sleeve: bool) -> ArrayMesh:
+ var arrays: Array=original.surface_get_arrays(0)
+ var vertices: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+ var normals: PackedVector3Array=arrays[Mesh.ARRAY_NORMAL]
+ var along: Vector3=axis.normalized()
+ for i in vertices.size():
+  var relative: Vector3=vertices[i]-origin
+  var radial: Vector3=relative-along*relative.dot(along)
+  var radius: float=radial.length()
+  var factor:=1.0
+  if sleeve:
+   factor=1.40
+  elif radius>0.0001:
+   # Preserve the inner grip while adding padding on the outside of the glove.
+   factor=1.0+0.008*smoothstep(0.025,0.055,radius)/radius
+  vertices[i]=origin+along*relative.dot(along)+radial*factor
+  var normal: Vector3=normals[i]
+  var axial_normal: Vector3=along*normal.dot(along)
+  normals[i]=(axial_normal+(normal-axial_normal)/factor).normalized()
+ arrays[Mesh.ARRAY_VERTEX]=vertices
+ arrays[Mesh.ARRAY_NORMAL]=normals
+ var result:=ArrayMesh.new()
+ result.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+ return result
 static func game_texture(source: Texture2D, path: String) -> Texture2D:
  if source==null: return null
  var image: Image=source.get_image()
@@ -39,14 +65,20 @@ func build() -> void:
  for mesh: MeshInstance3D in arms.find_children("*","MeshInstance3D",true,false):
   if mesh.name in ["fp_pump_shotgun","fp_pump_shotgun_forearm_l","fp_pump_shotgun_hand_r","fp_pump_shotgun_hand_l"]:
    var wrist: Vector3=Vector3(0.262258,-0.016676,0.301567) if mesh.name=="fp_pump_shotgun" else Vector3.ZERO
-   mesh.mesh=recolour(mesh.mesh,0 if mesh.name in ["fp_pump_shotgun","fp_pump_shotgun_forearm_l"] else 2,wrist)
+   var sleeve: bool=mesh.name in ["fp_pump_shotgun","fp_pump_shotgun_forearm_l"]
+   var origin: Vector3=wrist
+   var axis: Vector3=-wrist if mesh.name=="fp_pump_shotgun" else Vector3(0.12,-0.20,-0.23)
+   if not sleeve:
+    origin=Vector3(0.07736,0.00985,0.04657) if mesh.name=="fp_pump_shotgun_hand_r" else Vector3(-0.03129,0.02742,0.01415)
+    axis=Vector3.UP if mesh.name=="fp_pump_shotgun_hand_r" else Vector3.FORWARD
+   mesh.mesh=recolour(bulk_up(mesh.mesh,origin,axis,sleeve),0 if sleeve else 2,wrist)
    mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
   else:
    mesh.mesh=null # Preserve animation hierarchy; remove the pack's weapon geometry.
  var gun: Node3D=load("res://weapons/crop_duster/source/Crop_Duster_Rigged_Textured.glb").instantiate()
  gun.scene_file_path=""
  gun.name="Gun"
- gun.position=Vector3(0,-0.10,0.14)
+ gun.position=Vector3(0,-0.078,0.163) # Stock grip centred in the native right palm.
  gun.scale=Vector3.ONE*0.65
  held.add_child(gun)
  for mesh: MeshInstance3D in gun.find_children("*","MeshInstance3D",true,false):

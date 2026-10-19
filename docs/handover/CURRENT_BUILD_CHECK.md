@@ -24,3 +24,5 @@ The restricted tool run could not write Godot's normal shader cache and showed f
 ## Remaining scope
 
 These are adaptations of low-poly source hands with keyed rigid hand/forearm movement, not newly sculpted finger-by-finger animations. Reload poses were sampled and rendered, rather than proven free of every possible continuous mesh intersection. Reserve ammunition is finite; pickups/resupply are future gameplay work. The new static dagger-hand GLB from the separate Claude handoff is not integrated here.
+
+Follow-up: the Crop Duster now passes 27 checks and has thicker hands/sleeves plus revised reload/holster handling. See CROP_DUSTER_POLISH.md for the current details and dedicated shotgun video.

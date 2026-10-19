@@ -4,6 +4,7 @@ var main: Node3D
 var gun: Node3D
 func _initialize() -> void: run.call_deferred()
 func snap(label: String, state: String, clock: float, recoil: float=0.0) -> void:
+ if state=="holster": gun.set_active(false)
  gun.set("state",state)
  gun.set("clock",clock)
  gun.set("recoil",recoil)

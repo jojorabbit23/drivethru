@@ -75,6 +75,44 @@ func run() -> void:
  gun.loaded.fill(true)
  gun.shoot()
  check(behind.health==hp,"solid cover blocks every pellet")
+ # Recovery queues reload input instead of snapping straight out of recoil.
+ gun.loaded.fill(true)
+ gun.reserve=24
+ gun.cooldown=0.0
+ gun.state="idle"
+ gun.shoot()
+ check(gun.reload() and gun.state=="idle","reload request waits for the firing recovery")
+ gun._update(0.20)
+ check(gun.state=="idle","action remains closed during recoil recovery")
+ gun._update(0.23)
+ check(gun.state=="reload" and gun.clock<0.02,"queued reload starts after recovery without skipping animation time")
+ var plan: Array=gun.get("_reload_plan")
+ check(plan[0] and not plan[1],"top-up plans only the spent barrel")
+ gun._update(0.99)
+ var mechanics: Skeleton3D=gun.get("_mechanics")
+ var right_shell: int=mechanics.find_bone("shell_right")
+ check(mechanics.get_bone_pose_position(right_shell).is_equal_approx(mechanics.get_bone_rest(right_shell).origin),"unfired shell stays seated while opening")
+ # Sample both chamber contacts in a full reload.
+ gun.state="idle"
+ gun.loaded.fill(false)
+ gun.reload()
+ var left: Node3D=gun.get("_left_hand")
+ var local_grip: Vector3=gun.get("_grip_in_hand")
+ var model: Node3D=gun.get("_gun")
+ for i in 2:
+  gun.clock=1.9 if i==0 else 2.4
+  gun._pose(0.0)
+  var target: Vector3=gun.call("_shell_grip_point",i)
+  check(left.to_global(local_grip).distance_to(model.to_global(target))<0.0001,"palm anchor follows shell %d through the rotated action" % (i+1))
+ var before_hand: Transform3D=model.global_transform.affine_inverse()*left.global_transform
+ var before_hinge: Transform3D=mechanics.get_bone_global_pose(mechanics.find_bone("barrel_hinge"))
+ player.switch_weapon(1)
+ gun._update(0.10)
+ check(gun.visible and (model.global_transform.affine_inverse()*left.global_transform).is_equal_approx(before_hand),"mid-reload holster lowers the complete grip together")
+ check(mechanics.get_bone_global_pose(mechanics.find_bone("barrel_hinge")).is_equal_approx(before_hinge),"mid-reload holster does not snap the action closed")
+ gun._update(0.13)
+ player.switch_weapon(2)
+ gun._update(0.45)
  player.health=0.0
  gun.cooldown=0.0
  check(not gun.shoot() and not gun.reload(),"dead player cannot fire or reload")
