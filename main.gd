@@ -4,15 +4,17 @@ extends Node3D
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
 const LANCER := preload("res://enemies/lancer/lancer.tscn")
+const SCIENTIST := preload("res://enemies/scientist/scientist.tscn")
 const HOLLOWHEAD := preload("res://enemies/hollowhead/hollowhead.tscn")
 const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
-@export_range(0.0,1.0) var health_drop_chance: float=0.10
+@export_range(0.0,1.0,0.001) var health_drop_chance: float=0.075
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
 @export var max_zombies := 12        # alive at once; pending wave enemies wait at the cap
+@export var scientist_every := 4     # occupies an ordinary wave slot, never adds enemies
 @export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
 @export var lancer_every := 5        # from wave 2, every Nth spawn is a Lancer (0 = never; beats a Scuttler)
 @export var lancer_from_wave := 2
@@ -171,6 +173,8 @@ func _physics_process(delta: float) -> void:
 				spawn_lancer(_pick_window())
 			elif scuttler_every > 0 and n % scuttler_every == 0:
 				spawn_scuttler(_pick_window())
+			elif scientist_every > 0 and n % scientist_every == 0:
+				spawn_scientist(_pick_window())
 			elif n % 2 == 1:
 				spawn_hollowhead(_pick_window())
 			else:
@@ -225,6 +229,9 @@ func spawn_lancer(window: Node3D = null) -> Node:
 
 func spawn_zombie(window: Node3D = null) -> Node:
 	return spawn_enemy(SHAMBLER, window)
+
+func spawn_scientist(window: Node3D = null) -> Node:
+	return spawn_enemy(SCIENTIST, window)
 
 func spawn_hollowhead(window: Node3D = null) -> Node:
 	return spawn_enemy(HOLLOWHEAD, window)
@@ -296,6 +303,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				spawn_lancer()
 			KEY_H:
 				spawn_hollowhead()
+			KEY_B:
+				spawn_scientist()
 			KEY_R:
 				var weapon: Node = player.current_weapon()
 				if player.is_dead() or weapon == null or not weapon.has_method("reload"):

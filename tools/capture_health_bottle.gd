@@ -20,16 +20,24 @@ func run() -> void:
 	var camera: Camera3D=player.camera
 	camera.global_position=bottle.global_position+Vector3(0.6,0.45,1.1)
 	camera.look_at(bottle.global_position+Vector3(0,0.12,0))
+	player.health=30
+	player.health_changed.emit(player.health,player.max_health)
+	await physics_frame
+	player._update_focus()
 	await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://docs/previews/health_bottle.png"))
-	player.health=30
-	player.global_position=bottle.global_position-Vector3(0,bottle.hover,0)
-	bottle.set_process(true)
 	for i in 12:await process_frame
-	assert(player.health==80,"native bottle restores 50 HP")
-	assert(main._hud["health"].text.contains("HEALTH 80"),"health HUD updates immediately")
+	assert(player.health==30,"proximity does not consume bottle")
+	assert(player.focus==bottle,"native look ray selects health bottle")
+	var key:=InputEventKey.new()
+	key.physical_keycode=KEY_E
+	key.pressed=true
+	player._unhandled_input(key)
+	for i in 3:await process_frame
+	assert(player.health==55,"native E interaction restores 25 HP")
+	assert(main._hud["health"].text.contains("HEALTH 55"),"health HUD updates immediately")
 	main.free()
 	for i in 3:await process_frame
-	print("PASS native bottle healing and health HUD")
+	print("PASS native E bottle healing and health HUD")
 	quit()

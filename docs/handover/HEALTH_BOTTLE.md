@@ -1,26 +1,11 @@
-# Rare health bottle
+# Health bottle
 
-Each zombie death independently rolls randf() < health_drop_chance (default 0.10)
-once when the death is reported. A successful roll adds a bottle after the same
-short drop delay as the mushroom; the ordinary mushroom is always preserved.
-Shamblers, Scuttlers and Lancers all use this shared death path. It is a chance,
-not a guaranteed drop every tenth kill.
+Each zombie death independently rolls randf() < health_drop_chance (default 0.075, or 7.5%) once when death is reported. Success adds a bottle after the ordinary mushroom drop delay. The mushroom is always preserved, and all enemy types share this death path.
 
-Walking near a landed bottle collects it immediately for up to 50 HP. Health caps
-at max_health; full-health players leave it available and dead players cannot be
-revived. HUD health updates through the existing signal, +HP toast shows the actual
-amount gained, and normal pickup feedback remains active. Nearby bottles follow
-the same clear-line/window magnet rules as mushrooms; F2 auto-collect is respected.
-Health bottles use a separate health_pickups group so cooking inventory and
-mushroom accounting remain unchanged. There is no inventory item or drinking key.
+A landed bottle stays in place, spinning/bobbing with a +25 HP label. Look at it within the normal 2.3 m interaction reach and press E to immediately restore up to 25 HP. The existing station look-ray and HUD prompt are used; the bottle rechecks aim, range and world occlusion at use time. It cannot be used during its drop animation, through walls, by dead players, or when already taken. At full health it displays HEALTH FULL and remains available. Healing caps at max_health; the toast shows the actual amount gained.
 
-Owner GLB source is preserved untouched. tools/build_health_bottle.gd produces a
-0.38 m mesh (518 vertices) with the supplied blue texture reduced to 512 pixels
-and mipmapped. Pickup spins/bobs and has a +50 HP label, without extra lights or
-shadows. Use the Vulkan launcher confirmed smooth by the owner.
+Proximity, magnet movement and F2 auto-collect never consume or attract health bottles. Mushroom pickup behaviour is unchanged. Health bottles retain the separate health_pickups group and do not enter cooking inventory. Successful use clears focus before freeing the bottle, preventing a stale prompt reference.
 
-Verification: all 25 suites, import and touched-script checks. Health tests cover
-exact/capped healing, no full-health waste, no double-use/revival, automatic
-collection, all enemy death types, forced success/failure roll boundaries and
-preserved mushrooms. Native Vulkan capture verifies automatic collection and
-immediate HUD update. Bottle and required room/weapon renders were inspected.
+Owner GLB source is preserved untouched. tools/build_health_bottle.gd produces the supplied blue bottle mesh; no extra lights or shadows are added.
+
+Verification: tools/health_pickup_test.gd checks the 7.5% default, E input through the actual focus ray, 25 HP and capped healing, no full-health waste, no double-use/revival, no proximity/F2 collection, aim/range/wall rejection, all enemy death types, forced roll boundaries and preserved mushrooms. tools/capture_health_bottle.gd verifies the native E prompt, no proximity healing, 25 HP on E and immediate HUD update. Full regression suites and required native room/weapon renders also run before publication.
