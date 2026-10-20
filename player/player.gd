@@ -76,6 +76,11 @@ var _idle_t := 0.0
 var _base_fov := 75.0
 var _sprint_fov := false
 var _weapon_home := {}             # weapon -> the transform the scene gave it
+# Render interpolation for the first-person position; collision and aim stay live.
+var _view_previous_body := Vector3.ZERO
+var _view_current_body := Vector3.ZERO
+var _view_previous_local := Vector3.ZERO
+var _view_current_local := Vector3.ZERO
 
 # Default bindings are registered in code so the project works out of the box.
 # Move them into Project Settings > Input Map whenever you like; existing
@@ -122,6 +127,10 @@ func _ready() -> void:
 	if DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_base_fov = camera.fov
+	_view_current_body = global_position
+	_view_previous_body = global_position
+	_view_current_local = camera.position
+	_view_previous_local = camera.position
 	for c in camera.get_children():
 		if c.has_method("set_active"):
 			weapons.append(c)
@@ -165,6 +174,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
+	_view_previous_body = _view_current_body
+	_view_previous_local = _view_current_local
 	if BurgerItems.tick(burgers, delta, false, self): held_changed.emit(held)
 	var grounded := is_on_floor()
 	# Jump forgiveness: a short grace after walking off an edge, and a short
@@ -209,6 +220,19 @@ func _physics_process(delta: float) -> void:
 	_update_view(delta, is_on_floor(), moved)
 	_update_fov(delta, sprinting and moved > walk_speed * 0.9)
 	_update_weapon_idle(moved)
+	_view_current_body = global_position
+	_view_current_local = camera.position
+	# Teleports/spawn corrections must snap rather than travel through walls.
+	if _view_previous_body.distance_to(_view_current_body) > 0.5:
+		_view_previous_body = _view_current_body
+		_view_previous_local = _view_current_local
+
+func _process(_delta: float) -> void:
+	if DisplayServer.get_name() == "headless" or is_dead(): return
+	if not global_position.is_equal_approx(_view_current_body): return
+	var fraction: float = Engine.get_physics_interpolation_fraction()
+	var body_offset: Vector3 = _view_previous_body.lerp(_view_current_body, fraction) - global_position
+	camera.position = _view_previous_local.lerp(_view_current_local, fraction) + head.global_basis.inverse() * body_offset
 
 # The view: a small bob as you walk, a dip when you land, and a slow breath at
 # rest. This is the only thing that moves the camera itself.
