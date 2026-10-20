@@ -28,6 +28,9 @@ const SUPPLY_PRICE := 40
 const BULK_PACK := 15          # the big box: a little cheaper per burger
 const BULK_PRICE := 110
 const SHOTGUN_PRICE := 150     # weapon 4
+const DESERT_EAGLE_PRICE := 180
+const EAGLE_AMMO_PRICE := 20
+const EAGLE_AMMO_PACK := 14
 const SAWN_OFF_PRICE := 90
 const SHELL_PACK := 12         # docs/GAME_DESIGN.md: 12 shells = $30
 const SHELL_PRICE := 30
