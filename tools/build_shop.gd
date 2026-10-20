@@ -66,10 +66,10 @@ const HATCH := {"at": -3.0, "w": 1.8, "bottom": 1.0, "top": 2.0}      # north wa
 const DELIVERY_DOOR := {"at": 3.0, "w": 1.4, "bottom": 0.0, "top": 2.3} # south wall, storeroom
 
 const ROOMS := [
-	{"name": "ShopFloor", "label": "SHOP FLOOR", "c": Vector2(-3.0, -2.4), "floor": "floor_tile", "light": 1.6},
-	{"name": "Kitchen", "label": "KITCHEN", "c": Vector2(3.0, -2.4), "floor": "floor_tile", "light": 1.05},
-	{"name": "BackOffice", "label": "BACK OFFICE", "c": Vector2(-3.0, 2.4), "floor": "floor_concrete", "light": 1.6},
-	{"name": "Storeroom", "label": "STOREROOM", "c": Vector2(3.0, 2.4), "floor": "floor_concrete", "light": 1.35},
+	{"name": "ShopFloor", "label": "SHOP FLOOR", "c": Vector2(-3.0, -2.4), "floor": "floor_tile", "light": 1.3},
+	{"name": "Kitchen", "label": "KITCHEN", "c": Vector2(3.0, -2.4), "floor": "floor_tile", "light": 1.35},
+	{"name": "BackOffice", "label": "BACK OFFICE", "c": Vector2(-3.0, 2.4), "floor": "floor_concrete", "light": 1.3},
+	{"name": "Storeroom", "label": "STOREROOM", "c": Vector2(3.0, 2.4), "floor": "floor_concrete", "light": 1.25},
 ]
 
 const LAYER_WORLD := 1
@@ -667,13 +667,19 @@ func add_omni(parent: Node3D, name: String, pos: Vector3, colour: Color, energy:
 	l.omni_range = range_m
 	l.omni_attenuation = 1.2
 	l.shadow_enabled = shadow
+	l.omni_shadow_mode = OmniLight3D.SHADOW_DUAL_PARABOLOID
+	l.shadow_blur = 1.15
+	l.distance_fade_enabled = true
+	l.distance_fade_begin = 18.0
+	l.distance_fade_length = 5.0
+	l.distance_fade_shadow = 12.0
 	parent.add_child(l)
 
 func make_lights(parent: Node3D) -> void:
 	for r in ROOMS:
 		var c: Vector2 = r["c"]
 		add_omni(parent, "Light_" + r["name"], Vector3(c.x, WALL_H - 0.35, c.y),
-			Palette.AMBER_GLOW.lerp(Palette.WARM_CHALK, 0.35), r["light"], 6.5, true)
+			Palette.WARM_CHALK.lerp(Palette.AMBER_GLOW, 0.16), r["light"], 5.2, true)
 	for w in WINDOWS:
 		var t := window_frame(w)
 		var y0: float = -(w["bottom"] + w["top"]) * 0.5
