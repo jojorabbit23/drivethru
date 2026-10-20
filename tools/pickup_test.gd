@@ -81,10 +81,10 @@ func _run() -> void:
 			ys.append(p.global_position.y)
 		check(ys.max() - ys.min() > float(p.bob) * 1.8, "and bobs (%.2f m)" % (ys.max() - ys.min()))
 		var light := p.get_node("Glow") as OmniLight3D
-		check(light != null and light.light_color.is_equal_approx(Palette.AMBER_GLOW) and light.light_energy > 0.3 and light.light_energy < 1.2, "with a soft orange glow (energy %.2f)" % (light.light_energy if light else 0.0))
+		check(light != null and light.light_color.is_equal_approx(Palette.AMBER_GLOW) and light.light_energy > 0.05 and light.light_energy < 0.2, "with a soft orange glow (energy %.2f)" % (light.light_energy if light else 0.0))
 		var mi := p.get_node("Mesh") as MeshInstance3D
 		var mat := mi.material_override as StandardMaterial3D
-		check(mat != null and mat.emission_enabled and mat.next_pass is ShaderMaterial, "glowing spots and an orange halo on the model")
+		check(mat != null and not mat.emission_enabled and mat.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED and mat.next_pass is ShaderMaterial, "source colours stay readable without white emission; restrained halo retained")
 		check(p.global_position.distance_to(p.get("_home")) < 0.1, "it stays put while you're far away")
 		# walk up to it
 		player.global_position = p.global_position + Vector3(1.6, 0, 0)

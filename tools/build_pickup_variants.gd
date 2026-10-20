@@ -31,7 +31,9 @@ func _initialize() -> void:
  var source: StandardMaterial3D=mesh.get_surface_material(0)
  var image: Image=source.albedo_texture.get_image();image.decompress();image.resize(1024,1024,Image.INTERPOLATE_LANCZOS);image.generate_mipmaps()
  var mat:=StandardMaterial3D.new();mat.albedo_texture=ImageTexture.create_from_image(image);mat.roughness=0.85;mat.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
- mat.emission_enabled=true;mat.emission_texture=mat.albedo_texture;mat.emission=Color.WHITE;mat.emission_energy_multiplier=0.12
+ # Pickup colours must remain readable under overlapping lights and in dark lanes.
+ mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+ mat.emission_enabled=false
  var halo:=ShaderMaterial.new();halo.shader=load(OUT+"pickup_glow.gdshader");halo.set_shader_parameter("glow_color",preload("res://core/palette.gd").AMBER_GLOW);mat.next_pass=halo
  assert(ResourceSaver.save(mat,OUT+"pack_material.tres")==OK);mat.take_over_path(OUT+"pack_material.tres")
  var counts: Dictionary={"brown":0,"blue":0,"red":0};var excluded: int=0
