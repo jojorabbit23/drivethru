@@ -137,7 +137,7 @@ func tidy_help() -> void:
    style.set_content_margin_all(16)
    help_panel.add_theme_stylebox_override("panel",style)
    var details:=Label.new()
-   details.text="CONTROLS — F1 to close\nWASD move · Shift sprint · Space jump\nLMB fire / slash · RMB aim / stab · F inspect\n1–4 or wheel switch · Buy shotguns at shop\nV cycle burgers · E place / retrieve / discard\nR reload firearm\nE use / hold to repair · 1–4 station options\nF2 auto-collect · Z/X debug spawn · L labels\nEsc pause · R restart after death / with knife"
+   details.text="CONTROLS - F1 to close\nWASD move · Shift sprint · Space jump\nLMB fire / slash · RMB aim / stab · F inspect\n1-4 or wheel switch · Buy shotguns at shop\nV cycle burgers · E place / retrieve / discard\nR reload firearm\nE use / hold to repair · 1-4 station options\nF2 auto-collect · Z/X debug spawn · L labels\nEsc pause · R restart after death / with knife"
    details.add_theme_font_size_override("font_size",16)
    help_panel.add_child(details)
    help_label.get_parent().add_child(help_panel)

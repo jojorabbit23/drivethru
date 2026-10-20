@@ -187,6 +187,7 @@ func _run() -> void:
 	print("== repairing while it rips")
 	await fresh()
 	await place_player(window("A").repair_point())
+	player.get_node("Head/Camera3D").look_at(window("A").global_position)
 	var z: Node = main.spawn_zombie(window("A"))
 	var t := 0.0
 	var repairs := 0

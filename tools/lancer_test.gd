@@ -143,6 +143,7 @@ func _run() -> void:
 
 	print("== repairing")
 	await fresh(win("A").repair_point())
+	player.get_node("Head/Camera3D").look_at(win("A").global_position)
 	w = win("A")
 	z = main.spawn_lancer(w)
 	hp0 = player.health
