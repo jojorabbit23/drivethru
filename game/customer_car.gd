@@ -131,7 +131,7 @@ func _add_bubble(at: Vector3) -> void:
 	_bubble.add_child(icon)
 	var title:=Label3D.new()
 	title.name="BurgerColour"
-	title.text=order.to_upper()+" BURGER"
+	title.text=order.replace("red","yellow").replace("_"," ").to_upper()+" BURGER"
 	title.position=Vector3(0,0.32,0.02)
 	title.billboard=BaseMaterial3D.BILLBOARD_ENABLED
 	title.font_size=28
