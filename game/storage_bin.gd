@@ -68,7 +68,7 @@ func prompt(player: Node) -> String:
 	if carrying > 0:
 		return "E  store %d mushroom%s" % [carrying, "" if carrying == 1 else "s"]
 	var st: Dictionary = economy().stock
-	return "MUSHROOM STORE  ·  %d common  %d blue  %d red" % [st["brown"], st["blue"], st["red"]]
+	return "MUSHROOM STORE  ·  %d common  %d blue  %d yellow" % [st["brown"], st["blue"], st["red"]]
 
 func interact(player: Node) -> void:
 	var carrying: int = player.mushrooms

@@ -12,10 +12,10 @@ extends RefCounted
 const RECIPES := {
 	"brown": {"name": "Common", "patties": ["brown"], "price": 30},
 	"blue": {"name": "Blue", "patties": ["blue"], "price": 30},
-	"red": {"name": "Red", "patties": ["red"], "price": 30},
+	"red": {"name": "Yellow", "patties": ["red"], "price": 30},
 	"double_brown": {"name": "Double Common", "patties": ["brown", "brown"], "price": 50},
 	"double_blue": {"name": "Double Blue", "patties": ["blue", "blue"], "price": 50},
-	"double_red": {"name": "Double Red", "patties": ["red", "red"], "price": 50},
+	"double_red": {"name": "Double Yellow", "patties": ["red", "red"], "price": 50},
 	"special": {"name": "Special", "patties": ["red", "blue"], "price": 60},
 }
 

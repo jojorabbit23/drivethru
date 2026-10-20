@@ -110,7 +110,7 @@ func _run() -> void:
 	check(f == main.grill and "place patty" in main.grill.prompt(player), "at the grill: '%s'" % main.grill.prompt(player))
 	player.use_focus()
 	var labels: Array = player.menu_options.map(func(o): return o["label"])
-	check(labels == ["Common patty  x3", "Blue patty  x2", "Red patty  x1", "Cancel"], "patty menu: %s" % str(labels))
+	check(labels == ["Common patty  x3", "Blue patty  x2", "Yellow patty  x1", "Cancel"], "patty menu: %s" % str(labels))
 	player.choose(1)     # key 2: blue
 	check(main.grill.state_of(0) == "raw" and main.grill.kind_of(0) == "blue" and econ.stock["blue"] == 1, "key 2 puts a blue patty on")
 	player.use_focus()
@@ -377,7 +377,7 @@ func _run() -> void:
 	main.hatch.next_order = "double_red"
 	var wc: Node3D = main.hatch.spawn_customer()
 	wc.state = "waiting"
-	check(not main.bench.bag(player) and "double red needs 2 red patties" in main.bench.prompt(player), "with a double red on the ticket, the bench waits for 2 reds: '%s'" % main.bench.prompt(player))
+	check(not main.bench.bag(player) and "double yellow needs 2 yellow patties" in main.bench.prompt(player), "with a double red on the ticket, the bench waits for 2 reds: '%s'" % main.bench.prompt(player))
 	player.set_held("burger", {"kind": "red", "quality": "perfect", "patties": ["red"]})
 	check("WRONG BURGER" in main.hatch.prompt(player) and not main.hatch.serve(player), "and a double red customer won't take a single red")
 	player.set_held("")
