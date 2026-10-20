@@ -102,6 +102,9 @@ func _ready() -> void:
 		_toast("%s  +$%d%s" % ["SALVAGE" if q == "burnt" else q.to_upper(), c + tip, ("  (tip $%d)" % tip) if tip > 0 else ""], P.AMBER_GLOW))
 	hatch.customer_missed.connect(func(): _toast("CUSTOMER LEFT", P.CONCRETE_GREY))
 	MushroomPickupScript.auto_collect = auto_collect
+	var clarity: CanvasLayer=preload("res://presentation/clarity_hud.gd").new()
+	clarity.name="ClarityHUD"
+	add_child(clarity)
 	_update_weapon()
 	_update_health()
 	_update_status()

@@ -31,7 +31,7 @@ func run() -> void:
 		camera.look_at(car._bubble.global_position)
 		car._bubble.global_basis=camera.global_basis
 		for i in 12:await process_frame
-		assert(car._bubble.get_node("BurgerColour").text==kind.to_upper()+" BURGER")
+		assert(car._bubble.get_node("BurgerColour").text==("YELLOW" if kind=="red" else kind.to_upper())+" BURGER")
 		car.received=1
 		car.refresh_order_quantity()
 		assert(car._quantity_label.text=="x%d" % (car.quantity-1))

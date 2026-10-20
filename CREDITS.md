@@ -50,3 +50,7 @@ Morel drivers kitchen poster: owner-supplied artwork, lightly weathered with the
 Fungal stock: owner-supplied carved wooden logs 3d model.glb, locally separated into six arrangements with original texture and UVs retained.
 
 Decorative empty bottles: owner-supplied glass bottle.glb. Glass break sound synthesized locally.
+
+Non-morel zombie drops: owner-supplied mushroom 3d model.glb, six intact components retaining supplied textures.
+
+Owner-supplied stylized pistol model: supplied for The Drive Thru by the project owner; original retained in weapons/pistol/source/stylized_pistol.glb. Mechanical part rig and hidden magazine/receiver geometry added locally. Existing PSX FPS Arms Free credit remains applicable to the hand setup.

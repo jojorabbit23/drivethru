@@ -120,8 +120,8 @@ Brown Burger Icon
 Blue Mushroom Burger Icon
 = Blue Mushroom Patty Burger
  
-Red Mushroom Burger Icon
-= Red Mushroom Patty Burger
+Yellow Mushroom Burger Icon
+= Yellow Mushroom Patty Burger
  
 Double Icon
 = Double Patty Burger
@@ -162,7 +162,7 @@ Example:
 Plain Text
 Common Patty x8
 Blue Patty x3
-Red Patty x2
+Yellow Patty x2
 Rare Patty x1
 
 The player selects the desired patty.

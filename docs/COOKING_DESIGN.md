@@ -78,7 +78,7 @@ Common Patty x8
  
 Blue Patty x3
  
-Red Patty x1
+Yellow Patty x1
  
 Cancel
 
@@ -279,9 +279,9 @@ Brown Patty
 Blue Burger
 Plain Text
 Blue Patty
-Red Burger
+Yellow Burger
 Plain Text
-Red Patty
+Yellow Patty
 Double Burger
 Plain Text
 2 Patties
@@ -290,7 +290,7 @@ Needs two grill slots worth of production.
 
 Special Burger
 Plain Text
-Red Patty
+Yellow Patty
 +
 Blue Patty
 

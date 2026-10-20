@@ -13,7 +13,12 @@ signal collected(pickup: Node3D)
 # flies to the player from anywhere once it has landed. main.gd toggles it (F2).
 static var auto_collect := false
 
-const MESH := preload("res://pickups/mushroom/mushroom_pickup_mesh.res")
+const MESH := preload("res://pickups/mushroom/pack_brown_0.res")
+const VARIANTS := {
+ "brown":[preload("res://pickups/mushroom/pack_brown_0.res"),preload("res://pickups/mushroom/pack_brown_1.res")],
+ "blue":[preload("res://pickups/mushroom/pack_blue_0.res"),preload("res://pickups/mushroom/pack_blue_1.res")],
+ "red":[preload("res://pickups/mushroom/pack_red_0.res"),preload("res://pickups/mushroom/pack_red_1.res")]
+}
 const Palette = preload("res://core/palette.gd")
 
 @export var hover := 0.42          # height of its centre above the floor
@@ -37,25 +42,27 @@ func _ready() -> void:
 	add_to_group("pickups")
 	_model = MeshInstance3D.new()
 	_model.name = "Mesh"
-	_model.mesh = MESH
+	var choices: Array=VARIANTS.get(kind,VARIANTS["brown"])
+	_model.mesh = choices[randi_range(0,choices.size()-1)]
 	_model.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_model)
 	# own copy of the halo so each pickup pulses on its own beat
-	var mat := (MESH.surface_get_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
+	var mat := (_model.mesh.surface_get_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
 	_halo = (mat.next_pass as ShaderMaterial).duplicate() as ShaderMaterial
 	mat.next_pass = _halo
-	# kind shows on the mushroom itself: brown as modelled, blue / red tinted,
-	# with the halo in the kind's colour (the light underneath stays amber)
-	const TINT := {"brown": Color(1, 1, 1), "blue": Color(0.55, 1.0, 1.0), "red": Color(1.0, 0.62, 0.45)}
-	const HALO := {"brown": Color("#F3A34D"), "blue": Color("#65C9C2"), "red": Color("#C96B35")}
+	# The supplied cap texture identifies each kind; do not tint its original colours.
+	# The halo uses the kind colour; legacy red means Yellow.
+	const TINT := {"brown": Color(1, 1, 1), "blue": Color.WHITE, "red": Color.WHITE}
+	const HALO := {"brown": Color("#F3A34D"), "blue": Color("#65C9C2"), "red": Color("#F3A34D")}
 	mat.albedo_color = TINT.get(kind, Color.WHITE)
 	_halo.set_shader_parameter("glow_color", HALO.get(kind, Palette.AMBER_GLOW))
+	_halo.set_shader_parameter("strength",0.06)
 	_model.material_override = mat
 	_light = OmniLight3D.new()
 	_light.name = "Glow"
 	_light.light_color = Palette.AMBER_GLOW
-	_light.light_energy = 0.7
-	_light.omni_range = 1.4
+	_light.light_energy = 0.12
+	_light.omni_range = 0.65
 	_light.omni_attenuation = 1.6
 	_light.shadow_enabled = false
 	add_child(_light)
@@ -90,7 +97,7 @@ func _process(delta: float) -> void:
 	_t += delta
 	rotation.y = wrapf(rotation.y + spin_speed * delta, -PI, PI)
 	var pulse := 0.8 + 0.2 * sin(_t * 2.6)
-	_light.light_energy = 0.7 * pulse
+	_light.light_energy = 0.12 * pulse
 	_halo.set_shader_parameter("pulse", pulse)
 	if not _ready_to_collect:
 		return
@@ -138,7 +145,7 @@ func _collect(player: Node3D) -> void:
 	remove_from_group("pickups")
 	var tw := create_tween().set_parallel(true)
 	tw.tween_property(self, "scale", Vector3.ONE * 1.4, 0.08)
-	tw.tween_property(_light, "light_energy", 2.0, 0.08)
+	tw.tween_property(_light, "light_energy", 0.3, 0.08)
 	tw.chain().tween_property(self, "scale", Vector3.ONE * 0.01, 0.14)
 	tw.chain().tween_callback(queue_free)
 
