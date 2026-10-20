@@ -39,7 +39,7 @@ See [rules and verification](docs/handover/RUSH_SHELF.md).
 
 Burger service update: V cycles carried burgers; E on an empty hatch-tray slot places the selected burger, E on a box retrieves it, and E at the hatch bin discards the selected item. Capacity starts at one and increases after clearing waves 3/6/9, to four. Burgers cool after 150 seconds including tray time; each cold item pays 50%. Both shotguns and separate shell packs are in the shop. See docs/handover/BURGER_INVENTORY_TRAY.md.
 
-Performance update: menu input targets 60 FPS, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
+Performance update: menu input follows VSync/display refresh, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
 
 # Current combined recovery — 2026-10-19
 
@@ -328,7 +328,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Desktop performance limits
 
-Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
+Ordinary play follows display refresh through VSync, dropping to 15 FPS when the application loses focus. A second software 60 FPS limiter was removed to improve pacing on high-refresh displays. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
 
 For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the pistol/shop, knife attacks, Crop Duster reload and a 12-zombie/ooze stress case, then exits; a 20-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
 

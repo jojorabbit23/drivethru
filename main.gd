@@ -567,4 +567,4 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		Engine.max_fps = 15
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
-		Engine.max_fps = int(ProjectSettings.get_setting("application/run/max_fps", 60))
+		Engine.max_fps = int(ProjectSettings.get_setting("application/run/max_fps", 0))

@@ -1,4 +1,4 @@
-# Bounded rendered check: 30 FPS, four short stages, then exits.
+# Bounded rendered check: 30 FPS by default; FPS_PROFILE_VSYNC=1 uses display pacing.
 # godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd
 extends SceneTree
 var main: Node3D
@@ -8,6 +8,7 @@ var results: Array[Dictionary] = []
 var profile_fps: int = 30
 func _initialize() -> void:
 	profile_fps = maxi(30, int(OS.get_environment("FPS_PROFILE_CAP"))) if not OS.get_environment("FPS_PROFILE_CAP").is_empty() else 30
+	if OS.get_environment("FPS_PROFILE_VSYNC") == "1": profile_fps = 0
 	Engine.max_fps = profile_fps
 	create_timer(20.0).timeout.connect(_timeout)
 	run.call_deferred()
@@ -65,8 +66,8 @@ func run() -> void:
 	main.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	assert(Engine.max_fps == 15, "background cap")
 	main.notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN)
-	assert(Engine.max_fps == 60, "focused cap")
-	print("PASS focus caps: 60 focused / 15 background")
+	assert(Engine.max_fps == int(ProjectSettings.get_setting("application/run/max_fps", 0)), "focused cap")
+	print("PASS display-paced foreground / 15 FPS background")
 	await settle(30)
 	await measure("pistol / shop")
 	player.call("switch_weapon",1)

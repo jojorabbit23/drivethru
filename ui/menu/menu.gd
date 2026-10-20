@@ -25,7 +25,7 @@ func atlas(rect: Rect2) -> AtlasTexture:
 func _ready() -> void:
  Prefs.configure()
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
- Engine.max_fps=60
+ Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
  var background:=ColorRect.new()
  background.color=P.MIDNIGHT_TYNE
  background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -101,7 +101,7 @@ func layout() -> void:
   images[i].size=Vector2(RECTS[i].size.x*0.37,RECTS[i].size.y*0.37)
 func _video_finished() -> void:
  if starting:
-  Engine.max_fps=60
+  Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
   get_tree().change_scene_to_file("res://main.tscn")
  else:
   _loop_bread()
@@ -195,6 +195,6 @@ func _notification(what: int) -> void:
   if video:video.paused=true
   Prefs.set_focused(false)
  elif what==NOTIFICATION_APPLICATION_FOCUS_IN:
-  Engine.max_fps=60
+  Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
   if video:video.paused=false
   Prefs.set_focused(true)

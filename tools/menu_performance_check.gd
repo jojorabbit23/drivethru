@@ -2,7 +2,9 @@
 extends SceneTree
 var menu: Control
 var results: Array[Dictionary]=[]
-func _initialize() -> void: run.call_deferred()
+func _initialize() -> void:
+	create_timer(20.0).timeout.connect(func() -> void: quit(1))
+	run.call_deferred()
 func sample(label: String) -> void:
 	for i in 12:await process_frame
 	var frames: Array[float]=[]
@@ -36,7 +38,7 @@ func run() -> void:
 	menu.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	assert(menu.video.paused,"background video stops decoding")
 	menu.notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN)
-	assert(not menu.video.paused and Engine.max_fps==60,"foreground video and input resume")
+	assert(not menu.video.paused and Engine.max_fps==int(ProjectSettings.get_setting("application/run/max_fps",0)),"foreground video and input resume")
 	var path: String=OS.get_environment("MENU_PROFILE_OUTPUT")
 	if not path.is_empty():
 		var file:=FileAccess.open(path,FileAccess.WRITE)
