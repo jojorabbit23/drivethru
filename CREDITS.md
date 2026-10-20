@@ -54,3 +54,5 @@ Decorative empty bottles: owner-supplied glass bottle.glb. Glass break sound syn
 Non-morel zombie drops: owner-supplied mushroom 3d model.glb, six intact components retaining supplied textures.
 
 Owner-supplied stylized pistol model: supplied for The Drive Thru by the project owner; original retained in weapons/pistol/source/stylized_pistol.glb. Mechanical part rig and hidden magazine/receiver geometry added locally. Existing PSX FPS Arms Free credit remains applicable to the hand setup.
+
+Owner-supplied mushroom-headed scientist model: original retained in enemies/scientist/source/scientist.glb. Local skeleton, skinning, retargeted infected clips, detachable-head setup and generated fungal sound effects added for The Drive Thru. Existing source animation credits remain applicable.
