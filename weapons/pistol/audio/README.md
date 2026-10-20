@@ -1,0 +1,1 @@
+Pistol firing alternates owner-selected Gentler_Cleanup/gun_103.wav and gun_105.wav. Source WAVs are unchanged. Four Effects-bus voices at -6 dB preserve overlapping tails without unbounded player allocation. shot.wav is retained as the legacy sample.
