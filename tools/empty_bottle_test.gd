@@ -11,7 +11,10 @@ func run() -> void:
  var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;root.add_child(main)
  var player: Node3D=main.player;player.set_physics_process(false);player.set_process(false)
  for w: Node3D in player.weapons:w.set_physics_process(false)
- check(get_nodes_in_group("destructible_props").size()==3,"three decorative bottles placed")
+ var original_bottles: int=0
+ for child: Node in main.get_node("ShopGreybox/Decor").get_children():
+  if child.get_script()==Bottle:original_bottles+=1
+ check(original_bottles==3 and main.get_node("ShopGreybox/Garage/EmptyBottles").get_child_count()==3 and get_nodes_in_group("destructible_props").size()==6,"three original bottles retained plus exactly three in the new garage")
  var camera: Camera3D=player.camera;camera.global_position=Vector3(0,5,0);camera.global_rotation=Vector3.ZERO
  var before: int=get_nodes_in_group("zombies").size()
  var b: StaticBody3D=fresh(Vector3(0,4.865,-0.65))
