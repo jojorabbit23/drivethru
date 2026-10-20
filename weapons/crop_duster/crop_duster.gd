@@ -6,7 +6,9 @@ signal ammo_changed
 const P=preload("res://core/palette.gd")
 const Hitscan=preload("res://core/hitscan.gd")
 const VIEWMODEL=preload("res://weapons/crop_duster/crop_duster_viewmodel.tscn")
-const SHOT_SOUND=preload("res://weapons/crop_duster/audio/sawn_off_deep_blast.wav")
+const SHOT_SOUND=preload("res://weapons/crop_duster/audio/shotgun_sound_04.wav")
+const SHELL_SOUND=preload("res://weapons/crop_duster/audio/shotgun_sound_13.wav")
+const COCK_SOUND=preload("res://weapons/crop_duster/audio/shotgun_sound_14.wav")
 const DRAW_TIME:=0.45
 const RELOAD_TIME:=3.4
 @export var pellet_damage:=22.0
@@ -52,6 +54,8 @@ var _sound: AudioStreamPlayer
 var _mechanism_sound: AudioStreamPlayer
 var _shot_voices: Array[AudioStreamPlayer]=[]
 var _shot_voice: int=0
+var _reload_voices: Array[AudioStreamPlayer]=[]
+var _reload_voice: int=0
 var _vapour: Node3D
 var _hand_anchor:=Vector3.ZERO
 const Sounds=preload("res://presentation/audio_library.gd")
@@ -89,11 +93,17 @@ func _ready() -> void:
  _flash.position=Vector3(0,0.32,0.50)
  for i in 3:
   var voice:=AudioStreamPlayer.new()
-  voice.volume_db=-5.0
+  voice.volume_db=-8.0
   voice.bus="Effects"
   voice.stream=SHOT_SOUND
   add_child(voice)
   _shot_voices.append(voice)
+ for i in 2:
+  var voice:=AudioStreamPlayer.new()
+  voice.volume_db=-11.0
+  voice.bus="Effects"
+  add_child(voice)
+  _reload_voices.append(voice)
  _sound=_shot_voices[0]
  _mechanism_sound=AudioStreamPlayer.new()
  _mechanism_sound.volume_db=-11.0
@@ -120,6 +130,7 @@ func set_active(on: bool) -> void:
  if not on:
   for voice in _shot_voices:voice.stop()
   _mechanism_sound.stop()
+  for voice in _reload_voices:voice.stop()
   if _vapour: _vapour.clear()
  # Interrupted reloads retain only seated shells. A brief reversed draw lowers the gun.
  _pose(0.0)
@@ -158,7 +169,7 @@ func reload() -> bool:
   if _reload_plan[i]: available-=1
  state="reload"
  clock=0.0
- _click()
+ _reload_sound(COCK_SOUND)
  return true
 func _update(delta: float) -> void:
  if not active and state!="holster": return
@@ -181,7 +192,7 @@ func _update(delta: float) -> void:
     loaded[i]=true
     reserve-=1
     ammo_changed.emit()
-    _click()
+    _reload_sound(SHELL_SOUND)
   if previous<3.0 and clock>=3.0: _click()
   if clock>=RELOAD_TIME:
    state="idle"
@@ -356,3 +367,11 @@ func _click() -> void:
  if DisplayServer.get_name()=="headless":return
  _mechanism_sound.stream=Sounds.sound("mechanism")
  _mechanism_sound.play()
+
+# Separate pooled reload voices preserve the short overlap between seated shells.
+func _reload_sound(stream: AudioStream) -> void:
+ if DisplayServer.get_name()=="headless":return
+ _reload_voice=(_reload_voice+1)%_reload_voices.size()
+ var voice: AudioStreamPlayer=_reload_voices[_reload_voice]
+ voice.stream=stream
+ voice.play()

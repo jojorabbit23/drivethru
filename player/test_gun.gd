@@ -4,8 +4,7 @@
 # (weapons/pistol/pistol_viewmodel.tscn, tools/build_pistol.gd) uses the
 # owner's stylized pistol in Cleatimus's gloved hands. Code supplies draw rise
 # and recoil; its AnimationPlayer cycles the hammer, slide and magazine.
-# Sounds are requested by name ("pistol"); game/sfx.gd plays silence for names
-# it doesn't know yet.
+# Owner-selected firing clips alternate through a bounded voice pool.
 extends Node3D
 
 const Hitscan = preload("res://core/hitscan.gd")
@@ -13,6 +12,9 @@ const Sfx = preload("res://game/sfx.gd")
 const MODEL := preload("res://weapons/pistol/pistol_viewmodel.tscn")
 
 # Rest pose (camera space): low right, muzzle forward.
+const SHOT_SOUNDS := [preload("res://weapons/pistol/audio/gun_103.wav"), preload("res://weapons/pistol/audio/gun_105.wav")]
+var _shot_voices: Array[AudioStreamPlayer] = []
+var _shot_index := 0
 const REST_POS := Vector3(0.13, -0.15, -0.26)
 const REST_ROT := Vector3(0.0, 0.0, 0.0)   # degrees: pitch, yaw, roll
 const DRAW_TIME := 0.28
@@ -47,6 +49,8 @@ var _support_rest: Transform3D
 
 func set_active(on: bool) -> void:
 	active = on
+	if not on:
+		for voice in _shot_voices: voice.stop()
 	_cooldown = maxf(_cooldown, 0.25)  # brief draw delay
 	if on:
 		_draw_t = DRAW_TIME
@@ -61,6 +65,12 @@ func set_active(on: bool) -> void:
 var _flash: OmniLight3D
 
 func _ready() -> void:
+	for i in 4:
+		var voice := AudioStreamPlayer.new()
+		voice.bus = "Effects"
+		voice.volume_db = -6.0
+		add_child(voice)
+		_shot_voices.append(voice)
 	mag = mag_size
 	reserve = start_reserve
 	_pivot = MODEL.instantiate() as Node3D
@@ -172,7 +182,7 @@ func shoot() -> Dictionary:
 		reload()
 	_flash.light_energy = 3.0
 	_flash.visible = true
-	Sfx.play(self, "pistol", -2.0)
+	_play_shot()
 	fired.emit()
 	var head := camera.get_parent() as Node3D
 	head.rotation.x = minf(head.rotation.x + deg_to_rad(1.2), deg_to_rad(85.0))
@@ -199,6 +209,13 @@ func shoot() -> Dictionary:
 		var killed: bool = zombie.is_dead()
 		hit.emit(zombie, headshot, killed)
 	return res
+
+func _play_shot() -> void:
+	if DisplayServer.get_name() == "headless": return
+	var voice: AudioStreamPlayer = _shot_voices[_shot_index % _shot_voices.size()]
+	voice.stream = SHOT_SOUNDS[_shot_index % SHOT_SOUNDS.size()]
+	voice.play()
+	_shot_index += 1
 
 func _spark(at: Vector3) -> void:
 	if DisplayServer.get_name() == "headless": return
