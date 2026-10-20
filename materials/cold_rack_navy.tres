@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/fridge_room/pack/textures/rack_navy/albedo.png" id="1_13vv3"]
+[ext_resource type="Texture2D" path="res://art/fridge_room/pack/textures/rack_navy/metallic.png" id="2_fmrir"]
+[ext_resource type="Texture2D" path="res://art/fridge_room/pack/textures/rack_navy/normal_gl.png" id="3_71hm4"]
+[ext_resource type="Texture2D" path="res://art/fridge_room/pack/textures/rack_navy/roughness.png" id="4_8aeh7"]
+
+[resource]
+resource_name = "cold_rack_navy"
+albedo_texture = ExtResource("1_13vv3")
+metallic = 1.0
+metallic_specular = 0.25
+metallic_texture = ExtResource("2_fmrir")
+roughness_texture = ExtResource("4_8aeh7")
+normal_enabled = true
+normal_scale = 0.35
+normal_texture = ExtResource("3_71hm4")
+texture_filter = 2

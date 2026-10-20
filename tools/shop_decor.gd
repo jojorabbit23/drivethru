@@ -66,7 +66,7 @@ func wall_lamp(g: String, t: Transform3D, light_name: String, energy := 1.2, rea
 	b.light(light_name, t * Vector3(0, -0.35, 0.45), P.AMBER_GLOW.lerp(P.WARM_CHALK, 0.45), energy, reach)
 
 func crate(g: String, t: Transform3D, c: Vector3, size: float, yaw := 0.0, collide := true) -> void:
-	rbox(g, "crate", t, c + Vector3(0, size * 0.5, 0), Vector3.ONE * size, roty(yaw), collide)
+	rbox(g, ("cold_crate_wood" if g == "Props_Storeroom" else "crate"), t, c + Vector3(0, size * 0.5, 0), Vector3.ONE * size, roty(yaw), collide)
 
 func carton(g: String, t: Transform3D, c: Vector3, s: Vector3, yaw := 0.0) -> void:
 	rbox(g, "cardboard", t, c + Vector3(0, s.y * 0.5, 0), s, roty(yaw))
@@ -122,11 +122,11 @@ func shelf_unit(g: String, x0: float, x1: float, z0: float, z1: float, h: float,
 	var along_x := (x1 - x0) >= (z1 - z0)
 	for cx in [x0 + 0.02, x1 - 0.02]:
 		for cz in [z0 + 0.02, z1 - 0.02]:
-			b.box(g, "metal", Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
+			b.box(g, ("cold_rack_navy" if g == "Props_Storeroom" else "metal"), Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
 	var gap := (h - 0.1) / levels
 	for i in levels:
 		var y := 0.08 + i * gap
-		b.box(g, "steel", Vector3(x0, y, z0), Vector3(x1, y + 0.03, z1), false)
+		b.box(g, ("cold_shelf_steel" if g == "Props_Storeroom" else "steel"), Vector3(x0, y, z0), Vector3(x1, y + 0.03, z1), false)
 		var depth := (z1 - z0) if along_x else (x1 - x0)
 		var length := (x1 - x0) if along_x else (z1 - z0)
 		var cursor := 0.06
@@ -145,8 +145,11 @@ func shelf_unit(g: String, x0: float, x1: float, z0: float, z1: float, h: float,
 					var o := (k - 0.5) * (w * 0.45)
 					var tp := pos + (Vector3(o, 0, 0) if along_x else Vector3(0, 0, o))
 					b.prism(g, "paint_orange" if rng.randf() < 0.5 else "lettuce", tp, 0.06, minf(0.16, hh), 8)
+			elif g == "Props_Storeroom" and (i + int(cursor * 10)) % 3 == 0:
+				b.prism(g, "cold_fungal_flesh", pos, minf(w * 0.38, 0.13), hh * 0.65, 7)
+				b.prism(g, "cold_pipe_orange", pos + Vector3(0,hh * 0.65,0), minf(w * 0.48,0.17), 0.06, 7)
 			else:
-				b.obox(g, "cardboard", pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
+				b.obox(g, ("cold_carton_brown" if g == "Props_Storeroom" else "cardboard"), pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
 			cursor += w + rng.randf_range(0.02, 0.08)
 	b.col(g, Vector3(x0, 0, z0), Vector3(x1, h, z1))
 
@@ -410,6 +413,8 @@ func shelf_frame(g: String, x0: float, x1: float, z0: float, z1: float, h: float
 			b.box(g, "metal", Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
 
 func storeroom() -> void:
+	var cold = preload("res://tools/fridge_room.gd").new()
+	cold.build(self)
 	var g := "Props_Storeroom"
 	var IX: float = b.IX
 	var IZ: float = b.IZ
