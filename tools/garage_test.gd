@@ -17,6 +17,11 @@ func run() -> void:
   if main._pick_window()==garage.get_node("Window_C"):excluded=false
  check(excluded,"repeated wave selections never target the locked garage")
  check(garage.get_node("EmptyBottles").get_child_count()==3 and garage.get_node("FungalStock").get_child_count()==5,"three empty destructible bottles and shared fridge parts decorate the shelves and boxes")
+ var bike_mesh: Mesh=garage.get_node("Motorcycle/SuppliedModel").mesh
+ var bike_bounds: AABB=bike_mesh.get_aabb()
+ check(bike_mesh.resource_path.ends_with("motorcycle_mesh.res") and absf(bike_bounds.position.y)<.001 and absf(bike_bounds.size.z-2.35)<.001,"owner motorcycle replaces the placeholder, scaled and grounded")
+ player.global_position=Vector3(1.35,.02,8.3)
+ check(player.test_move(player.global_transform,Vector3(0,0,2)),"motorcycle has solid collision in its parking corner")
  main.economy.cash=249
  garage.interact(player)
  check(not garage.unlocked and main.economy.cash==249,"insufficient funds cannot open or charge for the room")

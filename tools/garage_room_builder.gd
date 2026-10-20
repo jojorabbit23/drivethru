@@ -1,4 +1,4 @@
-# Built with the shop's existing textures; no external model or runtime geometry.
+# Garage structure reuses shop materials; motorcycle uses the retained owner GLB.
 extends RefCounted
 const WINDOW: Dictionary={"id":"C","side":"east","at":8.0,"w":1.4,"bottom":.9,"top":2.1,"room":"Garage","origin":Vector3(6,1.5,8)}
 var b
@@ -31,61 +31,13 @@ func build(builder,decor) -> void:
   for column in 2:
    decor.carton("Props_Garage",Transform3D.IDENTITY,Vector3(4.4+column*.65,row*.48,10.4),Vector3(.6,.48,.65),float(column*4-row*3))
  decor.carton("Props_Garage",Transform3D.IDENTITY,Vector3(4.7,1.44,10.45),Vector3(.55,.4,.5),-8)
- # Cruiser parked in the rear-left corner; leave a clear middle path.
- motorcycle(Transform3D(Basis(Vector3.UP,deg_to_rad(-12)),Vector3(1.35,0,10.0)))
  b.build_window_lane(WINDOW)
-func rod(g: String,t: Transform3D,a: Vector3,c: Vector3,r: float,mat: String="steel") -> void:
- var direction: Vector3=c-a
- var basis: Basis=Basis(Quaternion(Vector3.UP,direction.normalized()))
- b.tprism(g,mat,t,a,r,direction.length(),8,basis)
-func motorcycle(t: Transform3D) -> void:
- var g: String="Props_Garage_Cruiser"
- var axle:=Basis(Vector3.FORWARD,PI/2)
- for z: float in [-.88,.84]:
-  b.tprism(g,"rubber_mat",t,Vector3(.14,.35,z),.35,.28,16,axle)
-  b.tprism(g,"steel",t,Vector3(.155,.35,z),.255,.31,16,axle)
-  b.tprism(g,"metal",t,Vector3(.16,.35,z),.18,.32,12,axle)
-  b.tprism(g,"steel",t,Vector3(.17,.35,z),.07,.34,8,axle)
-  for angle in 8:
-   var theta: float=TAU*angle/8
-   rod(g,t,Vector3(-.175,.35,z),Vector3(-.175,.35+sin(theta)*.25,z+cos(theta)*.25),.012)
- # Double cradle frame, raked fork and rear swing arm.
- for x: float in [-.16,.16]:
-  rod(g,t,Vector3(x,.35,.84),Vector3(x,.42,-.35),.035,"metal")
-  rod(g,t,Vector3(x,.42,-.35),Vector3(x,1.0,-.52),.035,"metal")
-  rod(g,t,Vector3(x,1.0,-.52),Vector3(x,.78,.5),.035,"metal")
-  rod(g,t,Vector3(x,.78,.5),Vector3(x,.35,.84),.035,"metal")
-  rod(g,t,Vector3(x,.35,-.88),Vector3(x,1.08,-.5),.035)
- # V-twin engine, cooling fins, crank case and twin exhaust pipes.
- b.tprism(g,"steel",t,Vector3(.15,.47,.05),.14,.30,12,axle)
- for sign: float in [-1.0,1.0]:
-  var v:=Transform3D(Basis(Vector3.RIGHT,sign*.48),Vector3(0,.48,.05))
-  for i in 6:
-   b.tprism(g,"steel" if i%2==0 else "metal",t*v,Vector3(0,.06+i*.035,0),.13,.03,8)
-  rod(g,t,Vector3(-.27,.45,sign*.1),Vector3(-.3,.26,.5+sign*.14),.045,"metal")
-  rod(g,t,Vector3(-.3,.26,.5+sign*.14),Vector3(-.3,.26,1.05+sign*.14),.055)
- # Sculpted fuel tank, saddle, rear fender and handlebars.
- b.tprism(g,"serve_orange",t,Vector3(0,.94,-.49),.19,.52,8,Basis(Vector3.RIGHT,PI/2))
- b.tprism(g,"steel",t,Vector3(0,1.075,-.2),.045,.02,8)
- b.tbox(g,"rubber_mat",t,Vector3(0,.83,.3),Vector3(.43,.1,.53))
- b.tbox(g,"rubber_mat",t,Vector3(0,.89,.62),Vector3(.34,.09,.26))
- b.tbox(g,"serve_orange",t,Vector3(0,.72,.84),Vector3(.32,.06,.5))
- b.tbox(g,"serve_orange",t,Vector3(0,.72,-.88),Vector3(.3,.05,.42))
- rod(g,t,Vector3(0,1.08,-.5),Vector3(0,1.22,-.47),.03)
- rod(g,t,Vector3(-.45,1.26,-.48),Vector3(.45,1.26,-.48),.025)
- for x: float in [-.44,.44]:
-  rod(g,t,Vector3(x,1.26,-.48),Vector3(x,1.26,-.27),.035,"rubber_mat")
-  rod(g,t,Vector3(x*.65,1.26,-.48),Vector3(x*.9,1.47,-.5),.012)
-  b.tbox(g,"steel",t,Vector3(x*.9,1.48,-.5),Vector3(.14,.09,.025))
- # Headlamp is reflective glass, not an extra dynamic light.
- var forward:=Basis(Vector3.RIGHT,PI/2)
- b.tprism(g,"metal",t,Vector3(0,1.04,-.7),.12,.14,12,forward)
- b.tprism(g,"chalk",t,Vector3(0,1.04,-.85),.095,.012,12,forward)
- rod(g,t,Vector3(-.15,.4,.18),Vector3(-.45,.02,.3),.02,"metal")
- b.col(g,t*Vector3(-.45,0,-1.2),t*Vector3(.45,1.15,1.25))
 func add_live_nodes(shop: Node3D) -> Node3D:
  var garage:=Node3D.new();garage.name="Garage";shop.add_child(garage)
  b.make_windows(garage,[WINDOW])
+ var bike:=StaticBody3D.new();bike.name="Motorcycle";bike.position=Vector3(1.35,0,10);bike.rotation_degrees.y=-12
+ var bike_mesh:=MeshInstance3D.new();bike_mesh.name="SuppliedModel";bike_mesh.mesh=load("res://props/motorcycle/motorcycle_mesh.res");bike.add_child(bike_mesh)
+ var bike_shape:=CollisionShape3D.new();var bike_box:=BoxShape3D.new();bike_box.size=Vector3(.95,1.15,2.35);bike_shape.shape=bike_box;bike_shape.position.y=.575;bike.add_child(bike_shape);garage.add_child(bike)
  var far_door:=StaticBody3D.new();far_door.name="RearDoorClosed";far_door.position=Vector3(3,1.14,11.4)
  var mesh:=MeshInstance3D.new();mesh.mesh=b.single_box_mesh("door",Vector3(1.36,2.28,.08));far_door.add_child(mesh)
  var collision:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(1.36,2.28,.08);collision.shape=shape;far_door.add_child(collision);garage.add_child(far_door)
