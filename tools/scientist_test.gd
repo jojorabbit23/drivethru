@@ -30,6 +30,9 @@ func skin_check(enemy: Node3D) -> void:
  var contact_error: float=0
  for name: String in ["idle","shamble","swing","rip","climb","flinch","death"]:
   check(enemy.anim.has_animation(name),"authored "+name+" clip available")
+  if name=="death":
+   arrays=load("res://enemies/scientist/scientist_body.res").surface_get_arrays(0)
+   v=arrays[Mesh.ARRAY_VERTEX];bones=arrays[Mesh.ARRAY_BONES];weights=arrays[Mesh.ARRAY_WEIGHTS];faces=arrays[Mesh.ARRAY_INDEX]
   var clip: Animation=enemy.anim.get_animation(name)
   for phase: float in [.0,.25,.5,.75,.99]:
    skeleton.reset_bone_poses()
@@ -59,7 +62,21 @@ func run() -> void:
  player.health=player.max_health
  var enemy: Node3D=spawn()
  check(enemy.health==100 and enemy.attack_damage==12 and enemy.is_in_group("zombies"),"balanced scientist enters the regular infected roster")
+ check(enemy.get_node("Model/Skeleton3D/Body").mesh.resource_path.ends_with("scientist_live.res") and not enemy.get_node("Model/Skeleton3D/NeckStump").visible,"living scientist uses intact skin with no exposed cut surface")
  skin_check(enemy)
+ var skeleton_walk: Skeleton3D=enemy.get_node("Model/Skeleton3D")
+ for side: String in ["r","l"]:
+  var previous:=Vector3.ZERO
+  var planted: bool=true
+  for phase: float in [.08,.2,.35,.5]:
+   var time: float=phase if side=="r" else phase+.5
+   enemy.anim.play("shamble",0);enemy.anim.seek(fposmod(time,1.0),true);skeleton_walk.force_update_all_bone_transforms()
+   var foot_pose: Transform3D=skeleton_walk.get_bone_global_pose(skeleton_walk.find_bone("foot_"+side))
+   var point: Vector3=foot_pose.origin-Vector3.BACK*(.95*time)
+   if phase>.08 and absf(point.z-previous.z)>.008:planted=false
+   if foot_pose.basis.y.dot(Vector3.UP)<.999:planted=false
+   previous=point
+  check(planted,"support boot "+side+" remains flat and planted as the character advances")
  enemy.take_damage(10,true)
  check(enemy.health==70 and enemy.state==enemy.State.STAGGER,"fungal head is vulnerable and heavy hits stagger")
  enemy.state=enemy.State.ATTACK;enemy._swing_landed=false
@@ -80,10 +97,13 @@ func run() -> void:
  enemy.died.connect(func(_enemy: Node):deaths[0]+=1)
  main.health_drop_chance=1.0
  var cash: int=main.economy.cash
+ var ooze: Node3D=enemy.Ooze.get_fx(enemy)
+ var sprays_before: int=ooze.stats.sprays
  enemy.take_damage(1000,false,{"dir":Vector3(0,0,-1)})
  enemy.take_damage(1000)
+ check(ooze.stats.sprays==sprays_before+1 and ooze.droplets.size()>0 and ooze.droplets.size()<=ooze.MAX_DROPLETS,"one bounded neck splatter burst, never duplicated by corpse damage")
  check(deaths[0]==1 and enemy.is_dead() and not enemy.is_in_group("zombies") and enemy.collision_layer==0,"death and rewards occur only once, corpse stops blocking combat")
- check(not enemy.get_node("Model/Skeleton3D/DetachableHead/Head").visible,"attached head disappears exactly when a detached one appears")
+ check(not enemy.get_node("Model/Skeleton3D/DetachableHead/Head").visible and enemy.get_node("Model/Skeleton3D/Body").mesh.resource_path.ends_with("scientist_body.res") and enemy.get_node("Model/Skeleton3D/NeckStump").visible,"cut body and closed stump only appear on death")
  var heads: Array=get_nodes_in_group("scientist_heads")
  check(heads.size()==1,"one complete mushroom head detaches")
  var head: RigidBody3D=heads[0]
