@@ -29,6 +29,8 @@ static func material_specs() -> Dictionary:
  specs["serve_steel"]["uv"]="world"
  specs["serve_steel"]["metal"]=0.45
  specs["serve_steel"]["roughness"]=0.75
+ specs["serve_owner_pinup"]={"texture_path":"res://art/posters/service_yeasty_pinup.png","uv":"face","roughness":1.0}
+ specs["serve_owner_selection"]={"texture_path":"res://art/posters/service_last_selection.png","uv":"face","roughness":1.0}
  return specs
 var d
 var b
@@ -128,6 +130,11 @@ func counter_props() -> void:
  b.prism(G,"paint_orange",Vector3(-1.55,1.50,-4.65),0.075,0.34,10)
  box("metal",Vector3(-1.62,1.85,-4.68),Vector3(-1.48,1.90,-4.63))
 func posters() -> void:
+ # Owner's portrait and square prints on the back wall, beside the office door.
+ box("serve_dark",Vector3(-2.205,1.225,-0.131),Vector3(-1.455,2.325,-0.09))
+ box("serve_owner_pinup",Vector3(-2.18,1.25,-0.145),Vector3(-1.48,2.30,-0.132))
+ box("serve_dark",Vector3(-1.325,1.355,-0.131),Vector3(-0.355,2.325,-0.09))
+ box("serve_owner_selection",Vector3(-1.30,1.38,-0.145),Vector3(-0.38,2.30,-0.132))
  # Posters are thin boxes with complete face UVs and no extra collision.
  box("serve_shroom_girl",Vector3(-5.735,1.99,-2.77),Vector3(-5.719,2.76,-2.04))
  box("serve_cap_daddy",Vector3(-5.735,2.17,-1.70),Vector3(-5.719,2.77,-1.14))

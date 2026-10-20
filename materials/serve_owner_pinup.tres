@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/posters/service_yeasty_pinup.png" id="1_w0d32"]
+
+[resource]
+resource_name = "serve_owner_pinup"
+albedo_texture = ExtResource("1_w0d32")
+metallic_specular = 0.25
+texture_filter = 2
