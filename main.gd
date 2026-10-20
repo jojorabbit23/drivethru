@@ -7,7 +7,7 @@ const LANCER := preload("res://enemies/lancer/lancer.tscn")
 const HOLLOWHEAD := preload("res://enemies/hollowhead/hollowhead.tscn")
 const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
-@export_range(0.0,1.0) var health_drop_chance: float=0.10
+@export_range(0.0,1.0,0.001) var health_drop_chance: float=0.075
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0

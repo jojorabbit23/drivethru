@@ -32,7 +32,7 @@ H manually spawns one through the same capped path for testing.
 - Death releases a 1.6 s spore cloud. Within 1.7 m of the chest, with an unobstructed
   line, it deals 3 HP once and briefly tints/obscures vision. Nearby zombies become
   agitated for six seconds. Owner explicitly deferred infection progression.
-- Normal mushroom, kill cash, wave clearing and independent 10% health-bottle roll
+- Normal mushroom, kill cash, wave clearing and independent 7.5% health-bottle roll
   use the shared death path.
 
 ## Asset / performance
