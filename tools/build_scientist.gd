@@ -174,7 +174,11 @@ func smooth_skin(vertices: PackedVector3Array,faces: PackedInt32Array,bones: Pac
   values=next
  var result_bones:=PackedInt32Array();var result_weights:=PackedFloat32Array()
  for i in vertices.size():
-  var influence: PackedFloat32Array=values[weld[i]]
+  var influence: PackedFloat32Array=values[weld[i]].duplicate()
+  # Keep the bottom of each boot rigid, blending softly into the ankle above it.
+  var sole: float=1.0-smoothstep(.11,.22,vertices[i].y)
+  var foot: int=14 if vertices[i].x>0 else 17
+  for bone in BONES.size():influence[bone]=influence[bone]*(1.0-sole)+(sole if bone==foot else 0.0)
   var ranked: Array=[]
   for bone in BONES.size():ranked.append([bone,influence[bone]])
   ranked.sort_custom(func(x: Array,y: Array)->bool:return x[1]>y[1])
@@ -182,6 +186,63 @@ func smooth_skin(vertices: PackedVector3Array,faces: PackedInt32Array,bones: Pac
   for k in 4:total+=ranked[k][1]
   for k in 4:result_bones.append(ranked[k][0]);result_weights.append(ranked[k][1]/total)
  return [result_bones,result_weights]
+# A short, low-clearance shuffle with a flat, stationary support foot for 62% of each step.
+func plant_walk(player: AnimationPlayer,skeleton: Skeleton3D) -> void:
+ var clip: Animation=player.get_animation("shamble")
+ var old_length: float=clip.length
+ for track in clip.get_track_count():
+  for key in clip.track_get_key_count(track):clip.track_set_key_time(track,key,clip.track_get_key_time(track,key)/old_length)
+ clip.length=1.0
+ var controlled: Array[String]=["root","hips","thigh_r","shin_r","foot_r","thigh_l","shin_l","foot_l"]
+ for track in range(clip.get_track_count()-1,-1,-1):
+  if str(clip.track_get_path(track)).trim_prefix("Skeleton3D:") in controlled:clip.remove_track(track)
+ for name: String in controlled:
+  var index: int=skeleton.find_bone(name)
+  if name!="root":
+   var position_track: int=clip.add_track(Animation.TYPE_POSITION_3D)
+   clip.track_set_path(position_track,"Skeleton3D:"+name)
+   clip.position_track_insert_key(position_track,0,skeleton.get_bone_rest(index).origin)
+   clip.position_track_insert_key(position_track,1,skeleton.get_bone_rest(index).origin)
+ var rotation_tracks: Dictionary={}
+ for name: String in controlled:
+  var track: int=clip.add_track(Animation.TYPE_ROTATION_3D)
+  clip.track_set_path(track,"Skeleton3D:"+name)
+  rotation_tracks[name]=track
+ var root_track: int=clip.add_track(Animation.TYPE_POSITION_3D)
+ clip.track_set_path(root_track,"Skeleton3D:root")
+ for frame in 41:
+  var time: float=frame/40.0
+  var root_position:=Vector3(0,-.083+.004*cos(TAU*2*time),0)
+  clip.position_track_insert_key(root_track,time,root_position)
+  clip.rotation_track_insert_key(rotation_tracks["root"],time,Quaternion.IDENTITY)
+  clip.rotation_track_insert_key(rotation_tracks["hips"],time,Quaternion.IDENTITY)
+  for side in 2:
+   var suffix: String="r" if side==0 else "l"
+   var thigh: int=skeleton.find_bone("thigh_"+suffix)
+   var shin: int=skeleton.find_bone("shin_"+suffix)
+   var foot: int=skeleton.find_bone("foot_"+suffix)
+   var phase: float=fposmod(time+side*.5,1.0)
+   var stance: bool=phase<.62
+   var swing: float=(phase-.62)/.38 if not stance else 0.0
+   var stride: float=.95*.62
+   var target: Vector3=skeleton.get_bone_global_rest(foot).origin
+   target.z=lerpf(-stride*.5,stride*.5,phase/.62) if stance else lerpf(stride*.5,-stride*.5,smoothstep(0,1,swing))
+   target.y+=.055*pow(maxf(0,sin(PI*swing)),1.5)
+   var hip: Vector3=skeleton.get_bone_global_rest(thigh).origin+root_position
+   var upper: Vector3=skeleton.get_bone_rest(shin).origin
+   var lower: Vector3=skeleton.get_bone_rest(foot).origin
+   var length_a: float=upper.length();var length_b: float=lower.length()
+   var direction: Vector3=(target-hip).normalized()
+   var distance: float=minf(target.distance_to(hip),length_a+length_b-.0001)
+   var bend: Vector3=(Vector3.FORWARD-direction*direction.dot(Vector3.FORWARD)).normalized()
+   var cosine: float=clampf((length_a*length_a+distance*distance-length_b*length_b)/(2*length_a*distance),-1,1)
+   var knee: Vector3=hip+direction*(cosine*length_a)+bend*(sqrt(1-cosine*cosine)*length_a)
+   var thigh_rotation:=Quaternion(upper.normalized(),(knee-hip).normalized())
+   var shin_rotation:=Quaternion(lower.normalized(),(target-knee).normalized())
+   var foot_rotation:=Quaternion(Vector3.RIGHT,deg_to_rad(8.0)*sin(PI*swing))
+   clip.rotation_track_insert_key(rotation_tracks["thigh_"+suffix],time,thigh_rotation)
+   clip.rotation_track_insert_key(rotation_tracks["shin_"+suffix],time,thigh_rotation.inverse()*shin_rotation)
+   clip.rotation_track_insert_key(rotation_tracks["foot_"+suffix],time,shin_rotation.inverse()*foot_rotation)
 # Bake contact correction into clips, with no per-enemy vertex work at runtime.
 func ground_clips(player: AnimationPlayer,skeleton: Skeleton3D,mesh: ArrayMesh) -> void:
  var arrays: Array=mesh.surface_get_arrays(0)
@@ -233,12 +294,13 @@ func _initialize() -> void:
  for vertex: Vector3 in vertices:top=maxf(top,vertex.y)
  factor=1.85/top
  var labels: Array=families(vertices,triangles)
- var body_points: Array=[];var head_points: Array=[]
+ var body_points: Array=[];var head_points: Array=[];var live_points: Array=[]
  for tri in range(0,triangles.size(),3):
   var polygon: Array=[]
   for k in 3:
    var at: int=triangles[tri+k]
    polygon.append([vertices[at],normals[at],uv[at],labels[at]])
+  append_triangles(live_points,polygon)
   append_triangles(body_points,cut_polygon(polygon,false))
   append_triangles(head_points,cut_polygon(polygon,true))
  var skeleton:=Skeleton3D.new();skeleton.name="Skeleton3D"
@@ -260,9 +322,15 @@ func _initialize() -> void:
  importer.generate_lods(25,60,transforms)
  var body:=MeshInstance3D.new();body.name="Body";body.mesh=importer.get_mesh()
  save_mesh(body.mesh,OUT+"scientist_body.res")
+ var severed_mesh: ArrayMesh=body.mesh
+ var live_importer:=ImporterMesh.new()
+ live_importer.add_surface(Mesh.PRIMITIVE_TRIANGLES,make_arrays(live_points,true),[],{},material)
+ live_importer.generate_lods(25,60,transforms)
+ body.mesh=live_importer.get_mesh()
+ save_mesh(body.mesh,OUT+"scientist_live.res")
  skeleton.add_child(body);body.skin=skeleton.create_skin_from_rest_transforms();body.skeleton=NodePath("..")
  var head_mesh:=ArrayMesh.new();head_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,make_arrays(head_points,false));head_mesh.surface_set_material(0,material)
- var stump:=StandardMaterial3D.new();stump.albedo_color=Palette.WARM_CHALK;stump.roughness=1.0
+ var stump:=StandardMaterial3D.new();stump.albedo_color=Palette.BURNT_ORANGE;stump.roughness=.45
  # Cap the detached stem; the remaining neck has a matching closed stump.
  var cap_v:=PackedVector3Array();var cap_n:=PackedVector3Array()
  for k in 16:
@@ -272,8 +340,8 @@ func _initialize() -> void:
  head_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,cap_a);head_mesh.surface_set_material(1,stump)
  save_mesh(head_mesh,OUT+"scientist_head.res")
  var attach:=BoneAttachment3D.new();attach.name="DetachableHead";attach.bone_name="head";skeleton.add_child(attach)
- var head:=MeshInstance3D.new();head.name="Head";head.mesh=head_mesh;attach.add_child(head)
- var neck:=BoneAttachment3D.new();neck.name="NeckStump";neck.bone_name="neck";skeleton.add_child(neck)
+ var head:=MeshInstance3D.new();head.name="Head";head.mesh=head_mesh;head.visible=false;attach.add_child(head)
+ var neck:=BoneAttachment3D.new();neck.name="NeckStump";neck.bone_name="neck";neck.visible=false;skeleton.add_child(neck)
  var cap:=MeshInstance3D.new();cap.name="ClosedStem"
  var cylinder:=CylinderMesh.new();cylinder.top_radius=.026*factor;cylinder.bottom_radius=.026*factor;cylinder.height=.008;cylinder.radial_segments=12;cylinder.material=stump
  cap.mesh=cylinder;cap.position.y=(CUT-.66)*factor-.004;neck.add_child(cap)
@@ -297,7 +365,8 @@ func _initialize() -> void:
  var model:=Node3D.new();model.name="ScientistModel";model.add_child(skeleton)
  var player:=AnimationPlayer.new();player.name="AnimationPlayer";player.add_animation_library("",library);player.autoplay="idle";player.playback_default_blend_time=.15;model.add_child(player)
  root.add_child(model)
- ground_clips(player,skeleton,body.mesh)
+ plant_walk(player,skeleton)
+ ground_clips(player,skeleton,severed_mesh)
  for child: Node in model.get_children():own(child,model)
  var packed:=PackedScene.new();assert(packed.pack(model)==OK);assert(ResourceSaver.save(packed,OUT+"scientist_model.tscn")==OK)
  print("Scientist built: ",body_points.size()/3," body triangles, ",head_points.size()/3," head triangles; ",library.get_animation_list())

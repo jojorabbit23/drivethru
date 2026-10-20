@@ -1,4 +1,5 @@
 extends "res://enemies/shambler/shambler.gd"
+const SEVERED_BODY = preload("res://enemies/scientist/scientist_body.res")
 const FallenHead = preload("res://enemies/scientist/fallen_head.gd")
 const BREATH = preload("res://enemies/scientist/audio/breath.wav")
 const SNAP = preload("res://enemies/scientist/audio/snap.wav")
@@ -54,6 +55,10 @@ func _die() -> void:
  if direction.length_squared()<.01:direction=-global_basis.z
  head.launch=direction.normalized()*.9+Vector3.UP*1.0
  attached.hide()
+ (skeleton.get_node("Body") as MeshInstance3D).mesh=SEVERED_BODY
+ skeleton.get_node("NeckStump").show()
+ # One bounded fungal burst at the animated cut, including deaths without a hitscan impact.
+ Ooze.get_fx(self).spray(head.source_pose.origin,(direction.normalized()*.25+Vector3.UP).normalized(),Vector3.UP,1.25,true)
  get_parent().add_child(head)
  if _voice:
   _voice.stop()

@@ -22,7 +22,7 @@ func run() -> void:
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
  var enemy: Node3D=main.spawn_scientist()
  enemy.set_physics_process(false)
- enemy.global_position=Vector3(3,.02,-2.4)
+ enemy.global_position=Vector3(3,.002,-2.4)
  enemy.rotation.y=PI
  var camera: Camera3D=player.camera
  camera.global_position=Vector3(3,1.05,.2)
