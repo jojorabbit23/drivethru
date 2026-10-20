@@ -115,3 +115,6 @@ Rush shelf: age_seconds belongs to each burger; hot_remaining is a compatibility
 projection. Never reset either on transfer. Freshness stages and payments live in
 game/burger_items.gd. Discount Box shares the four tray spaces. The serving heater
 is separate from the patty warmer. See docs/handover/RUSH_SHELF.md.
+
+Kitchen radio BROADCASTS play once per run after track 2; retain played_broadcasts
+across music loops and power toggles. Off/on pauses/resumes the current stream.

@@ -6,6 +6,10 @@ const TRACKS: Array[String]=[
 	"res://presentation/music/The_Skillet_Vigil.mp3",
 ]
 const TITLES: Array[String]=["SHORT ORDER CARNAGE","LOCKED SCREEN DOOR","THE SKILLET VIGIL"]
+const BROADCASTS: Array[String]=["res://presentation/music/broadcasts/broadcast_01.ogg"]
+# Per-run history: switching off pauses a broadcast; playlist loops never replay it.
+var played_broadcasts: Dictionary={}
+var broadcast_index: int=-1
 var source: AudioStreamPlayer3D
 var enabled: bool=true
 var track_index: int=0
@@ -49,16 +53,26 @@ func _ready() -> void:
 	source.finished.connect(_next_track)
 	_load_track()
 func _load_track() -> void:
-	source.stream=load(TRACKS[track_index])
+	source.stream=load(BROADCASTS[broadcast_index] if broadcast_index>=0 else TRACKS[track_index])
 	# Individual tracks must finish so all three participate in the playlist.
 	if source.stream is AudioStreamMP3:source.stream.loop=false
+	if source.stream is AudioStreamOggVorbis:source.stream.loop=false
 	source.play()
 	source.stream_paused=not enabled
 func _next_track() -> void:
+	if broadcast_index>=0:
+		broadcast_index=-1
+	elif track_index==1:
+		for i in BROADCASTS.size():
+			if played_broadcasts.has(BROADCASTS[i]):continue
+			broadcast_index=i
+			played_broadcasts[BROADCASTS[i]]=true
+			_load_track()
+			return
 	track_index=(track_index+1)%TRACKS.size()
 	_load_track()
 func prompt(_player: Node) -> String:
-	return "E  turn radio on" if not enabled else "E  turn radio off  -  "+TITLES[track_index]
+	return "E  turn radio on" if not enabled else "E  turn radio off  -  "+("RADIO BROADCAST" if broadcast_index>=0 else TITLES[track_index])
 func interact(_player: Node) -> void:
 	enabled=not enabled
 	# Pause rather than restart: turning it back on resumes the current song.

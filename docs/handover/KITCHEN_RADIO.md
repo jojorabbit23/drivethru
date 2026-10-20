@@ -34,3 +34,8 @@ chambers, pale pith and seeds. Their natural red follows the owner-provided toma
 reference; cheese uses the shared amber palette. Both trays are merged into
 Props_Kitchen with no additional movement collision. Rebuild via build_shop.gd;
 render/inspect with capture_kitchen_toppings.gd.
+
+Broadcast update: the owner recording is inserted once after Locked Screen Door,
+then The Skillet Vigil resumes. played_broadcasts tracks each audio path per run;
+power toggles pause/resume rather than reload it. Future entries go in BROADCASTS.
+See presentation/music/broadcasts/README.md for extraction provenance and checks.

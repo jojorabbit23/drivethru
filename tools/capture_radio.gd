@@ -25,6 +25,11 @@ func run() -> void:
 	for weapon: Node3D in player.weapons:weapon.hide();weapon.set_physics_process(false)
 	Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
 	var radio: Node3D=main.get_node("KitchenRadio")
+	var broadcast_mode: bool=OS.get_cmdline_user_args().has("--broadcast")
+	if broadcast_mode:
+		radio._next_track()
+		radio._next_track()
+		assert(radio.broadcast_index==0,"broadcast starts after second song")
 	player.global_position=Vector3(4.4,0.05,-3.25)
 	var direction: Vector3=radio.global_position+Vector3(0,0.20,0)-player.camera.global_position
 	player.rotation.y=atan2(-direction.x,-direction.z)
@@ -33,7 +38,7 @@ func run() -> void:
 	player._update_focus()
 	assert(player.focus==radio,"actual interaction ray reaches radio without hitting food stations")
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://docs/previews/kitchen_radio.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://docs/previews/kitchen_radio_broadcast.png" if broadcast_mode else "res://docs/previews/kitchen_radio.png"))
 	player.use_focus()
 	assert(not radio.enabled and radio.source.stream_paused,"E turns radio off")
 	var paused_at: float=radio.source.get_playback_position()
@@ -53,6 +58,11 @@ func run() -> void:
 	var far_level: float=await sample(radio,listener,Vector3(0,0,18),capture)
 	print("RADIO AUDIO near RMS=",near_level," far RMS=",far_level)
 	assert(near_level>0.00001 and far_level<near_level*0.4,"music is audible nearby and fades with distance")
+	if broadcast_mode:
+		radio.source.finished.emit()
+		assert(radio.track_index==2 and radio.broadcast_index==-1,"third song follows broadcast")
+		for i in 3:radio.source.finished.emit()
+		assert(radio.track_index==2 and radio.broadcast_index==-1 and radio.played_broadcasts.size()==1,"next loop does not repeat broadcast")
 	AudioServer.remove_bus_effect(bus,AudioServer.get_bus_effect_count(bus)-1)
 	var pause: CanvasLayer=player.get_node("PauseMenu")
 	pause.open()
