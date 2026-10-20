@@ -29,7 +29,6 @@
 extends SceneTree
 
 const Palette = preload("res://core/palette.gd")
-const Fridge = preload("res://tools/fridge_room.gd")
 const Kitchen = preload("res://tools/kitchen_room.gd")
 const Serving = preload("res://tools/serving_room.gd")
 const Decor = preload("res://tools/shop_decor.gd")
@@ -147,7 +146,6 @@ func make_materials() -> void:
 	var specs := material_specs()
 	specs.merge(Serving.material_specs())
 	specs.merge(Kitchen.material_specs())
-	specs.merge(Fridge.material_specs())
 	var missing := []
 	for name in specs:
 		var spec: Dictionary = specs[name]
@@ -180,14 +178,6 @@ func make_materials() -> void:
 			texture.take_over_path(texture_path)
 			m.albedo_texture = texture
 			m.uv1_scale = Vector3.ONE * float(spec.get("repeat", 1.0))
-		if spec.has("normal_path"):
-			m.normal_enabled = true
-			m.normal_texture = load(spec["normal_path"])
-			m.normal_scale = 0.35
-			m.roughness_texture = load(spec["roughness_path"])
-			m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
-			m.metallic_texture = load(spec["metallic_path"])
-			m.metallic_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 		if spec.get("alpha", false):
 			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 			m.alpha_scissor_threshold = 0.5
@@ -655,13 +645,7 @@ func make_delivery_door(parent: Node3D) -> void:
 	var size := Vector3(w, h, 0.07)
 	var mi := MeshInstance3D.new()
 	mi.name = "Mesh"
-	mi.mesh = single_box_mesh("cold_door_teal", size)
-	# Hardware follows the hinged door, retaining the existing collider and interaction.
-	for detail: Array in [["cold_rack_navy",Vector3(w*0.5,1.68,-0.046),Vector3(0.46,0.36,0.022)],["cold_shelf_steel",Vector3(w*0.5,0.22,-0.046),Vector3(w-0.08,0.34,0.022)],["cold_shelf_steel",Vector3(w-0.15,1.05,-0.09),Vector3(0.045,0.31,0.065)]]:
-		var hardware := MeshInstance3D.new()
-		hardware.mesh = single_box_mesh(detail[0],detail[2])
-		hardware.position = detail[1]
-		sb.add_child(hardware)
+	mi.mesh = single_box_mesh("door", size)
 	mi.position = Vector3(w * 0.5, h * 0.5, 0.0)
 	sb.add_child(mi)
 	var cs := CollisionShape3D.new()
