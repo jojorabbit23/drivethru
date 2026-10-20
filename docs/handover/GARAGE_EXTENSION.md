@@ -1,0 +1,13 @@
+# Purchasable garage / storeroom
+
+A 6 m by 6.5 m extension sits behind the fridge's existing rear door (world x 0..6, z 5..11.5). It starts closed. Looking at the original fridge rear door and pressing E buys access for $250 if affordable. Cash is charged once, then the connecting door swings inward. Dead players cannot purchase. The far rear door stays shut and solid, with no interaction assigned yet.
+
+The room contains an original low-poly Harley-style V-twin cruiser prop in the rear-left corner, a cardboard box stack opposite it, a steel shelf using the fridge's cardboard material and five shared fungal zombie-part meshes. Exactly three empty bottles reuse the destructible bottle script/mesh: two on shelves, one on the box stack. The motorcycle is a hand-built stylized prop, not a supplied Harley-Davidson asset. Shared textures and one non-shadowed ceiling light keep presentation costs low; the cruiser is approximately 2,264 triangles and no decoration requires per-frame geometry updates.
+
+Window_C is a standard four-board eastern breach with lane, sill, repair point and climb/spawn markers. It is kept outside the normal Windows node and removed from the active windows group until the room is bought, so existing two-window starting waves are unchanged. The door-opening tween adds it to that group only after the door has finished opening; it uses normal spawn selection, repairs and enemy climb behaviour without increasing wave counts.
+
+The external delivery apron/drop marker move behind the new far door. The original shop rooms are retained. The navigation bake includes the extension and treats the connecting door as open only while baking; its world collider remains enabled in the saved starting scene. The navigation merge rasterizer uses 0.001 precision with the existing 0.05 m bake/map cell size to prevent close polygon edges incorrectly merging in the extended bake. Path continuity and actual breach traversal are tested.
+
+Rebuild with tools/build_shop.gd; garage geometry and live nodes are authored in tools/garage_room_builder.gd. Interaction is game/garage_room.gd. Never hand-edit levels/shop/generated/shop_greybox.tscn or export/shop_greybox.glb.
+
+Validation: tools/garage_test.gd covers locked collision, insufficient funds, normal look/E focus, exact price and repeated use, three bottles/fungal stock, third-window activation, open connecting path, permanently closed far door, connected navigation, repairs and actual zombie climb. tools/capture_garage.gd renders locked door, interior, cruiser, shelving, barricade and exterior. Run all test suites and required native Vulkan room/weapon captures before publication.

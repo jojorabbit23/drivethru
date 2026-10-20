@@ -32,6 +32,7 @@ const Palette = preload("res://core/palette.gd")
 const Kitchen = preload("res://tools/kitchen_room.gd")
 const Serving = preload("res://tools/serving_room.gd")
 const Decor = preload("res://tools/shop_decor.gd")
+const GarageBuilder = preload("res://tools/garage_room_builder.gd")
 
 const OUT_SCENE := "res://levels/shop/generated/shop_greybox.tscn"
 const OUT_GLB := "res://export/shop_greybox.glb"
@@ -525,6 +526,7 @@ func window_basis(w: Dictionary) -> Basis:
 	return Basis(Vector3.UP.cross(outward), Vector3.UP, outward)
 
 func window_origin(w: Dictionary) -> Vector3:
+	if w.has("origin"):return w["origin"]
 	var y: float = (w["bottom"] + w["top"]) * 0.5
 	match w["side"]:
 		"east": return Vector3(HALF_W, y, w["at"])
@@ -578,9 +580,9 @@ func build_site() -> void:
 	box("Road", "concrete", Vector3(-40, -0.02, -6.0), Vector3(40, 0.12, -5.75))  # kerb
 	# Delivery apron at the back door.
 	var dx: float = DELIVERY_DOOR["at"]
-	box("Road", "lane_floor", Vector3(dx - 2.5, -0.02, HALF_D), Vector3(dx + 2.5, 0.0, HALF_D + 5.0))
+	box("Road", "lane_floor", Vector3(dx - 2.5, -0.02, 11.5), Vector3(dx + 2.5, 0.0, 16.5))
 	for i in 5:
-		var z := HALF_D + 0.6 + i * 0.9
+		var z := 11.5 + 0.6 + i * 0.9
 		box("Road", "paint_hazard", Vector3(dx - 2.3, -0.005, z), Vector3(dx - 1.9, 0.008, z + 0.45), false)
 		box("Road", "paint_hazard", Vector3(dx + 1.9, -0.005, z), Vector3(dx + 2.3, 0.008, z + 0.45), false)
 
@@ -594,8 +596,8 @@ func make_marker(parent: Node, name: String, pos: Vector3, yaw_deg := 0.0) -> Ma
 	parent.add_child(m)
 	return m
 
-func make_windows(parent: Node3D) -> void:
-	for w in WINDOWS:
+func make_windows(parent: Node3D, definitions: Array=WINDOWS) -> void:
+	for w in definitions:
 		var node := Node3D.new()
 		node.name = "Window_" + w["id"]
 		node.transform = window_frame(w)
@@ -749,7 +751,7 @@ func make_markers(parent: Node3D) -> void:
 	make_marker(parent, "Customer_Stop", Vector3(hx, 0, -8.0), -90)
 	make_marker(parent, "Customer_Lane_End", Vector3(38, 0, -8.0), -90)
 	make_marker(parent, "Delivery_Spawn", Vector3(DELIVERY_DOOR["at"], 0, 30.0), 0)
-	make_marker(parent, "Delivery_Drop", Vector3(DELIVERY_DOOR["at"], 0, HALF_D + 1.2), 0)
+	make_marker(parent, "Delivery_Drop", Vector3(DELIVERY_DOOR["at"], 0, 12.7), 0)
 
 # Navigation mesh for zombies inside the building (they walk the lanes in
 # straight lines, then climb through a window onto this mesh). Baked from the
@@ -767,7 +769,7 @@ func bake_navigation(shop: Node3D) -> void:
 	nm.region_min_size = 1.0
 	nm.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
 	nm.geometry_collision_mask = LAYER_WORLD
-	nm.filter_baking_aabb = AABB(Vector3(-HALF_W, -0.5, -HALF_D), Vector3(HALF_W * 2.0, 2.4, HALF_D * 2.0))
+	nm.filter_baking_aabb = AABB(Vector3(-HALF_W, -0.5, -HALF_D), Vector3(HALF_W * 2.0, 2.4, 16.5))
 	region.navigation_mesh = nm
 	shop.add_child(region)
 	root.add_child(shop) # parsing needs global transforms
@@ -794,6 +796,8 @@ func _build() -> void:
 	build_site()
 	var decor = Decor.new()
 	decor.build(self)
+	var garage_builder=GarageBuilder.new()
+	garage_builder.build(self,decor)
 
 	var root := Node3D.new()
 	root.name = "ShopGreybox"
@@ -819,7 +823,13 @@ func _build() -> void:
 	make_sign(root)
 	var markers := Node3D.new(); markers.name = "Markers"; root.add_child(markers)
 	make_markers(markers)
+	var garage: Node3D=garage_builder.add_live_nodes(root)
+	# Bake the purchased doorway as a connection; its runtime door remains solid.
+	var garage_door: StaticBody3D=doors.get_node("Delivery_Door")
+	garage_door.collision_layer=0
 	bake_navigation(root)
+	garage_door.collision_layer=LAYER_WORLD
+	garage.set_script(load("res://game/garage_room.gd"))
 	own_all(root, root)
 
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://levels/shop/generated"))
