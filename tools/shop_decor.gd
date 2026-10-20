@@ -11,6 +11,7 @@ const P = preload("res://core/palette.gd")
 
 var b # the builder (tools/build_shop.gd)
 var rng := RandomNumberGenerator.new()
+var stored_fungus: Array=[]
 
 func build(builder) -> void:
 	b = builder
@@ -146,7 +147,12 @@ func shelf_unit(g: String, x0: float, x1: float, z0: float, z1: float, h: float,
 					var tp := pos + (Vector3(o, 0, 0) if along_x else Vector3(0, 0, o))
 					b.prism(g, "paint_orange" if rng.randf() < 0.5 else "lettuce", tp, 0.06, minf(0.16, hh), 8)
 			else:
-				b.obox(g, "cardboard", pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
+				if g == "Props_Storeroom" and i % 2 == 0 and cursor < 0.4:
+					stored_fungus.append([pos,stored_fungus.size()%6,0.0 if along_x else -90.0])
+				else:
+					b.obox(g, "cardboard", pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
+				if g == "Props_Storeroom" and i == levels-1 and cursor < 0.4:
+					stored_fungus.append([pos+Vector3(0,hh,0),stored_fungus.size()%6,15.0])
 			cursor += w + rng.randf_range(0.02, 0.08)
 	b.col(g, Vector3(x0, 0, z0), Vector3(x1, h, z1))
 
@@ -442,3 +448,24 @@ func storeroom() -> void:
 		b.tprism(g, "metal", th, Vector3(sx * 1.25, 0.1, -0.05), 0.1, 0.05, 8, Basis(Vector3.BACK, PI / 2))
 	b.tbox(g, "metal", th, Vector3(0, 1.2, 0), Vector3(0.4, 0.04, 0.04))
 	b.col(g, Vector3(4.72, 0, 2.15), Vector3(5.23, 1.25, 2.65))
+
+# Shared static meshes; no additional lights, physics bodies or per-frame scripts.
+func add_stored_fungus(parent: Node3D) -> void:
+	stored_fungus.append([Vector3(0.96,1.19,3.85),4,-15.0])
+	stored_fungus.append([Vector3(0.68,0.64,4.36),2,25.0])
+	var stock:=Node3D.new();stock.name="Stored_Fungal_Cuts";parent.add_child(stock)
+	for i in stored_fungus.size():
+		var item: Array=stored_fungus[i]
+		var instance:=MeshInstance3D.new();instance.name="FungalCut_%02d"%i
+		instance.mesh=load("res://props/fungal_stock/cut_%d.res"%int(item[1]))
+		instance.position=item[0];instance.rotation_degrees.y=item[2]
+		instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		stock.add_child(instance)
+
+func add_empty_bottles(parent: Node3D) -> void:
+	var script: Script=load("res://props/empty_bottle/empty_bottle.gd")
+	for at: Vector3 in [Vector3(4.26,0.90,-0.25),Vector3(5.28,1.535,3.15),Vector3(1.38,0.69,3.80)]:
+		var bottle:=StaticBody3D.new();bottle.set_script(script);bottle.name="EmptyBottle_%d"%parent.get_child_count();bottle.position=at;bottle.collision_layer=1;bottle.collision_mask=0
+		var mesh:=MeshInstance3D.new();mesh.mesh=load("res://props/empty_bottle/bottle_mesh.res");bottle.add_child(mesh)
+		var shape:=CollisionShape3D.new();var capsule:=CylinderShape3D.new();capsule.radius=0.045;capsule.height=0.27;shape.shape=capsule;shape.position.y=0.135;bottle.add_child(shape)
+		parent.add_child(bottle)

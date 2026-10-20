@@ -178,6 +178,7 @@ func shoot() -> Dictionary:
 	var res := Hitscan.cast(camera.get_world_3d().direct_space_state, from, to, ex)
 	if res.is_empty():
 		return {}
+	Hitscan.damage_prop(res, damage)
 	_spark(res["position"])
 	var col: Object = res["collider"]
 	var zombie: Node = null

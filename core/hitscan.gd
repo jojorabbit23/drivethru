@@ -33,3 +33,12 @@ static func cast(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, e
 	if not world.is_empty():
 		world["kind"] = "world"
 	return world
+
+# Decorative breakables use a separate API and never count as zombie hits/kills.
+static func damage_prop(result: Dictionary, amount: float) -> bool:
+	if result.is_empty():return false
+	var target: Object=result.get("collider")
+	if is_instance_valid(target) and target.has_method("take_prop_damage"):
+		target.take_prop_damage(amount)
+		return true
+	return false

@@ -299,6 +299,7 @@ func _strike() -> void:
 		hit.emit(z, head, z.is_dead())
 		_kick(0.6)
 	elif not wall.is_empty():
+		Hitscan.damage_prop(wall,slash_damage if _attack_kind == "slash" else stab_damage)
 		_clink(wall["position"], wall["normal"])
 		_kick(1.0)
 

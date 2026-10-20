@@ -800,6 +800,8 @@ func _build() -> void:
 	for g in group_order:
 		var parent := decor_root if (g as String).begins_with("Decor") or (g as String).begins_with("Props") else structure
 		parent.add_child(make_group_node(g, groups[g]))
+	decor.add_stored_fungus(decor_root)
+	decor.add_empty_bottles(decor_root)
 	var windows := Node3D.new(); windows.name = "Windows"; root.add_child(windows)
 	make_windows(windows)
 	var doors := Node3D.new(); doors.name = "Doors"; root.add_child(doors)
