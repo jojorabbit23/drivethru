@@ -478,15 +478,23 @@ func choose(i: int) -> void:
 
 # ------------------------------------------------------------ repair ----
 func _update_repair(delta: float) -> void:
+	var previous: Node3D=repair_window
 	repair_window = null
 	if is_dead() or focus:
+		repair_progress=0.0
 		return
 	var best := repair_reach
 	for w in get_tree().get_nodes_in_group("windows"):
 		var d := Vector2(w.repair_point().x - global_position.x, w.repair_point().z - global_position.z).length()
-		if d < best and w.boards_left() < w.boards.size():
-			best = d
-			repair_window = w
+		if d >= best or w.boards_left() >= w.boards.size():continue
+		var target: Vector3=w.global_position
+		var direction: Vector3=camera.global_position.direction_to(target)
+		if (-camera.global_basis.z).dot(direction)<0.65:continue
+		var ray:=PhysicsRayQueryParameters3D.create(camera.global_position,target,1)
+		if not get_world_3d().direct_space_state.intersect_ray(ray).is_empty():continue
+		best=d
+		repair_window=w
+	if previous!=repair_window:repair_progress=0.0
 	if repair_window and Input.is_action_pressed("interact"):
 		repair_progress += delta / repair_time
 		if repair_progress >= 1.0:

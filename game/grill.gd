@@ -248,11 +248,11 @@ func _show(i: int) -> void:
 		"cooking":
 			var k := (t - RAW_TIME) / (COOK_TIME - RAW_TIME)
 			cook = k * 0.7
-			label.text = "%s\n%d%%" % [kind, int(k * 100.0)]
+			label.text = "%s\nCOOKING\n%d%%" % [kind, int(k * 100.0)]
 			label.modulate = P.AMBER_GLOW
 		"ready":
 			cook = 0.7 + 0.3 * clampf((t - COOK_TIME) / ready_window(), 0.0, 1.0)
-			label.text = "%s\n%ds" % [kind, ceili(burn_time() - t)]
+			label.text = "%s\nREADY\n%ds" % [kind, ceili(burn_time() - t)]
 			label.modulate = P.ELECTRIC_TEAL
 		"burnt":
 			cook = 1.0
@@ -417,10 +417,17 @@ func prompt(player: Node) -> String:
 	var a := aimed_slot(player)
 	if can_flip(a):
 		return "E  flip the %s patty  ·  cooks faster" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
+	if a>=0 and a<slot_count():
+		var target: Dictionary=slots[a]
+		if target.state=="raw":return "RAW  ·  cooking starts automatically"
+		if target.state=="ready":return "READY  ·  bag at the PREP bench"
+		if target.state=="burnt":return "BURNT  ·  salvage at PREP or discard after bagging"
+		if target.state=="cooking":return "COOKING  ·  leave this patty on the grill"
 	if first("burnt") >= 0:
 		return "E  GRILL  ·  a patty is burning!"
 	if first("") >= 0:
 		return "E  place patty  ·  %d free slot%s" % [count(""), "" if count("") == 1 else "s"]
+	if count("ready")==0:return "GRILL FULL  ·  leave patties to cook"
 	return "GRILL FULL  ·  bag ready patties at the prep bench"
 
 func menu_title() -> String:

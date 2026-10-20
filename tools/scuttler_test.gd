@@ -115,6 +115,7 @@ func _run() -> void:
 
 	print("== repairing")
 	await fresh(win("A").repair_point())
+	player.get_node("Head/Camera3D").look_at(win("A").global_position)
 	z = main.spawn_scuttler(win("A"))
 	var held := 0.0
 	t = 0.0

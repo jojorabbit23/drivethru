@@ -28,8 +28,10 @@ void fragment() {
 	vec3 c = mix(under, cap_colour.rgb, is_cap);
 	float d = dot(texture(detail, UV).rgb, vec3(0.333));
 	c *= 0.82 + 0.36 * d;                        // speckle from the pickup's texture
-	vec3 seared = c * 0.6 + vec3(0.05, 0.02, 0.0);  // darker, a touch warmer: still its own colour
-	c = mix(c, seared, cook);
+	vec3 seared = mix(vec3(0.34, 0.16, 0.055), cap_colour.rgb * 0.48, is_cap * 0.35);  // darker, a touch warmer: still its own colour
+	c = mix(c, seared, smoothstep(0.0, 0.7, cook));
+	float stripes = 1.0 - step(0.13, abs(fract(lp.x * 18.0 + lp.z * 4.0) - 0.5));
+	c *= 1.0 - stripes * smoothstep(0.3, 0.8, cook) * 0.55;
 	c = mix(c, vec3(0.085, 0.07, 0.065), burnt);  // charred
 	ALBEDO = c;
 	ROUGHNESS = mix(0.8, 0.55, cook * (1.0 - burnt)); // a seared sheen
