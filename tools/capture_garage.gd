@@ -22,7 +22,7 @@ func run() -> void:
  for i in 20:await process_frame
  camera.global_position=Vector3(3.1,1.65,5.65);camera.look_at(Vector3(2.7,1.05,9.75));camera.fov=82
  await snap("interior")
- camera.global_position=Vector3(4.4,1.5,8.25);camera.look_at(Vector3(1.35,.7,10.0));camera.fov=65
+ camera.global_position=Vector3(4.4,1.5,8.25);camera.look_at(Vector3(1.5,.7,10.0));camera.fov=65
  await snap("cruiser")
  camera.global_position=Vector3(4.3,1.6,10.3);camera.look_at(Vector3(.65,1.1,7.3));camera.fov=75
  await snap("shelves")

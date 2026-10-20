@@ -38,6 +38,8 @@ func run() -> void:
  check(not player.test_move(player.global_transform,Vector3(0,0,2.3)),"purchased doorway opens a clear path into the garage")
  garage.interact(player)
  check(main.economy.cash==50,"repeat interaction never charges twice")
+ player.global_position=Vector3(3,.02,6.1)
+ check(not player.test_move(player.global_transform,Vector3(0,0,4.5)),"diagonally parked motorcycle leaves the centre aisle clear")
  player.global_position=Vector3(3,.02,9.6)
  check(player.test_move(player.global_transform,Vector3(0,0,3)),"the additional rear door remains shut and solid")
  var nav: RID=main.shop.get_node("NavigationRegion3D").get_navigation_map()
