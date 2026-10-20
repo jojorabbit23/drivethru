@@ -28,6 +28,7 @@ static func material_specs() -> Dictionary:
  specs["kit_tomato_pith"]={"c":tomato_red.lerp(P.WARM_CHALK,0.45)}
  specs["kit_tomato_seed"]={"c":P.AMBER_GLOW.lerp(P.WARM_CHALK,0.35)}
  specs["kit_owner_poster"]={"texture_path":"res://art/posters/kitchen_misery_sermon.png","uv":"face","roughness":1.0}
+ specs["kit_morel_drivers"]={"texture_path":"res://art/posters/kitchen_morel_drivers_worn.png","uv":"face","roughness":1.0}
  return specs
 var b
 var d
@@ -172,6 +173,9 @@ func ingredient_rack() -> void:
     for row in 2:b.prism(G,"bun",Vector3(0.50+j*0.22,y+0.025,-0.46+row*0.20),0.08,0.06,8)
  b.col(G,Vector3(0.35,0,-0.62),Vector3(1.35,1.75,-0.10))
 func wall_details() -> void:
+ # Worn landscape poster above the ingredient rack, below the overhead pipes.
+ box("serve_dark",Vector3(0.275,1.955,-0.131),Vector3(1.325,2.687,-0.09))
+ box("kit_morel_drivers",Vector3(0.30,1.98,-0.145),Vector3(1.30,2.662,-0.132))
  # Original portrait proportions; mounted beside the doorway, clear of the rack.
  var poster_height: float=0.82*1457.0/1079.0
  box("serve_dark",Vector3(1.415,1.225,-0.131),Vector3(2.285,1.275+poster_height,-0.09))
