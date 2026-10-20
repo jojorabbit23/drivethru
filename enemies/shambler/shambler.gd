@@ -188,7 +188,8 @@ func _window_busy() -> bool:
 
 func _start_climb() -> void:
 	state = State.CLIMB
-	collision_layer = 0
+	# Keep weapon rays hittable; only movement collision is suspended for entry.
+	collision_layer = 8
 	collision_mask = 0
 	velocity = Vector3.ZERO
 	_play("climb", 0.15)

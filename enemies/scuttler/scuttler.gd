@@ -199,7 +199,8 @@ func _start_dive() -> void:
 	if gi < 0:
 		return
 	state = State.CLIMB
-	collision_layer = 0
+	# Keep weapon rays hittable; only movement collision is suspended for entry.
+	collision_layer = 8
 	collision_mask = 0
 	velocity = Vector3.ZERO
 	_play("dive", 0.06)
