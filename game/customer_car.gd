@@ -72,7 +72,7 @@ func _build_bus() -> void:
 		driver.name="CubeDriver"
 		_body.add_child(driver)
 		driver.position=Vector3(0.68,1.40,0.20)
-	_add_bubble(Vector3(VEHICLES[vehicle]["side"], 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
+	_add_bubble(Vector3(VEHICLES[vehicle]["side"], 1.60, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
 
 # Old placeholder car (kept for reference; unused).
 func _build(colour: Color) -> void:
@@ -121,48 +121,64 @@ func _add_bubble(at: Vector3) -> void:
 	_bubble_y = at.y
 	add_child(_bubble)
 	var back := Icons.sprite("burger", 0.03)
-	back.texture = _bubble_texture()
+	back.texture = _bubble_texture(order)
+	back.pixel_size = 0.035
 	back.render_priority = 0
 	_bubble.add_child(back)
-	var icon := Icons.sprite("burger_" + order, 0.026)
-	icon.position = Vector3(0, 0.04, 0.0)
+	var icon := Icons.sprite("burger_" + order, 0.035)
+	icon.position = Vector3(-0.19, -0.04, 0.01)
 	icon.render_priority = 1
 	_bubble.add_child(icon)
-	if quantity>1:
-		var count:=Label3D.new()
-		_quantity_label=count
-		count.text="x%d" % quantity
-		count.position=Vector3(0.36,0.04,0.02)
-		count.billboard=BaseMaterial3D.BILLBOARD_ENABLED
-		count.font_size=32
-		count.pixel_size=0.008
-		_bubble.add_child(count)
+	var title:=Label3D.new()
+	title.name="BurgerColour"
+	title.text=order.to_upper()+" BURGER"
+	title.position=Vector3(0,0.32,0.02)
+	title.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+	title.font_size=28
+	title.pixel_size=0.003
+	title.modulate=P.MIDNIGHT_TYNE
+	title.render_priority=2
+	title.outline_size=0
+	_bubble.add_child(title)
+	var count:=Label3D.new()
+	_quantity_label=count
+	count.text="x%d" % quantity
+	count.position=Vector3(0.30,-0.04,0.02)
+	count.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+	count.font_size=40
+	count.pixel_size=0.006
+	count.modulate=P.MIDNIGHT_TYNE
+	count.render_priority=2
+	count.outline_size=0
+	_bubble.add_child(count)
 	_bar = MeshInstance3D.new()
 	var q := QuadMesh.new()
-	q.size = Vector2(0.5, 0.06)
+	q.size = Vector2(0.8, 0.06)
 	_bar.mesh = q
 	var bm := Station.flat(P.ELECTRIC_TEAL)
 	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	bm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	bm.render_priority = 3
 	_bar.material_override = bm
-	_bar.position = Vector3(0, -0.36, 0)
+	_bar.position = Vector3(0, -0.36, 0.03)
 	_bubble.add_child(_bar)
 	_bubble.visible = false
 
 func refresh_order_quantity() -> void:
 	if _quantity_label:_quantity_label.text="x%d" % maxi(0,quantity-received)
 
-static func _bubble_texture() -> Texture2D:
-	var img := Image.create(24, 24, false, Image.FORMAT_RGBA8)
+static func _bubble_texture(kind: String="brown") -> Texture2D:
+	var img := Image.create(32, 30, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
-	for y in 20:
-		for x in 24:
-			var corner := (x < 2 or x > 21) and (y < 2 or y > 17)
+	var colour: Color=Icons.KIND_COLOUR.get(kind,P.BURNT_ORANGE)
+	for y in 26:
+		for x in 32:
+			var corner := (x < 2 or x > 29) and (y < 2 or y > 23)
 			if not corner:
-				img.set_pixel(x, y, P.WARM_CHALK if (x > 0 and x < 23 and y > 0 and y < 19) else P.MIDNIGHT_TYNE)
-	for y in range(20, 24):            # tail
-		for x in range(6, 6 + (24 - y)):
-			img.set_pixel(x, y, P.WARM_CHALK)
+				img.set_pixel(x,y,P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==25 else (colour if x<3 or x>28 or y<3 else P.WARM_CHALK))
+	for y in range(26, 30):            # tail
+		for x in range(8, 8 + (30 - y)):
+			img.set_pixel(x, y, colour)
 	return ImageTexture.create_from_image(img)
 
 func _box(size: Vector3, at: Vector3, colour: Color) -> void:
@@ -175,6 +191,9 @@ func _box(size: Vector3, at: Vector3, colour: Color) -> void:
 	add_child(m)
 
 func _process(delta: float) -> void:
+	# Lay out the entire card in screen-facing space, including icon/count offsets.
+	var viewer: Camera3D=get_viewport().get_camera_3d()
+	if _bubble and viewer:_bubble.global_basis=viewer.global_basis
 	_t += delta
 	_spin_wheels()
 	match state:
