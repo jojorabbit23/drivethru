@@ -15,7 +15,7 @@ func run() -> void:
  check(gun._pivot.visible and gun._view_anim.has_animation("reload"),"new model and reload animation load")
  var slide: MeshInstance3D=gun._pivot.find_child("pistol_slide",true,false)
  var finish: ShaderMaterial=slide.mesh.surface_get_material(0)
- check(finish.get_shader_parameter("textured") and finish.get_shader_parameter("albedo_tex")!=null,"original textured pistol replaces stock gun in new hands")
+ check(finish.get_shader_parameter("textured") and finish.get_shader_parameter("albedo_tex")!=null,"owner stylized textured pistol loads in retained hands")
  check(not gun.request_fire() and gun.mag==12,"draw gate prevents premature shot")
  gun._physics_process(0.4)
  check(gun.request_fire() and gun.mag==11,"pistol fires one round")

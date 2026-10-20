@@ -7,9 +7,10 @@
 #   pistol_hand_r.res / pistol_hand_l.res  Cleatimus's sculpted glove (the knife
 #       hand, already fitted round a handle) moved into handle space, and a
 #       mirrored copy for the left support hand
-#   pistol_viewmodel.tscn  the pack's 9mm pistol (addons/psx_fps_arms, CC BY
-#       4.0: its LICENSE file and the credit line in CREDITS.md stay) with the
-#       gloved hands on GripSocket / SupportSocket and a MuzzleTip marker.
+#   pistol_viewmodel.tscn  owner's stylized pistol with Cleatimus hands.
+#   stylized_pistol_rig.tscn / stylized_*.res / stylized_albedo.png: mechanical
+#       rig from tools/stylized_pistol_rig.gd. Pack measurements are retained
+#       for the established hand sockets; retain the pack's CC BY 4.0 credit.
 #
 # Handle space is the knife's: the handle runs along +Z from the origin, the
 # thumb points down -Z (where the knife's blade went) and the back of the hand
@@ -33,7 +34,6 @@ const OUT := "res://weapons/pistol/"
 # camera must not have collision bodies sitting inside the player.
 const PISTOL := "res://addons/psx_fps_arms/models/pistol_model.glb"
 const KNIFE_VM := "res://weapons/knife/knife_viewmodel.tscn"
-const CUSTOM_PISTOL := "res://weapons/pistol/source/pistol_custom.glb"
 const Common = preload("res://tools/build_crop_duster.gd")
 
 const CUT := 0.14              # along the forearm: keep the glove and cuff up to here
@@ -299,43 +299,17 @@ func build_model(hand_r: Mesh, hand_l: Mesh, arm_r: Vector3, arm_l: Vector3) -> 
 	model.add_child(marker)
 	marker.owner = scene
 	print("muzzle ", marker.position)
-	# Both pistols use the same named parts and model coordinates. Replace the
-	# stock geometry while keeping its animated nodes and the new hand sockets.
-	var custom: Node3D = load(CUSTOM_PISTOL).instantiate()
-	var custom_parts: Dictionary = {}
-	for mesh: MeshInstance3D in custom.find_children("*", "MeshInstance3D", true, false):
-		custom_parts[String(mesh.name)] = mesh.mesh
-	for mesh: MeshInstance3D in pistol.find_children("*", "MeshInstance3D", true, false):
-		mesh.mesh = custom_parts.get(String(mesh.name))
-		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		if mesh.mesh == null: continue
-		mesh.mesh = mesh.mesh.duplicate()
-		for surface in mesh.mesh.get_surface_count():
-			var original: StandardMaterial3D = mesh.mesh.surface_get_material(surface)
-			var material := ShaderMaterial.new()
-			material.shader = preload("res://weapons/crop_duster/viewmodel.gdshader")
-			material.set_shader_parameter("colour", original.albedo_color)
-			material.set_shader_parameter("textured", original.albedo_texture != null)
-			material.set_shader_parameter("albedo_tex", original.albedo_texture)
-			material.set_shader_parameter("roughness", original.roughness)
-			material.set_shader_parameter("metallic", original.metallic)
-			mesh.mesh.surface_set_material(surface, material)
-	custom.free()
-	var magazine: Node3D = pistol.find_child("pistol_magazine", true, false)
-	var body := MeshInstance3D.new()
-	body.name = "MagazineBody"
-	var box := BoxMesh.new()
-	box.size = Vector3(0.024, 0.085, 0.032)
-	body.mesh = box
-	body.position = Vector3(0, 0.040, -0.010)
-	body.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var metal := ShaderMaterial.new()
-	metal.shader = preload("res://weapons/crop_duster/viewmodel.gdshader")
-	metal.set_shader_parameter("colour", preload("res://core/palette.gd").WET_CHARCOAL)
-	metal.set_shader_parameter("roughness", 0.75)
-	body.material_override = metal
-	magazine.add_child(body)
+	# Keep the established hand sockets; replace only the owner's weapon rig.
+	model.remove_child(pistol)
+	pistol.free()
+	pistol = preload("res://tools/stylized_pistol_rig.gd").new().build()
+	model.add_child(pistol)
+	marker.position = (Vector3(0,0.485,0.48)-Vector3(0,0.21,-0.30))*0.22
 	pistol.scene_file_path = ""
+	Common.own_children(pistol, pistol)
+	var standalone := PackedScene.new()
+	assert(standalone.pack(pistol) == OK)
+	assert(ResourceSaver.save(standalone, OUT + "stylized_pistol_rig.tscn") == OK)
 	Common.own_children(scene, scene)
 
 	var packed := PackedScene.new()
