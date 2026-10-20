@@ -42,7 +42,7 @@ func run() -> void:
  for i in 5:await process_frame
  check(player.position.is_equal_approx(position),"player stays fixed while paused")
  pause.show_settings()
- check(pause.settings and pause.content.get_child_count()==10,"all nine presentation controls are available")
+ check(pause.settings and pause.content.get_child_count()==11,"audio, comfort and lighting controls are available")
  pause.home()
  pause.resume()
  check(not paused and not pause.screen.visible,"resume restores gameplay")

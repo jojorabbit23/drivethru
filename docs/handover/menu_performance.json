@@ -1,0 +1,23 @@
+[
+  {
+    "p95_ms": 17.757,
+    "stage": "intro / changing selection",
+    "video_height": 720,
+    "video_width": 1280,
+    "worst_ms": 18.094
+  },
+  {
+    "p95_ms": 17.906,
+    "stage": "waiting bun / changing selection",
+    "video_height": 720,
+    "video_width": 1280,
+    "worst_ms": 18.184
+  },
+  {
+    "p95_ms": 17.758,
+    "stage": "bus cinematic",
+    "video_height": 720,
+    "video_width": 1280,
+    "worst_ms": 17.998
+  }
+]

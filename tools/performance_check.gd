@@ -5,13 +5,15 @@ var main: Node3D
 var knife: Node
 var viewport_rid: RID
 var results: Array[Dictionary] = []
+var profile_fps: int = 30
 func _initialize() -> void:
-	Engine.max_fps = 30
+	profile_fps = maxi(30, int(OS.get_environment("FPS_PROFILE_CAP"))) if not OS.get_environment("FPS_PROFILE_CAP").is_empty() else 30
+	Engine.max_fps = profile_fps
 	create_timer(20.0).timeout.connect(_timeout)
 	run.call_deferred()
 func settle(frames: int) -> void:
 	for i in frames:
-		Engine.max_fps = 30
+		Engine.max_fps = profile_fps
 		await process_frame
 func stats(samples: Array[float]) -> Dictionary:
 	samples.sort()
@@ -27,7 +29,7 @@ func measure(label: String, combat: bool = false) -> void:
 	var primitives := 0.0
 	var last: int = Time.get_ticks_usec()
 	for i in 75:
-		Engine.max_fps = 30
+		Engine.max_fps = profile_fps
 		if combat and i % 30 == 0:
 			knife.call("request","slash" if i % 60 == 0 else "stab")
 		await process_frame
@@ -50,6 +52,9 @@ func run() -> void:
 	main = load("res://main.tscn").instantiate()
 	main.set("auto_spawn",false)
 	root.add_child(main)
+	if profile_fps > 60: DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	if OS.get_environment("FPS_PROFILE_NO_SHADOWS") == "1":
+		for light: Light3D in main.find_children("*", "Light3D", true, false): light.shadow_enabled = false
 	var player: CharacterBody3D = main.get_node("Player")
 	player.set_process_unhandled_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

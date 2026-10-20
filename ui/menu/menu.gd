@@ -25,7 +25,7 @@ func atlas(rect: Rect2) -> AtlasTexture:
 func _ready() -> void:
  Prefs.configure()
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
- Engine.max_fps=30
+ Engine.max_fps=60
  var background:=ColorRect.new()
  background.color=P.MIDNIGHT_TYNE
  background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -192,7 +192,9 @@ func _notification(what: int) -> void:
  if DisplayServer.get_name()=="headless":return
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   Engine.max_fps=15
+  if video:video.paused=true
   Prefs.set_focused(false)
  elif what==NOTIFICATION_APPLICATION_FOCUS_IN:
-  Engine.max_fps=30
+  Engine.max_fps=60
+  if video:video.paused=false
   Prefs.set_focused(true)
