@@ -18,6 +18,7 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    script you touch:
    `godot --headless --path . --check-only --script res://path/to/file.gd`
 2. **Never hand-edit generated files.** These are rebuilt by scripts:
+   - `pickups/health/bottle_mesh.res`: `tools/build_health_bottle.gd` (owner GLB retained in source/)
    - `levels/shop/generated/*`, `materials/*.tres`: `tools/build_shop.gd`
    - `enemies/shambler/shambler_model.tscn` and `shambler_*`: `tools/build_zombie.gd`
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
@@ -55,6 +56,7 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    Scuttler's glowing orange cap spots and the dropped mushroom pickups, which
    are deliberate bioluminescence. The owner-supplied tomato reference also permits
    natural red flesh for the kitchen tomato slices (local food-colour exception).
+   The owner-supplied blue health bottle retains its supplied texture.
 6. **Respect licences.** The PSX FPS Arms Free pack is CC BY 4.0. Any use of it
    must keep its LICENSE file and the credit line in `CREDITS.md`.
 7. **Small, honest commits.** Say in the commit message what you changed and
