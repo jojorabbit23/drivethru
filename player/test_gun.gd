@@ -1,9 +1,9 @@
 # The pistol, slot 1. Lives under Head/Camera3D. Left click to fire.
 # Body shot 34, headshot x3 (one-shot kill on a Shambler).
 # The shot itself is still hitscan; the viewmodel
-# (weapons/pistol/pistol_viewmodel.tscn, tools/build_pistol.gd) is the arms
-# pack's own 9mm in Cleatimus's gloved hands, animated in code (draw rise,
-# recoil kick) plus the pack's fire/reload clips on its AnimationPlayer.
+# (weapons/pistol/pistol_viewmodel.tscn, tools/build_pistol.gd) uses the
+# owner's stylized pistol in Cleatimus's gloved hands. Code supplies draw rise
+# and recoil; its AnimationPlayer cycles the hammer, slide and magazine.
 # Sounds are requested by name ("pistol"); game/sfx.gd plays silence for names
 # it doesn't know yet.
 extends Node3D
@@ -53,8 +53,7 @@ func set_active(on: bool) -> void:
 	else:
 		_reloading = 0.0
 		if _view_anim:
-			_view_anim.stop()
-			_view_anim.speed_scale = 1.0
+			_reset_mechanism()
 		if _support: _support.transform = _support_rest
 	if _pivot:
 		_pivot.visible = on
@@ -93,8 +92,7 @@ func _physics_process(delta: float) -> void:
 			var n := mini(mag_size - mag, reserve)
 			mag += n
 			reserve -= n
-			if _view_anim:
-				_view_anim.speed_scale = 1.0
+			_reset_mechanism()
 			ammo_changed.emit(mag, reserve)
 	_flash.light_energy = maxf(0.0, _flash.light_energy - delta * 40.0)
 	_flash.visible = _flash.light_energy > 0.0
@@ -129,7 +127,7 @@ func reload() -> void:
 	_play_reload()
 	ammo_changed.emit(mag, reserve)
 
-# The pack's clip is 1.6 s; run it at the game's reload pace so its slide rack
+# The mechanical clip is 1.6 s; run it at the game's reload pace so its slide rack
 # lands just as the fresh magazine goes back in.
 func _play_reload() -> void:
 	if _view_anim == null:
@@ -139,6 +137,14 @@ func _play_reload() -> void:
 		return
 	_view_anim.speed_scale = clip.length / maxf(reload_time, 0.01)
 	_view_anim.play("reload", 0.04)
+
+# Restore the physical parts too when a reload finishes or is cancelled.
+func _reset_mechanism() -> void:
+	if not _view_anim: return
+	_view_anim.speed_scale = 1.0
+	_view_anim.play("RESET", 0.0)
+	_view_anim.advance(0.0)
+	_view_anim.stop()
 
 func is_reloading() -> bool:
 	return _reloading > 0.0
@@ -219,9 +225,14 @@ func _animate(delta: float) -> void:
 	var progress: float = 1.0 - _reloading / reload_time if is_reloading() else 0.0
 	var release: float = smoothstep(0.0, 0.18, progress) * (1.0 - smoothstep(0.72, 1.0, progress))
 	_support.transform = _support_rest
-	_support.position += Vector3(-0.055, -0.13, -0.02) * release
+	# Match the magazine's extraction/insertion phases, then settle back onto the grip.
+	var magazine_travel: float = smoothstep(0.1, 0.275, progress) * (1.0 - smoothstep(0.4375, 0.70625, progress))
+	_support.position += Vector3(-0.025, -0.03, -0.01) * release + Vector3(0.0, -0.13, -0.03) * magazine_travel
 	var pos := REST_POS
 	var rot := REST_ROT
+	# Bring the magazine well into view while the support hand changes the magazine.
+	pos += Vector3(-0.02, 0.025, 0.015) * release
+	rot += Vector3(12.0, -18.0, -14.0) * release
 	# draw: rise into view
 	if _draw_t > 0.0:
 		_draw_t = maxf(0.0, _draw_t - delta)
