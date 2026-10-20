@@ -35,7 +35,7 @@ func build(builder,decor) -> void:
 func add_live_nodes(shop: Node3D) -> Node3D:
  var garage:=Node3D.new();garage.name="Garage";shop.add_child(garage)
  b.make_windows(garage,[WINDOW])
- var bike:=StaticBody3D.new();bike.name="Motorcycle";bike.position=Vector3(1.5,0,10);bike.rotation_degrees.y=135
+ var bike:=StaticBody3D.new();bike.name="Motorcycle";bike.position=Vector3(1.135,0,10.225);bike.rotation_degrees.y=225
  var bike_mesh:=MeshInstance3D.new();bike_mesh.name="SuppliedModel";bike_mesh.mesh=load("res://props/motorcycle/motorcycle_mesh.res");bike.add_child(bike_mesh)
  var bike_shape:=CollisionShape3D.new();var bike_box:=BoxShape3D.new();bike_box.size=Vector3(.85,1.15,2.25);bike_shape.shape=bike_box;bike_shape.position.y=.575;bike.add_child(bike_shape);garage.add_child(bike)
  var far_door:=StaticBody3D.new();far_door.name="RearDoorClosed";far_door.position=Vector3(3,1.14,11.4)

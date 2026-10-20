@@ -20,6 +20,14 @@ func run() -> void:
  var bike_mesh: Mesh=garage.get_node("Motorcycle/SuppliedModel").mesh
  var bike_bounds: AABB=bike_mesh.get_aabb()
  check(bike_mesh.resource_path.ends_with("motorcycle_mesh.res") and absf(bike_bounds.position.y)<.001 and absf(bike_bounds.size.z-2.35)<.001,"owner motorcycle replaces the placeholder, scaled and grounded")
+ var left_edge: float=INF;var back_edge: float=-INF
+ var bike: Node3D=garage.get_node("Motorcycle")
+ for surface in bike_mesh.get_surface_count():
+  var vertices: PackedVector3Array=bike_mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+  for vertex: Vector3 in vertices:
+   var world: Vector3=bike.to_global(vertex)
+   left_edge=minf(left_edge,world.x);back_edge=maxf(back_edge,world.z)
+ check(absf(left_edge-.25)<.015 and absf(back_edge-11.25)<.015,"both tyres meet their respective walls without the model clipping through")
  player.global_position=Vector3(1.35,.02,8.3)
  check(player.test_move(player.global_transform,Vector3(0,0,2)),"motorcycle has solid collision in its parking corner")
  main.economy.cash=249
