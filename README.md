@@ -1,3 +1,10 @@
+## Sawn-off sound update
+
+SAWN-OFF now uses the supplied explosive blast with a deeper bass impact. The
+original ringing tail is preserved after 0.85s. Audio/source and reproducible
+processing notes live in weapons/crop_duster/audio/; native firing/audio checks
+are in tools/check_sawn_off_audio.gd.
+
 ## Rugged customer truck
 
 The supplied off-road truck joins the bus and armoured truck in the random customer

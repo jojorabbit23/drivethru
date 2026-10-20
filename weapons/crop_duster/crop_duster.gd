@@ -6,6 +6,7 @@ signal ammo_changed
 const P=preload("res://core/palette.gd")
 const Hitscan=preload("res://core/hitscan.gd")
 const VIEWMODEL=preload("res://weapons/crop_duster/crop_duster_viewmodel.tscn")
+const SHOT_SOUND=preload("res://weapons/crop_duster/audio/sawn_off_deep_blast.wav")
 const DRAW_TIME:=0.45
 const RELOAD_TIME:=3.4
 @export var pellet_damage:=22.0
@@ -90,6 +91,7 @@ func _ready() -> void:
   var voice:=AudioStreamPlayer.new()
   voice.volume_db=-5.0
   voice.bus="Effects"
+  voice.stream=SHOT_SOUND
   add_child(voice)
   _shot_voices.append(voice)
  _sound=_shot_voices[0]
@@ -98,7 +100,6 @@ func _ready() -> void:
  _mechanism_sound.bus="Effects"
  add_child(_mechanism_sound)
  if DisplayServer.get_name()!="headless":
-  for i in 4:Sounds.sound("shotgun",i)
   Sounds.sound("mechanism")
  _vapour=preload("res://weapons/crop_duster/muzzle_vapour.gd").new()
  add_child(_vapour)
@@ -349,7 +350,6 @@ func _shot_sound() -> void:
  if DisplayServer.get_name()=="headless":return
  _shot_voice=(_shot_voice+1)%_shot_voices.size()
  _sound=_shot_voices[_shot_voice]
- _sound.stream=Sounds.sound("shotgun",_rng.randi_range(0,3))
  _sound.play()
 func _click() -> void:
  if DisplayServer.get_name()=="headless":return

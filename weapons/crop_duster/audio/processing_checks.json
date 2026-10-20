@@ -1,0 +1,8 @@
+{
+  "duration_seconds": 4.2,
+  "peak_dbfs": -0.9155032481583973,
+  "bass_35_180hz_gain_db_first_400ms": 2.78091451308929,
+  "ringing_tail_bit_identical_after_seconds": 0.85,
+  "tail_matches": true,
+  "clipped_samples": 0
+}

@@ -34,3 +34,5 @@ Current pistol integration: the original textured pistol mesh is fitted to the n
 Kitchen radio music: Short Order Carnage, Locked Screen Door and The Skillet Vigil — tracks supplied by the project owner.
 
 Rugged off-road customer truck: model supplied by the project owner (rugged off-road truck 3d model.glb). Cube driver and tracking behaviour created for this project.
+
+Sawn-off blast: explosive_shotgun_ear_ringing.wav supplied by the project owner; opening impact deepened for the game.
