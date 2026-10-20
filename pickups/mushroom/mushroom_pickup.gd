@@ -56,13 +56,13 @@ func _ready() -> void:
 	const HALO := {"brown": Color("#F3A34D"), "blue": Color("#65C9C2"), "red": Color("#F3A34D")}
 	mat.albedo_color = TINT.get(kind, Color.WHITE)
 	_halo.set_shader_parameter("glow_color", HALO.get(kind, Palette.AMBER_GLOW))
-	_halo.set_shader_parameter("strength",0.25)
+	_halo.set_shader_parameter("strength",0.06)
 	_model.material_override = mat
 	_light = OmniLight3D.new()
 	_light.name = "Glow"
 	_light.light_color = Palette.AMBER_GLOW
-	_light.light_energy = 0.55
-	_light.omni_range = 1.4
+	_light.light_energy = 0.12
+	_light.omni_range = 0.65
 	_light.omni_attenuation = 1.6
 	_light.shadow_enabled = false
 	add_child(_light)
@@ -97,7 +97,7 @@ func _process(delta: float) -> void:
 	_t += delta
 	rotation.y = wrapf(rotation.y + spin_speed * delta, -PI, PI)
 	var pulse := 0.8 + 0.2 * sin(_t * 2.6)
-	_light.light_energy = 0.55 * pulse
+	_light.light_energy = 0.12 * pulse
 	_halo.set_shader_parameter("pulse", pulse)
 	if not _ready_to_collect:
 		return
@@ -145,7 +145,7 @@ func _collect(player: Node3D) -> void:
 	remove_from_group("pickups")
 	var tw := create_tween().set_parallel(true)
 	tw.tween_property(self, "scale", Vector3.ONE * 1.4, 0.08)
-	tw.tween_property(_light, "light_energy", 2.0, 0.08)
+	tw.tween_property(_light, "light_energy", 0.3, 0.08)
 	tw.chain().tween_property(self, "scale", Vector3.ONE * 0.01, 0.14)
 	tw.chain().tween_callback(queue_free)
 
