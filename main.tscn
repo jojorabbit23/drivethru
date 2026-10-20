@@ -9,7 +9,7 @@ background_mode = 1
 background_color = Color(0.0627, 0.1098, 0.1725, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.1412, 0.2196, 0.2941, 1)
-ambient_light_energy = 1.2
+ambient_light_energy = 0.9
 tonemap_mode = 2
 fog_enabled = true
 fog_light_color = Color(0.0627, 0.1098, 0.1725, 1)
@@ -24,7 +24,7 @@ environment = SubResource("Environment_night")
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.8192, -0.3531, 0.4520, 0.0000, 0.7880, 0.6157, -0.5736, -0.5043, 0.6455, 0, 20, 0)
 light_color = Color(0.62, 0.72, 0.82, 1)
-light_energy = 0.6
+light_energy = 0.45
 shadow_enabled = true
 
 [node name="ShopGreybox" parent="." instance=ExtResource("2_shop")]

@@ -19,6 +19,7 @@ func run() -> void:
 	var enabled: int=0
 	for light: OmniLight3D in budget.lights:
 		if light.shadow_enabled:enabled+=1
+	check(budget.lights.all(func(light: OmniLight3D)->bool:return light.omni_shadow_mode==OmniLight3D.SHADOW_DUAL_PARABOLOID),"shadow lights use two-pass dual paraboloid maps")
 	check(enabled==2,"balanced mode bounds expensive shadow cubemaps")
 	main.player.position=Vector3(-3,0,2.4)
 	budget.apply_budget()
