@@ -6,6 +6,9 @@ const SHEET=preload("res://ui/menu/menu_reference.png")
 const INTRO=preload("res://ui/menu/intro.ogv")
 const BUS=preload("res://ui/menu/start_bus.ogv")
 const LOOP=preload("res://ui/menu/bread_loop.ogv")
+const GAME_PATH: String="res://main.tscn"
+var game_scene: PackedScene
+var waiting_for_game: bool=false
 const TITLES=["Start Cooking","Continue","How to Play","Settings","Credits","Quit"]
 const RECTS=[Rect2(225,105,970,130),Rect2(225,250,610,130),Rect2(225,393,805,130),Rect2(225,535,600,130),Rect2(225,678,520,130),Rect2(225,820,300,140)]
 var starting: bool=false
@@ -24,6 +27,8 @@ func atlas(rect: Rect2) -> AtlasTexture:
  return a
 func _ready() -> void:
  Prefs.configure()
+ if DisplayServer.get_name()!="headless":
+  ResourceLoader.load_threaded_request(GAME_PATH)
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
  Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
  var background:=ColorRect.new()
@@ -102,9 +107,25 @@ func layout() -> void:
 func _video_finished() -> void:
  if starting:
   Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
-  get_tree().change_scene_to_file("res://main.tscn")
+  if DisplayServer.get_name()=="headless":
+   get_tree().change_scene_to_file(GAME_PATH)
+  else:
+   waiting_for_game=true
+   _enter_loaded_game()
  else:
   _loop_bread()
+func _process(_delta: float) -> void:
+ if DisplayServer.get_name()=="headless":return
+ if game_scene==null and ResourceLoader.load_threaded_get_status(GAME_PATH)==ResourceLoader.THREAD_LOAD_LOADED:
+  game_scene=ResourceLoader.load_threaded_get(GAME_PATH) as PackedScene
+ if waiting_for_game:_enter_loaded_game()
+func _enter_loaded_game() -> void:
+ if game_scene:
+  waiting_for_game=false
+  get_tree().change_scene_to_packed(game_scene)
+ elif ResourceLoader.load_threaded_get_status(GAME_PATH)==ResourceLoader.THREAD_LOAD_FAILED:
+  waiting_for_game=false
+  push_error("Could not load game scene")
 func _start_game() -> void:
  if starting:return
  starting=true
