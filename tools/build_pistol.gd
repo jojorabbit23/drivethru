@@ -299,7 +299,61 @@ func build_model(hand_r: Mesh, hand_l: Mesh, arm_r: Vector3, arm_l: Vector3) -> 
 	model.add_child(marker)
 	marker.owner = scene
 	print("muzzle ", marker.position)
-	# Keep the established hand sockets; replace only the owner's weapon rig.
+	# Both pistols use the same named parts and model coordinates. Replace the
+	# stock geometry while keeping its animated nodes and the new hand sockets.
+	var custom: Node3D = load("res://weapons/pistol/source/pistol_custom.glb").instantiate()
+	var custom_parts: Dictionary = {}
+	for mesh: MeshInstance3D in custom.find_children("*", "MeshInstance3D", true, false):
+		custom_parts[String(mesh.name)] = mesh.mesh
+	for mesh: MeshInstance3D in pistol.find_children("*", "MeshInstance3D", true, false):
+		mesh.mesh = custom_parts.get(String(mesh.name))
+		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if mesh.mesh == null: continue
+		mesh.mesh = mesh.mesh.duplicate()
+		for surface in mesh.mesh.get_surface_count():
+			var original: StandardMaterial3D = mesh.mesh.surface_get_material(surface)
+			var material := ShaderMaterial.new()
+			material.shader = preload("res://weapons/crop_duster/viewmodel.gdshader")
+			material.set_shader_parameter("colour", original.albedo_color)
+			material.set_shader_parameter("textured", original.albedo_texture != null)
+			material.set_shader_parameter("albedo_tex", original.albedo_texture)
+			material.set_shader_parameter("roughness", original.roughness)
+			material.set_shader_parameter("metallic", original.metallic)
+			mesh.mesh.surface_set_material(surface, material)
+	custom.free()
+	var magazine: Node3D = pistol.find_child("pistol_magazine", true, false)
+	var body := MeshInstance3D.new()
+	body.name = "MagazineBody"
+	var box := BoxMesh.new()
+	box.size = Vector3(0.024, 0.085, 0.032)
+	body.mesh = box
+	body.position = Vector3(0, 0.040, -0.010)
+	body.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var metal := ShaderMaterial.new()
+	metal.shader = preload("res://weapons/crop_duster/viewmodel.gdshader")
+	metal.set_shader_parameter("colour", preload("res://core/palette.gd").WET_CHARCOAL)
+	metal.set_shader_parameter("roughness", 0.75)
+	body.material_override = metal
+	magazine.add_child(body)
+	pistol.scene_file_path = ""
+	Common.own_children(scene, scene)
+
+	# The stock pack has fire/reload only. A reset clip prevents a holstered
+	# magazine or slide being left halfway through its animation.
+	var starter_anim: AnimationPlayer = pistol.find_child("AnimationPlayer", true, false)
+	var starter_library: AnimationLibrary = starter_anim.get_animation_library("")
+	var reload_clip: Animation = starter_anim.get_animation("reload")
+	var reset_clip := Animation.new()
+	reset_clip.length = 0.001
+	for track_index in reload_clip.get_track_count():
+		var track: int = reset_clip.add_track(reload_clip.track_get_type(track_index))
+		reset_clip.track_set_path(track, reload_clip.track_get_path(track_index))
+		reset_clip.track_insert_key(track, 0.0, reload_clip.track_get_key_value(track_index, 0))
+	starter_library.add_animation("RESET", reset_clip)
+	var starter := PackedScene.new()
+	assert(starter.pack(scene) == OK)
+	assert(ResourceSaver.save(starter, OUT + "starter_pistol_viewmodel.tscn") == OK)
+	# Keep the established hand sockets; build the gold Desert Eagle separately.
 	model.remove_child(pistol)
 	pistol.free()
 	pistol = preload("res://tools/stylized_pistol_rig.gd").new().build()

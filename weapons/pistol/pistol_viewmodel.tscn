@@ -1,16 +1,16 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/pistol_hand_r.res" id="1_cq650"]
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/pistol_hand_l.res" id="2_0oh8a"]
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_frame.res" id="3_7bwqs"]
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_slide.res" id="4_hn81d"]
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_hammer.res" id="5_673gj"]
-[ext_resource type="Shader" path="res://weapons/crop_duster/viewmodel.gdshader" id="6_i6gfn"]
-[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_magazine.res" id="7_bmqe5"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/pistol_hand_r.res" id="1_m0fhs"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/pistol_hand_l.res" id="2_0ism0"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_frame.res" id="3_c7coe"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_slide.res" id="4_hu153"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_hammer.res" id="5_0aus0"]
+[ext_resource type="Shader" path="res://weapons/crop_duster/viewmodel.gdshader" id="6_osv1m"]
+[ext_resource type="ArrayMesh" path="res://weapons/pistol/stylized_magazine.res" id="7_hrd0u"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0pd5y"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dkr4n"]
 render_priority = 0
-shader = ExtResource("6_i6gfn")
+shader = ExtResource("6_osv1m")
 shader_parameter/has_orm = null
 shader_parameter/visible_part = null
 shader_parameter/colour = Color(0.152941, 0.176471, 0.196078, 1)
@@ -18,12 +18,12 @@ shader_parameter/textured = null
 shader_parameter/roughness = 0.8
 shader_parameter/metallic = null
 
-[sub_resource type="BoxMesh" id="BoxMesh_5f08l"]
+[sub_resource type="BoxMesh" id="BoxMesh_q3cga"]
 size = Vector3(0.012, 0.009, 0.008)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ep3y5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g8ns"]
 render_priority = 0
-shader = ExtResource("6_i6gfn")
+shader = ExtResource("6_osv1m")
 shader_parameter/has_orm = null
 shader_parameter/visible_part = null
 shader_parameter/colour = Color(0.152941, 0.176471, 0.196078, 1)
@@ -31,12 +31,12 @@ shader_parameter/textured = null
 shader_parameter/roughness = 0.8
 shader_parameter/metallic = null
 
-[sub_resource type="BoxMesh" id="BoxMesh_a3o70"]
+[sub_resource type="BoxMesh" id="BoxMesh_78r6c"]
 size = Vector3(0.021, 0.069, 0.031)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0txav"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w6phb"]
 render_priority = 0
-shader = ExtResource("6_i6gfn")
+shader = ExtResource("6_osv1m")
 shader_parameter/has_orm = null
 shader_parameter/visible_part = null
 shader_parameter/colour = Color(0.152941, 0.176471, 0.196078, 1)
@@ -44,12 +44,12 @@ shader_parameter/textured = null
 shader_parameter/roughness = 0.8
 shader_parameter/metallic = null
 
-[sub_resource type="BoxMesh" id="BoxMesh_25jyk"]
+[sub_resource type="BoxMesh" id="BoxMesh_b4rf3"]
 size = Vector3(0.024, 0.009, 0.16)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d23m0"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qcv5l"]
 render_priority = 0
-shader = ExtResource("6_i6gfn")
+shader = ExtResource("6_osv1m")
 shader_parameter/has_orm = null
 shader_parameter/visible_part = null
 shader_parameter/colour = Color(0.152941, 0.176471, 0.196078, 1)
@@ -57,10 +57,37 @@ shader_parameter/textured = null
 shader_parameter/roughness = 0.8
 shader_parameter/metallic = null
 
-[sub_resource type="BoxMesh" id="BoxMesh_vogj3"]
+[sub_resource type="BoxMesh" id="BoxMesh_btktd"]
 size = Vector3(0.023, 0.05, 0.026)
 
-[sub_resource type="Animation" id="Animation_5d8x6"]
+[sub_resource type="Animation" id="Animation_ps7ho"]
+length = 0.28
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("pistol_slide:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.15, 0.26),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, -0.033), Vector3(0, 0, -0.033), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("pistol_hammer:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.26),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.5, 0, 0), Vector3(-0.68, 0, 0), Vector3(-0.5, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_nwyet"]
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -99,7 +126,7 @@ tracks/2/keys = {
 "values": [Vector3(0, -0.04004, -0.01034), Vector3(0, -0.04004, -0.01034)]
 }
 
-[sub_resource type="Animation" id="Animation_q1nl5"]
+[sub_resource type="Animation" id="Animation_62388"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -138,7 +165,7 @@ tracks/2/keys = {
 "values": [Vector3(0, -0.04004, -0.01034)]
 }
 
-[sub_resource type="Animation" id="Animation_pytys"]
+[sub_resource type="Animation" id="Animation_cxkc8"]
 length = 0.22
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -177,7 +204,7 @@ tracks/2/keys = {
 "values": [Vector3(0, -0.04004, -0.01034), Vector3(0, -0.04004, -0.01034)]
 }
 
-[sub_resource type="Animation" id="Animation_n6ck0"]
+[sub_resource type="Animation" id="Animation_6hl4h"]
 length = 1.6
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -216,12 +243,13 @@ tracks/2/keys = {
 "values": [Vector3(-0.5, 0, 0), Vector3(-0.5, 0, 0), Vector3(-0.68, 0, 0), Vector3(-0.5, 0, 0), Vector3(-0.5, 0, 0)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_bawis"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_gyel1"]
 _data = {
-"RESET": SubResource("Animation_q1nl5"),
-"fire": SubResource("Animation_pytys"),
-"idle": SubResource("Animation_5d8x6"),
-"reload": SubResource("Animation_n6ck0")
+"RESET": SubResource("Animation_62388"),
+"fire": SubResource("Animation_cxkc8"),
+"idle": SubResource("Animation_nwyet"),
+"rack": SubResource("Animation_ps7ho"),
+"reload": SubResource("Animation_6hl4h")
 }
 
 [node name="PistolViewmodel" type="Node3D"]
@@ -234,14 +262,14 @@ transform = Transform3D(-0.14337, 0.883414, 0.446123, 0.548612, 0.446123, -0.707
 
 [node name="RightHand" type="MeshInstance3D" parent="Model/GripSocket"]
 cast_shadow = 0
-mesh = ExtResource("1_cq650")
+mesh = ExtResource("1_m0fhs")
 
 [node name="SupportSocket" type="Node3D" parent="Model"]
 transform = Transform3D(0.355009, -0.641416, -0.680113, -0.548612, 0.446123, -0.707107, 0.756964, 0.624147, -0.193511, 0, -0.01, 0.008)
 
 [node name="LeftHand" type="MeshInstance3D" parent="Model/SupportSocket"]
 cast_shadow = 0
-mesh = ExtResource("2_0oh8a")
+mesh = ExtResource("2_0ism0")
 
 [node name="MuzzleTip" type="Marker3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0605, 0.1716)
@@ -251,46 +279,46 @@ metadata/source = "res://weapons/pistol/source/stylized_pistol.glb"
 
 [node name="pistol_frame" type="MeshInstance3D" parent="Model/StylizedPistol"]
 cast_shadow = 0
-mesh = ExtResource("3_7bwqs")
+mesh = ExtResource("3_c7coe")
 
 [node name="pistol_slide" type="MeshInstance3D" parent="Model/StylizedPistol"]
 cast_shadow = 0
-mesh = ExtResource("4_hn81d")
+mesh = ExtResource("4_hu153")
 
 [node name="pistol_hammer" type="MeshInstance3D" parent="Model/StylizedPistol"]
 transform = Transform3D(1, 0, 0, 0, 0.877583, 0.479426, 0, -0.479426, 0.877583, 0, 0.0528, -0.02354)
 cast_shadow = 0
-mesh = ExtResource("5_673gj")
+mesh = ExtResource("5_0aus0")
 
 [node name="HammerHeel" type="MeshInstance3D" parent="Model/StylizedPistol/pistol_hammer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.001, 0.001)
-material_override = SubResource("ShaderMaterial_0pd5y")
+material_override = SubResource("ShaderMaterial_dkr4n")
 cast_shadow = 0
-mesh = SubResource("BoxMesh_5f08l")
+mesh = SubResource("BoxMesh_q3cga")
 
 [node name="pistol_magazine" type="MeshInstance3D" parent="Model/StylizedPistol"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04004, -0.01034)
 cast_shadow = 0
-mesh = ExtResource("7_bmqe5")
+mesh = ExtResource("7_hrd0u")
 
 [node name="MagazineBody" type="MeshInstance3D" parent="Model/StylizedPistol/pistol_magazine"]
 transform = Transform3D(1, 0, 0, 0, 0.970296, -0.241922, 0, 0.241922, 0.970296, 0, 0.034, 0.008)
-material_override = SubResource("ShaderMaterial_ep3y5")
-mesh = SubResource("BoxMesh_a3o70")
+material_override = SubResource("ShaderMaterial_7g8ns")
+mesh = SubResource("BoxMesh_78r6c")
 
 [node name="ReceiverInterior" type="MeshInstance3D" parent="Model/StylizedPistol"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.047, 0.06)
-material_override = SubResource("ShaderMaterial_0txav")
+material_override = SubResource("ShaderMaterial_w6phb")
 cast_shadow = 0
-mesh = SubResource("BoxMesh_25jyk")
+mesh = SubResource("BoxMesh_b4rf3")
 
 [node name="GripInterior" type="MeshInstance3D" parent="Model/StylizedPistol"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0115, -0.011)
-material_override = SubResource("ShaderMaterial_d23m0")
+material_override = SubResource("ShaderMaterial_qcv5l")
 cast_shadow = 0
-mesh = SubResource("BoxMesh_vogj3")
+mesh = SubResource("BoxMesh_btktd")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Model/StylizedPistol"]
 libraries = {
-"": SubResource("AnimationLibrary_bawis")
+"": SubResource("AnimationLibrary_gyel1")
 }
