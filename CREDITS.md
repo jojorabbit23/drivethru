@@ -40,3 +40,5 @@ Sawn-off blast: explosive_shotgun_ear_ringing.wav supplied by the project owner;
 Radio broadcast 01: audio from 2026-10-20 01-08-28.mp4 supplied by the project owner.
 
 Health bottle: blue beer bottle 3d model.glb supplied by the project owner; source retained in pickups/health/source/.
+
+Hollowhead: low-poly monster 3d model.glb and enemy profile supplied by the project owner. Static source retained in enemies/hollowhead/source/. Rig, retargeted project enemy animations, slam, clicking audio and behaviour prepared for this game.

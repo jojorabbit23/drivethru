@@ -354,3 +354,5 @@ This project also includes the Scuttler, recurring 11-second enemy spawns (every
 Serving room refreshed from the owner's concept and atlas: room-specific tile finishes, teal cabinets, stock/packaging and poster art. Builder/rebuild notes and validation: docs/handover/SERVING_ROOM.md.
 
 Kitchen updated from the owner's two references and Kitchen_Texture_Pack.zip: stained tiles, steel cooking line, hood/utensils, labelled ingredient storage, teal fridge and sink. Live cooking and service mechanics retained. Builder/verification notes: docs/handover/KITCHEN.md.
+
+Hollowhead common infected: mixed into ordinary wave slots from wave 1, one at a time; no extra wave count or horde spawns. 80 HP, low-damage swipes/slam, clicking agitation, interruptible straight frenzy charge below 30% HP, brief minor-damage death spores. H spawns one for testing. Infection progression is deferred. See docs/handover/HOLLOWHEAD.md.

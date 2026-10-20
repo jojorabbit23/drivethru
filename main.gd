@@ -4,6 +4,7 @@ extends Node3D
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
 const LANCER := preload("res://enemies/lancer/lancer.tscn")
+const HOLLOWHEAD := preload("res://enemies/hollowhead/hollowhead.tscn")
 const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
 @export_range(0.0,1.0) var health_drop_chance: float=0.10
@@ -167,6 +168,8 @@ func _physics_process(delta: float) -> void:
 				spawn_lancer(_pick_window())
 			elif scuttler_every > 0 and n % scuttler_every == 0:
 				spawn_scuttler(_pick_window())
+			elif n % 2 == 1:
+				spawn_hollowhead(_pick_window())
 			else:
 				spawn_zombie(_pick_window())
 	elif get_tree().get_nodes_in_group("zombies").is_empty():
@@ -219,6 +222,9 @@ func spawn_lancer(window: Node3D = null) -> Node:
 
 func spawn_zombie(window: Node3D = null) -> Node:
 	return spawn_enemy(SHAMBLER, window)
+
+func spawn_hollowhead(window: Node3D = null) -> Node:
+	return spawn_enemy(HOLLOWHEAD, window)
 
 func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
@@ -285,6 +291,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				spawn_scuttler()
 			KEY_C:
 				spawn_lancer()
+			KEY_H:
+				spawn_hollowhead()
 			KEY_R:
 				var weapon: Node = player.current_weapon()
 				if player.is_dead() or weapon == null or not weapon.has_method("reload"):
