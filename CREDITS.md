@@ -60,3 +60,5 @@ Owner-supplied mushroom-headed scientist model: original retained in enemies/sci
 Garage motorcycle: owner-supplied "stylized motorcycle 3d model.glb", retained in props/motorcycle/source/motorcycle.glb; supplied colours preserved, optimized for the garage prop.
 
 Sawn-off sound selections: owner-supplied shotgun_sound_04.wav (fire), shotgun_sound_13.wav (shell insertion), shotgun_sound_14.wav (cock/open action), extracted from the owner-provided Shotgun sound (sound effect pack) video. Original split WAVs retained unchanged.
+
+Pistol firing: owner-selected gun_103.wav and gun_105.wav from the Gentler Cleanup sound pack, alternating per shot.
