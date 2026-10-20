@@ -350,6 +350,14 @@ func current_weapon() -> Node:
 	return weapons[weapon_index] if weapon_index < weapons.size() else null
 
 # ------------------------------------------------------------ health ----
+func heal(amount: float) -> float:
+	if is_dead() or amount <= 0.0: return 0.0
+	var restored: float=minf(amount,maxf(0.0,max_health-health))
+	if restored > 0.0:
+		health += restored
+		health_changed.emit(health,max_health)
+	return restored
+
 func take_damage(amount: float, from: Node3D = null) -> void:
 	if is_dead():
 		return

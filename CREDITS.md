@@ -38,3 +38,5 @@ Rugged off-road customer truck: model supplied by the project owner (rugged off-
 Sawn-off blast: explosive_shotgun_ear_ringing.wav supplied by the project owner; opening impact deepened for the game.
 
 Radio broadcast 01: audio from 2026-10-20 01-08-28.mp4 supplied by the project owner.
+
+Health bottle: blue beer bottle 3d model.glb supplied by the project owner; source retained in pickups/health/source/.

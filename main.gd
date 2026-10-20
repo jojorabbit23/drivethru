@@ -5,6 +5,8 @@ const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
 const LANCER := preload("res://enemies/lancer/lancer.tscn")
 const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
+const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
+@export_range(0.0,1.0) var health_drop_chance: float=0.10
 
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
@@ -238,10 +240,19 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 func _drop_later(z: Node3D) -> void:
 	var at := z.global_position
 	var kind := drop_kind(z)
+	var health_drop: bool=randf() < health_drop_chance
 	get_tree().create_timer(drop_delay).timeout.connect(func():
 		if is_instance_valid(z):
 			at = z.global_position
-		drop_pickup(at, kind))
+		drop_pickup(at, kind)
+		if health_drop:drop_health_pickup(at))
+
+func drop_health_pickup(at: Vector3) -> Node3D:
+	var bottle: Node3D=HEALTH_PICKUP.new()
+	bottle.healed.connect(func(amount: float):_toast("+%d HP" % int(amount),P.ELECTRIC_TEAL))
+	add_child(bottle)
+	bottle.drop(at,at.y)
+	return bottle
 
 # What each enemy drops (docs/COOKING_DESIGN.md: mushrooms are the livestock):
 # Shamblers mostly common brown, sometimes blue; Scuttlers blue, sometimes red;
