@@ -21,6 +21,7 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    - `enemies/hollowhead/hollowhead_model.tscn`, `hollowhead_mesh.res`: `tools/build_hollowhead.gd` (static source GLB retained)
    - `enemies/hollowhead/audio/click.wav`: `tools/audio/make_hollowhead_click.py` (NumPy)
    - `pickups/health/bottle_mesh.res`: `tools/build_health_bottle.gd` (owner GLB retained in source/)
+   - `levels/exterior/generated/surroundings.tscn`: `tools/build_exterior.gd` (static scenery; keep routes clear)
    - `levels/shop/generated/*`, `materials/*.tres`: `tools/build_shop.gd`
    - `enemies/shambler/shambler_model.tscn` and `shambler_*`: `tools/build_zombie.gd`
    - `weapons/knife/knife_model.tscn`, `knife_mesh.res`, `knife_material.tres`: `tools/build_knife.gd`
