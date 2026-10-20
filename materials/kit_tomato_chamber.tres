@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "kit_tomato_chamber"
+albedo_color = Color(0.488706, 0.162902, 0.109412, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

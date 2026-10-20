@@ -27,6 +27,7 @@ const SUPPLY_PRICE := 40
 const BULK_PACK := 15          # the big box: a little cheaper per burger
 const BULK_PRICE := 110
 const SHOTGUN_PRICE := 150     # weapon 4
+const SAWN_OFF_PRICE := 90
 const SHELL_PACK := 12         # docs/GAME_DESIGN.md: 12 shells = $30
 const SHELL_PRICE := 30
 # Kitchen upgrades (docs/COOKING_DESIGN.md "Kitchen Upgrades")
@@ -47,6 +48,8 @@ var stock := {"brown": 0, "blue": 0, "red": 0}   # stored mushrooms; one makes o
 var buns := 8
 var toppings := 8
 var grill_level := 0
+const SERVING_HEATER_PRICE := 180
+var has_serving_heater := false
 var has_tray := false
 var has_bell := false
 var earned := 0

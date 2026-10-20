@@ -25,7 +25,7 @@ func atlas(rect: Rect2) -> AtlasTexture:
 func _ready() -> void:
  Prefs.configure()
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
- Engine.max_fps=60
+ Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
  var background:=ColorRect.new()
  background.color=P.MIDNIGHT_TYNE
  background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -101,7 +101,7 @@ func layout() -> void:
   images[i].size=Vector2(RECTS[i].size.x*0.37,RECTS[i].size.y*0.37)
 func _video_finished() -> void:
  if starting:
-  Engine.max_fps=60
+  Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
   get_tree().change_scene_to_file("res://main.tscn")
  else:
   _loop_bread()
@@ -162,7 +162,7 @@ func activate(index: int) -> void:
   1:return
   2:
    clear_panel("HOW TO PLAY")
-   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nE use station · 1–4 choose station option\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc pause / settings\nR restarts after death, or while using the knife.")
+   paragraph("WASD move · Shift sprint · Space jump\n1 pistol · 2 knife · 3 Crop Duster · 4 dagger · Wheel switches\nLMB fire / slash · RMB aim / stab\nR reload firearm · F inspect · Hold E repair\nV cycle carried burgers · E tray / bin / station\n1–4 choose station option · Shotguns bought at shop\nZ Shambler · X Scuttler · F2 auto-collect · L labels · Esc pause / settings\nR restarts after death, or while using the knife.")
   3:
    clear_panel("SETTINGS")
    var scroll:=ScrollContainer.new()
@@ -195,6 +195,6 @@ func _notification(what: int) -> void:
   if video:video.paused=true
   Prefs.set_focused(false)
  elif what==NOTIFICATION_APPLICATION_FOCUS_IN:
-  Engine.max_fps=60
+  Engine.max_fps=int(ProjectSettings.get_setting("application/run/max_fps",0))
   if video:video.paused=false
   Prefs.set_focused(true)

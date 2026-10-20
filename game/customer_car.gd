@@ -8,6 +8,7 @@ extends Node3D
 const P = preload("res://core/palette.gd")
 const Sfx = preload("res://game/sfx.gd")
 const Icons = preload("res://game/icons.gd")
+const CubeDriver = preload("res://game/cube_driver.gd")
 const Station = preload("res://game/station.gd")
 
 signal arrived
@@ -19,6 +20,7 @@ const BODY_COLOURS := [P.OXIDISED_TEAL, P.BURNT_ORANGE, P.BLUE_SLATE, P.CONCRETE
 # Customer vehicles (tools/build_vehicles.gd). cab: the driver's window,
 # metres ahead of the vehicle's middle; side: half-width to the hatch side.
 const VEHICLES := {
+	"rugged_truck": {"scene": preload("res://vehicles/rugged_truck/rugged_model.tscn"), "cab": -0.20, "side": 1.35},
 	"school_bus": {"scene": preload("res://vehicles/school_bus/bus_model.tscn"), "cab": 1.6, "side": 1.9},
 	"armored_truck": {"scene": preload("res://vehicles/armored_truck/truck_model.tscn"), "cab": 1.9, "side": 1.65},
 }
@@ -27,6 +29,9 @@ var CAB_FROM_CENTRE := 1.6
 
 @export var patience := 50.0
 var order := "brown"        # which burger: brown (common) | blue | red
+var quantity: int=1
+var received: int=0
+var _quantity_label: Label3D
 var state := "arriving"     # arriving | waiting | leaving
 var waited := 0.0
 var _t := 0.0
@@ -62,6 +67,11 @@ func _build_bus() -> void:
 	for w in _body.get_children():
 		if w.name.begins_with("Wheel"):
 			_bus_wheels.append(w)
+	if vehicle=="rugged_truck":
+		var driver: Node3D=CubeDriver.new()
+		driver.name="CubeDriver"
+		_body.add_child(driver)
+		driver.position=Vector3(0.68,1.40,0.20)
 	_add_bubble(Vector3(VEHICLES[vehicle]["side"], 1.85, -CAB_FROM_CENTRE))   # by the cab, on the hatch side (+X faces the shop)
 
 # Old placeholder car (kept for reference; unused).
@@ -118,6 +128,15 @@ func _add_bubble(at: Vector3) -> void:
 	icon.position = Vector3(0, 0.04, 0.0)
 	icon.render_priority = 1
 	_bubble.add_child(icon)
+	if quantity>1:
+		var count:=Label3D.new()
+		_quantity_label=count
+		count.text="x%d" % quantity
+		count.position=Vector3(0.36,0.04,0.02)
+		count.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+		count.font_size=32
+		count.pixel_size=0.008
+		_bubble.add_child(count)
 	_bar = MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(0.5, 0.06)
@@ -129,6 +148,9 @@ func _add_bubble(at: Vector3) -> void:
 	_bar.position = Vector3(0, -0.36, 0)
 	_bubble.add_child(_bar)
 	_bubble.visible = false
+
+func refresh_order_quantity() -> void:
+	if _quantity_label:_quantity_label.text="x%d" % maxi(0,quantity-received)
 
 static func _bubble_texture() -> Texture2D:
 	var img := Image.create(24, 24, false, Image.FORMAT_RGBA8)

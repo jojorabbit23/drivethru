@@ -30,3 +30,11 @@ The supplied pack and full licence are retained in addons/psx_firearms/. Adaptat
 - Kitchen_Texture_Pack.zip and two kitchen references: supplied by the project owner, kept in art/kitchen/. All 16 base-colour textures are used directly; kitchen layout/material integration prepared for this game.
 
 Current pistol integration: the original textured pistol mesh is fitted to the newer sculpt-derived hands and wrist sockets from OpenCode, using PSX FPS Arms Free animated pistol nodes. Source models and licences remain intact.
+
+Kitchen radio music: Short Order Carnage, Locked Screen Door and The Skillet Vigil — tracks supplied by the project owner.
+
+Rugged off-road customer truck: model supplied by the project owner (rugged off-road truck 3d model.glb). Cube driver and tracking behaviour created for this project.
+
+Sawn-off blast: explosive_shotgun_ear_ringing.wav supplied by the project owner; opening impact deepened for the game.
+
+Radio broadcast 01: audio from 2026-10-20 01-08-28.mp4 supplied by the project owner.

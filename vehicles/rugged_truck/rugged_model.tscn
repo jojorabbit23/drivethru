@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="ArrayMesh" path="res://vehicles/rugged_truck/rugged_mesh.res" id="1_wbsp1"]
+[ext_resource type="ArrayMesh" path="res://vehicles/rugged_truck/rugged_wheel_rl.res" id="2_u1mcp"]
+[ext_resource type="ArrayMesh" path="res://vehicles/rugged_truck/rugged_wheel_rr.res" id="3_n2ekc"]
+[ext_resource type="ArrayMesh" path="res://vehicles/rugged_truck/rugged_wheel_fl.res" id="4_6vm7h"]
+[ext_resource type="ArrayMesh" path="res://vehicles/rugged_truck/rugged_wheel_fr.res" id="5_uwy4w"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jfifd"]
+size = Vector3(2.12753, 1.62002, 4.76)
+
+[node name="RuggedTruck" type="Node3D"]
+metadata/size = Vector3(2.50297, 2.02502, 5.6)
+metadata/wheel_radius = 0.469473
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_wbsp1")
+
+[node name="Wheel_RL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.03633, 0.469473, 1.6317)
+mesh = ExtResource("2_u1mcp")
+
+[node name="Wheel_RR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.04418, 0.469473, 1.6317)
+mesh = ExtResource("3_n2ekc")
+
+[node name="Wheel_FL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.01749, 0.469473, -1.75766)
+mesh = ExtResource("4_6vm7h")
+
+[node name="Wheel_FR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.02465, 0.469473, -1.75766)
+mesh = ExtResource("5_uwy4w")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.91126, 0)
+shape = SubResource("BoxShape3D_jfifd")

@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "kit_tomato_seed"
+albedo_color = Color(0.939216, 0.724314, 0.483137, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

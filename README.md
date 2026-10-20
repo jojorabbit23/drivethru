@@ -1,4 +1,45 @@
-Performance update: menu input targets 60 FPS, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
+## Sawn-off sound update
+
+SAWN-OFF now uses the supplied explosive blast with a deeper bass impact. The
+original ringing tail is preserved after 0.85s. Audio/source and reproducible
+processing notes live in weapons/crop_duster/audio/; native firing/audio checks
+are in tools/check_sawn_off_audio.gd.
+
+## Rugged customer truck
+
+The supplied off-road truck joins the bus and armoured truck in the random customer
+pool. Its driver has a seated black rectangular torso and a plain black cube head with two white dots; the head turns
+smoothly to keep the dots facing the player. Four separated wheels roll with the
+vehicle. Normal hatch alignment, orders, automatic tray sales and departure apply.
+Rebuild with tools/build_rugged_truck.gd; see docs/handover/RUGGED_TRUCK.md.
+
+## Kitchen radio
+
+The counter below the radio now holds stacked cheese squares and seeded tomato
+slices in two shallow ingredient trays (owner reference shapes). Capture close-ups
+with tools/capture_kitchen_toppings.gd.
+
+The weathered teal-and-orange radio above the counter plays Short Order
+Carnage, Locked Screen Door and The Skillet Vigil in order, repeating the playlist.
+A one-time spoken broadcast plays after the second track, then music resumes
+with The Skillet Vigil. Broadcasts do not repeat during a run, including after
+switching the radio off/on. Music fades with distance from the radio and is inaudible beyond 22 metres.
+E pauses/resumes the current song. Settings has a separate kitchen-radio volume
+slider; background mute and pause behaviour apply. See tools/radio_test.gd and
+tools/capture_radio.gd for playlist, interaction and actual audio-fade checks.
+
+## Rush shelf update
+
+Burger slots and tray boxes now show freshness icons. Customers buy matching stock
+automatically, freshest first, with up to three burgers per late-game order. Pre-stocked
+hot food earns a 25% quality-tip bonus. Cold/very-cold food pays 50%/25%; spoiled food
+must be binned. The Discount Box shares the four tray spaces. A $180 heated serving
+tray upgrade doubles the hot period while shelved. Inventory unlocks at waves 3/6/9.
+See [rules and verification](docs/handover/RUSH_SHELF.md).
+
+Burger service update: V cycles carried burgers; E on an empty hatch-tray slot places the selected burger, E on a box retrieves it, and E at the hatch bin discards the selected item. Capacity starts at one and increases after clearing waves 3/6/9, to four. Burgers cool after 150 seconds including tray time; each cold item pays 50%. Both shotguns and separate shell packs are in the shop. See docs/handover/BURGER_INVENTORY_TRAY.md.
+
+Performance update: menu input follows VSync/display refresh, intro clips decode at 720p, fullscreen keeps the 720p render budget, and balanced nearby shadows are now the default. Full lighting shadows remain available in settings. All 21 suites pass; see docs/handover/PERFORMANCE_MENU_RENDERING.md for measured results and remaining hitch limits.
 
 # Current combined recovery — 2026-10-19
 
@@ -287,7 +328,7 @@ godot --path . --script res://tools/capture_previews.gd
 
 ## Desktop performance limits
 
-Ordinary play is capped at 60 FPS with VSync requested, dropping to 15 FPS when the application loses focus. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
+Ordinary play follows display refresh through VSync, dropping to 15 FPS when the application loses focus. A second software 60 FPS limiter was removed to improve pacing on high-refresh displays. Physics/gameplay continues at its existing rate. Headless test scenes lift the display cap so simulation tests stay fast. Knife poses are applied once per update; a redundant second AnimationPlayer evaluation was removed.
 
 For a bounded rendered check, run `godot --path . --rendering-method gl_compatibility --script res://tools/performance_check.gd`. It caps itself at 30 FPS, profiles the pistol/shop, knife attacks, Crop Duster reload and a 12-zombie/ooze stress case, then exits; a 20-second watchdog also closes it if a check stalls. Set `FPS_PROFILE_OUTPUT` to save JSON. Results and limits are described in `docs/handover/PERFORMANCE_CHECK.md`.
 

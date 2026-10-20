@@ -15,7 +15,7 @@ var distant_voice: AudioStreamPlayer3D
 var help_label: Label
 var expanded_help: bool=false
 var help_panel: PanelContainer
-const SHORT_HELP: String="WASD move · Shift sprint · E interact / repair · R reload · 1–4 weapons · Esc pause · F1 controls"
+const SHORT_HELP: String="WASD move · E interact · V select burger · R reload · Wheel weapons · Esc pause · F1 controls"
 func _ready() -> void:
  actor=get_parent() as CharacterBody3D
  Prefs.configure()
@@ -130,14 +130,14 @@ func tidy_help() -> void:
    help_label.add_theme_color_override("font_outline_color",preload("res://core/palette.gd").MIDNIGHT_TYNE)
    help_label.add_theme_constant_override("outline_size",4)
    help_panel=PanelContainer.new()
-   help_panel.position=Vector2(16,140)
+   help_panel.position=Vector2(16,170)
    help_panel.theme=Prefs.theme()
    var style:=StyleBoxFlat.new()
    style.bg_color=Color(preload("res://core/palette.gd").MIDNIGHT_TYNE,0.95)
    style.set_content_margin_all(16)
    help_panel.add_theme_stylebox_override("panel",style)
    var details:=Label.new()
-   details.text="CONTROLS — F1 to close\nWASD move · Shift sprint · Space jump\nLMB fire / slash · RMB aim / stab · F inspect\n1–4 or wheel switch · R reload firearm\nE use / hold to repair · 1–4 station options\nF2 auto-collect · Z/X debug spawn · L labels\nEsc pause · R restart after death / with knife"
+   details.text="CONTROLS — F1 to close\nWASD move · Shift sprint · Space jump\nLMB fire / slash · RMB aim / stab · F inspect\n1–4 or wheel switch · Buy shotguns at shop\nV cycle burgers · E place / retrieve / discard\nR reload firearm\nE use / hold to repair · 1–4 station options\nF2 auto-collect · Z/X debug spawn · L labels\nEsc pause · R restart after death / with knife"
    details.add_theme_font_size_override("font_size",16)
    help_panel.add_child(details)
    help_label.get_parent().add_child(help_panel)

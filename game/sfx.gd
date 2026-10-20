@@ -45,6 +45,11 @@ static func _make(name: String) -> AudioStreamWAV:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(name)
 	match name:
+		"warning_tick", "storage_full":
+			for i in int(RATE*0.18):
+				var t: float=float(i)/RATE
+				var hz: float=660.0 if name=="warning_tick" else (330.0 if t<0.09 else 220.0)
+				samples.append(sin(TAU*hz*t)*exp(-t*24.0)*0.5)
 		"bell":    # two bright partials, long ring
 			for i in int(RATE * 0.9):
 				var t := float(i) / RATE

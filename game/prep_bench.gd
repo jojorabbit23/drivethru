@@ -150,8 +150,8 @@ static func _quality(picks: Array) -> String:
 
 func prompt(player: Node) -> String:
 	var e := economy()
-	if player.held != "":
-		return "PREP  ·  hands full: serve that burger first"
+	if not player.can_carry_burger():
+		return "PREP  ·  burger inventory full: use the serving tray or bin"
 	if not e.can_bag():
 		return "PREP  ·  out of %s: buy supplies at the terminal" % ("buns" if e.buns <= 0 else "toppings")
 	var pl := plan()
@@ -180,7 +180,7 @@ func interact(player: Node) -> void:
 
 func bag(player: Node) -> bool:
 	var e := economy()
-	if player.held != "" or not e.can_bag():
+	if not player.can_carry_burger() or not e.can_bag():
 		return false
 	var pl := plan()
 	if pl.is_empty() or not pl.has("picks"):
@@ -204,7 +204,7 @@ func bag(player: Node) -> bool:
 	var order: String = pl["order"]
 	if pl["burnt"]:
 		order = String(kinds[0])
-	player.set_held("burger", {"kind": order, "quality": quality, "patties": kinds})
+	player.add_burger({"kind": order, "quality": quality, "patties": kinds})
 	Sfx.play_at(self, "thunk", global_position + Vector3(0, 0.2, 0))
 	var show := BurgerStack.new()
 	show.position = Vector3(0.33, 0.02, 0.05)

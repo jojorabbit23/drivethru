@@ -42,6 +42,7 @@ script = ExtResource("3_knife")
 
 [node name="CropDuster" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("4_crop")
+metadata/purchased = false
 
 [node name="Dagger" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("3_knife")

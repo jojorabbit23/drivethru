@@ -10,6 +10,9 @@ func run() -> void:
  main.set("auto_spawn",false)
  root.add_child(main)
  var player: CharacterBody3D=main.get_node("Player")
+ main.economy.cash=90
+ main.terminal.buy_sawn_off(player)
+ player.switch_weapon(0)
  var gun: Node3D=player.get_node("Head/Camera3D/CropDuster")
  gun.set_physics_process(false)
  check(not gun.shoot() and gun.ammo==2,"holstered gun cannot fire")

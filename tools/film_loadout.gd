@@ -7,6 +7,7 @@ func run() -> void:
  main.set("auto_spawn",false)
  root.add_child(main)
  var player: CharacterBody3D=main.get_node("Player")
+ player.get_node("Head/Camera3D/CropDuster").set_meta("purchased",true)
  player.set_process_unhandled_input(false)
  player.set_physics_process(false)
  player.global_position=Vector3(1.4,0.05,-1.4)

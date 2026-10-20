@@ -25,6 +25,8 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
    - `enemies/scuttler/scuttler_model.tscn` and `scuttler_*`: `tools/build_scuttler.gd`
    - `pickups/mushroom/mushroom_pickup_mesh.res`, `mushroom_pickup_material.tres`, `mushroom_*.png`: `tools/build_pickup.gd`
    - `vehicles/school_bus/bus_model.tscn`, `bus_*`: `tools/build_bus.gd`
+   - `vehicles/rugged_truck/rugged_*`: `tools/build_rugged_truck.gd` (uses the shared vehicle builder)
+   - `weapons/crop_duster/audio/sawn_off_deep_blast.wav`: `tools/audio/deepen_sawn_off.py` (NumPy; source WAV unchanged)
    - `textures/*.png`: `tools/make_textures.gd` (it never overwrites existing PNGs)
 
    Change the build script, then rebuild.
@@ -51,7 +53,8 @@ The game design is `docs/GAME_DESIGN.md`. The first playable slice of it (the bu
 5. **Palette only.** Colours come from `core/palette.gd` (9 colours). Don't
    introduce new hues. Only light sources emit light. The exceptions are the
    Scuttler's glowing orange cap spots and the dropped mushroom pickups, which
-   are deliberate bioluminescence.
+   are deliberate bioluminescence. The owner-supplied tomato reference also permits
+   natural red flesh for the kitchen tomato slices (local food-colour exception).
 6. **Respect licences.** The PSX FPS Arms Free pack is CC BY 4.0. Any use of it
    must keep its LICENSE file and the credit line in `CREDITS.md`.
 7. **Small, honest commits.** Say in the commit message what you changed and
@@ -98,3 +101,20 @@ Render kitchen, serving room, pistol, knife and pump captures before shipping ch
 Claude owns cooking/station rules; Codex owns presentation. Shared main/player changes
 must preserve both sets of APIs. Pull/merge before editing; do not replace whole files
 with a copy from another branch. Do not hand-edit generated scenes or materials.
+
+Burger inventory update: use player.add_burger()/take_selected_burger(), not
+set_held(), for new gameplay. Burger dictionaries retain hot_remaining across
+inventory/tray transfers; never reset it on retrieval. Capacity unlocks on
+wave_started at 3/6/9, max four. ServingTray is boxed food, separate from the heated
+patty tray. Sawn-off starts reserved in slot 3 but requires purchase; wheel skips it
+until bought. Both shotguns have independent ammo purchases. See
+docs/handover/BURGER_INVENTORY_TRAY.md; run burger_inventory_test.gd and the native
+capture_serving_inventory.gd interaction assertions alongside all existing checks.
+
+Rush shelf: age_seconds belongs to each burger; hot_remaining is a compatibility
+projection. Never reset either on transfer. Freshness stages and payments live in
+game/burger_items.gd. Discount Box shares the four tray spaces. The serving heater
+is separate from the patty warmer. See docs/handover/RUSH_SHELF.md.
+
+Kitchen radio BROADCASTS play once per run after track 2; retain played_broadcasts
+across music loops and power toggles. Off/on pauses/resumes the current stream.

@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "kit_tomato_pith"
+albedo_color = Color(0.844706, 0.541569, 0.465882, 1)
+metallic_specular = 0.25
+roughness = 0.92
+texture_filter = 2

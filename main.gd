@@ -30,6 +30,11 @@ const ShopTerminal = preload("res://game/shop_terminal.gd")
 const PrepBench = preload("res://game/prep_bench.gd")
 const HoldingTray = preload("res://game/holding_tray.gd")
 const OrderRail = preload("res://game/order_rail.gd")
+const DiscountBox = preload("res://game/discount_box.gd")
+const KitchenRadio = preload("res://game/kitchen_radio.gd")
+const ServingTray = preload("res://game/serving_tray.gd")
+const BurgerBin = preload("res://game/burger_bin.gd")
+const BurgerItems = preload("res://game/burger_items.gd")
 const Recipes = preload("res://game/recipes.gd")
 const MushroomPickupScript = preload("res://pickups/mushroom/mushroom_pickup.gd")
 
@@ -44,6 +49,8 @@ var rail: Node3D
 var storage: Node3D
 var terminal: Node3D
 var bench: Node3D
+var serving_tray: Node3D
+var burger_bin: Node3D
 var _toast_t := 0.0
 
 var _spawn_t := 0.0
@@ -54,6 +61,7 @@ var _last_sides: Array[String] = []  # recent lanes, to avoid long streaks on on
 @onready var shop: Node3D = $ShopGreybox
 
 var _hud: Dictionary = {}
+var _burger_hud: Array[Dictionary] = []
 var _hitmark := 0.0
 var _kills := 0
 
@@ -68,6 +76,7 @@ func _ready() -> void:
 	player.hurt.connect(func(_a, _f): _flash_damage())
 	player.died.connect(_on_player_died)
 	player.mushrooms_changed.connect(func(_n): _update_health())
+	wave_started.connect(player.unlock_burger_slots)
 	for w in player.weapons:
 		if w.has_signal("hit"):
 			w.hit.connect(_on_hit)
@@ -106,8 +115,14 @@ func _build_stations() -> void:
 	storage = _station(StorageBin, "MushroomStore", Vector3(0.55, 0.0, 1.4), 0.0)
 	grill = _station(Grill, "Grill", Vector3(2.1, 0.92, -iz + 0.325), 0.0)
 	hatch = _station(CustomerWindow, "DriveThruWindow", Vector3(-3.0, 1.0, -5.0), 0.0)
+	serving_tray = _station(ServingTray,"ServingTray",Vector3(-3.0,1.02,-4.40),0.0)
+	burger_bin = _station(BurgerBin,"BurgerBin",Vector3(-1.82,0.20,-4.04),0.0)
+	var discount: Node=_station(DiscountBox,"DiscountBox",Vector3(-3.76,1.02,-4.40),0.0)
+	discount.tray=serving_tray
+	hatch.serving_tray=serving_tray
 	terminal = _station(ShopTerminal, "ShopTerminal", Vector3(-2.89, 0.77, iz - 0.29), 0.0)
 	bench = _station(PrepBench, "PrepBench", Vector3(0.79, 0.92, -iz + 0.325), 0.0)
+	_station(KitchenRadio,"KitchenRadio",Vector3(4.40,1.045,-4.50),0.0)
 	# the pass above the counter: warming tray (once bought) and the ticket rail
 	tray = _station(HoldingTray, "WarmingTray", Vector3(1.38, 1.36, -iz + 0.17), 0.0)
 	tray.grill = grill
@@ -339,12 +354,21 @@ func _update_status() -> void:
 		_hud["carry_" + k].text = "%d (%d)" % [player.carried[k], economy.stock[k]]
 	_hud["buns"].text = "%d" % economy.buns
 	_hud["tops"].text = "%d" % economy.toppings
-	_hud["held"].visible = player.held != ""
-	if player.held == "burger":
-		var b: Dictionary = player.held_burger
-		(_hud["held_icon"] as TextureRect).texture = Icons.texture("burger_" + String(b.get("kind", "brown")))
-		var q: String = b.get("quality", "standard")
-		_hud["held_text"].text = "%s %s" % [Recipes.name_of(String(b.get("kind", "brown"))).to_upper(), "SALVAGE" if q == "burnt" else q.to_upper()]
+	for i in 4:
+		var entry: Dictionary=_burger_hud[i]
+		var occupied: bool=i<player.burgers.size()
+		var unlocked: bool=i<player.burger_capacity
+		var selected: bool=occupied and i==player.selected_burger
+		(entry.style as StyleBoxFlat).border_color=P.AMBER_GLOW if selected else P.BLUE_SLATE
+		(entry.icon as TextureRect).modulate=Color.WHITE if occupied else Color(1,1,1,0.22 if unlocked else 0.07)
+		(entry.icon as TextureRect).texture=Icons.texture("burger_"+String(player.burgers[i].get("kind","brown"))) if occupied else Icons.texture("burger")
+		(entry.badge as TextureRect).visible=occupied
+		if occupied:(entry.badge as TextureRect).texture=Icons.texture(BurgerItems.icon(player.burgers[i]))
+		(entry.label as Label).text=BurgerItems.timer(player.burgers[i]) if occupied else ("EMPTY" if unlocked else "W%d" % (i*3))
+		(entry.label as Label).modulate=P.AMBER_GLOW if occupied and BurgerItems.cold(player.burgers[i]) else P.WARM_CHALK
+	_hud["held_text"].text="V  SELECT  %d/%d" % [player.burgers.size(),player.burger_capacity]
+	if player.held=="burger":
+		_hud["held_text"].text+="\n%s  %s" % [Recipes.name_of(String(player.held_burger.get("kind","brown"))).to_upper(),"COLD" if BurgerItems.cold(player.held_burger) else String(player.held_burger.get("quality","standard")).to_upper()]
 
 func _update_menu() -> void:
 	var box: VBoxContainer = _hud["menu"]
@@ -491,13 +515,29 @@ func _build_hud() -> void:
 	var tops := _label("0", 18, P.WARM_CHALK)
 	status.add_child(tops)
 	var held := HBoxContainer.new()
-	held.add_child(_label("   HOLDING", 16, P.ELECTRIC_TEAL))
-	var held_icon := _icon("burger", 28)
-	held.add_child(held_icon)
-	var held_text := _label("BURGER", 16, P.ELECTRIC_TEAL)
+	held.add_theme_constant_override("separation",6)
+	held.position=Vector2(16,88)
+	layer.add_child(held)
+	for i in 4:
+		var panel:=PanelContainer.new()
+		var style:=StyleBoxFlat.new()
+		style.bg_color=Color(P.MIDNIGHT_TYNE,0.85)
+		style.set_border_width_all(2)
+		style.set_content_margin_all(5)
+		panel.add_theme_stylebox_override("panel",style)
+		var column:=VBoxContainer.new()
+		var icon:=_icon("burger",28)
+		column.add_child(icon)
+		var label:=_label("",12,P.WARM_CHALK)
+		column.add_child(label)
+		panel.add_child(column)
+		held.add_child(panel)
+		var badge: TextureRect=_icon("freshness_fresh",20)
+		column.add_child(badge)
+		_burger_hud.append({"style":style,"icon":icon,"label":label,"badge":badge})
+	var held_icon: TextureRect=_burger_hud[0].icon
+	var held_text := _label("V  SELECT",14,P.ELECTRIC_TEAL)
 	held.add_child(held_text)
-	held.visible = false
-	status.add_child(held)
 	# station menu, above the prompt
 	var menu := VBoxContainer.new()
 	menu.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
@@ -527,4 +567,4 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		Engine.max_fps = 15
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
-		Engine.max_fps = int(ProjectSettings.get_setting("application/run/max_fps", 60))
+		Engine.max_fps = int(ProjectSettings.get_setting("application/run/max_fps", 0))

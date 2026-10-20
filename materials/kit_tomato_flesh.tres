@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "kit_tomato_flesh"
+albedo_color = Color(0.788235, 0.262745, 0.176471, 1)
+metallic_specular = 0.25
+roughness = 0.65
+texture_filter = 2

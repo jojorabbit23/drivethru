@@ -19,6 +19,14 @@ static func material_specs() -> Dictionary:
  specs["kit_steel"]["metal"]=0.05
  specs["kit_wall"]["c"]=P.WARM_CHALK.lerp(P.CONCRETE_GREY,0.18)
  specs["kit_ceiling"]["c"]=P.WARM_CHALK.lerp(P.CONCRETE_GREY,0.12)
+ # Cheese uses the shared palette; tomato red follows the owner-supplied food reference.
+ var tomato_red:=Color("#C9432D")
+ specs["kit_cheese_gold"]={"c":P.AMBER_GLOW,"roughness":0.8}
+ specs["kit_tomato_skin"]={"c":tomato_red.darkened(0.20),"roughness":0.55}
+ specs["kit_tomato_flesh"]={"c":tomato_red,"roughness":0.65}
+ specs["kit_tomato_chamber"]={"c":tomato_red.darkened(0.38)}
+ specs["kit_tomato_pith"]={"c":tomato_red.lerp(P.WARM_CHALK,0.45)}
+ specs["kit_tomato_seed"]={"c":P.AMBER_GLOW.lerp(P.WARM_CHALK,0.35)}
  return specs
 var b
 var d
@@ -70,8 +78,18 @@ func cooking_line() -> void:
   box("fries",Vector3(x+0.05,0.9,z0+0.18),Vector3(x+0.29,0.98,z1-0.2))
   box("metal",Vector3(x+0.15,0.95,z1-0.2),Vector3(x+0.19,0.98,z1+0.08))
  box("kit_steel",Vector3(3.6,0,z0),Vector3(4.4,0.92,z1),true)
- for i in 3:
-  for j in 2:b.prism(G,"bun",Vector3(3.75+i*0.22,0.92,z0+0.2+j*0.22),0.08,0.06,8)
+ # Shallow ingredient trays: square cheese slices and seeded tomato rounds.
+ for x: float in [3.79,4.17]:
+  box("metal",Vector3(x-0.175,0.921,z0+0.10),Vector3(x+0.175,0.930,z0+0.64))
+  for z: float in [z0+0.10,z0+0.64]:box("kit_steel",Vector3(x-0.18,0.930,z-0.007),Vector3(x+0.18,0.943,z+0.007))
+ for row in 2:
+  for layer in 3:
+   var centre:=Vector3(3.79+0.010*(layer%2),0.935+layer*0.007,z0+0.26+row*0.24)
+   var basis:=Basis(Vector3.UP,deg_to_rad(-9.0+layer*9.0+row*4.0))
+   b.obox(G,"kit_cheese_gold",centre,Vector3(0.205,0.006,0.185),basis,false)
+ tomato(Vector3(4.11,0.932,z0+0.35),0.10)
+ tomato(Vector3(4.23,0.947,z0+0.45),-0.25)
+ tomato(Vector3(4.10,0.963,z0+0.535),0.30)
  # Cabinet-front seams, ventilation and actual orange handles.
  for x in [0.15,0.80,1.55,2.15,2.75,3.30,3.85]:
   box("metal",Vector3(x,0.10,z1+0.002),Vector3(x+0.012,0.83,z1+0.008))
@@ -190,3 +208,19 @@ func utensils() -> void:
    box("kit_steel",Vector3(x-0.055,1.46,-4.62),Vector3(x+0.055,1.65,-4.59))
    if i%2==0:
     for j in 3:box("metal",Vector3(x-0.035+j*0.03,1.48,-4.586),Vector3(x-0.025+j*0.03,1.59,-4.581))
+
+# Decorative sliced tomato: skin ring, flesh, four seed chambers and pale core.
+func tomato(at: Vector3,yaw: float) -> void:
+ b.prism(G,"kit_tomato_skin",at,0.095,0.014,16)
+ b.prism(G,"kit_tomato_flesh",at+Vector3(0,0.014,0),0.087,0.001,16)
+ b.prism(G,"kit_tomato_pith",at+Vector3(0,0.0155,0),0.018,0.001,8)
+ for section in 4:
+  var angle: float=yaw+section*PI/2.0
+  var direction:=Vector3(cos(angle),0,sin(angle))
+  var centre: Vector3=at+direction*0.047+Vector3(0,0.0155,0)
+  b.prism(G,"kit_tomato_chamber",centre,0.029,0.001,3,Basis(Vector3.UP,-angle))
+  var spoke: Vector3=at+Vector3(cos(angle+PI/4),0,sin(angle+PI/4))*0.040+Vector3(0,0.016,0)
+  b.obox(G,"kit_tomato_pith",spoke,Vector3(0.065,0.001,0.007),Basis(Vector3.UP,-angle-PI/4),false)
+  for seed in 2:
+   var side:=Vector3(-direction.z,0,direction.x)*(0.009 if seed==0 else -0.009)
+   b.prism(G,"kit_tomato_seed",centre+side+Vector3(0,0.0015,0),0.0045,0.001,5,Basis.IDENTITY.scaled(Vector3(0.75,1,1.4)))

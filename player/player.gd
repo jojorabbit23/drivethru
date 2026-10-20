@@ -44,6 +44,10 @@ var mushrooms := 0                 # mushrooms carried, all kinds (see carried)
 var carried := {"brown": 0, "blue": 0, "red": 0}
 var held := ""                     # item in hand: "" or "burger" (a bagged burger)
 var held_burger := {}              # {kind, quality} of the bagged burger
+const BurgerItems = preload("res://game/burger_items.gd")
+var burgers: Array[Dictionary] = []
+var burger_capacity: int = 1
+var selected_burger: int = 0
 
 # Stations (game/station.gd) are looked at and used with E. A station may open
 # a small menu: options are {label, enabled, action: Callable, icon}; keys 1-4
@@ -88,6 +92,7 @@ const DEFAULT_BINDINGS := {
 	"weapon_2": [KEY_2],
 	"weapon_3": [KEY_3],
 	"weapon_4": [KEY_4],
+	"next_burger": [KEY_V],
 }
 
 signal weapon_changed(index: int, weapon: Node)
@@ -134,6 +139,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
 	elif menu_station and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_4:
 		choose(event.physical_keycode - KEY_1)
+	elif event.is_action_pressed("next_burger"):
+		cycle_burger()
 	elif event.is_action_pressed("interact") and focus:
 		use_focus()
 	elif event.is_action_pressed("weapon_1"):
@@ -147,13 +154,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
 		if not weapons.is_empty():
 			var step := 1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1
-			switch_weapon(posmod(weapon_index + step, weapons.size()))
+			for offset in range(1,weapons.size()+1):
+				var next_index: int=posmod(weapon_index+step*offset,weapons.size())
+				if weapons[next_index].get_meta("purchased",true):
+					switch_weapon(next_index)
+					break
 	elif event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
+	if BurgerItems.tick(burgers, delta, false, self): held_changed.emit(held)
 	var grounded := is_on_floor()
 	# Jump forgiveness: a short grace after walking off an edge, and a short
 	# buffer before you land, so a jump at the last moment isn't dropped.
@@ -271,6 +283,7 @@ func _update_weapon_idle(speed: float) -> void:
 func switch_weapon(i: int) -> void:
 	if i == weapon_index or i < 0 or i >= weapons.size():
 		return
+	if not weapons[i].get_meta("purchased",true):return
 	weapon_index = i
 	for k in weapons.size():
 		weapons[k].set_active(k == i)
@@ -299,13 +312,13 @@ func _remember_weapon(w: Node) -> void:
 
 func has_weapon(display_name: String) -> bool:
 	for w in weapons:
-		if w.get("display_name") == display_name:
+		if w.get("display_name") == display_name and w.get_meta("purchased",true):
 			return true
 	return false
 
 func weapon_named(display_name: String) -> Node:
 	for w in weapons:
-		if w.get("display_name") == display_name:
+		if w.get("display_name") == display_name and w.get_meta("purchased",true):
 			return w
 	return null
 
@@ -341,9 +354,47 @@ func drop_carried() -> Dictionary:
 	return out
 
 func set_held(item: String, burger := {}) -> void:
-	held = item
-	held_burger = burger if item == "burger" else {}
-	held_changed.emit(item)
+	# Compatibility for older stations/scripts: replaces the selected held item.
+	if item == "burger":
+		if not burgers.is_empty(): burgers[selected_burger] = burger
+		else: burgers.append(burger)
+		if not burger.has("hot_remaining"): burger.hot_remaining = BurgerItems.HOT_SECONDS
+	elif not burgers.is_empty():
+		burgers.remove_at(selected_burger)
+	_sync_burger()
+
+func can_carry_burger() -> bool:
+	return burgers.size() < burger_capacity
+
+func add_burger(burger: Dictionary) -> bool:
+	if not can_carry_burger(): return false
+	if not burger.has("hot_remaining"): burger.hot_remaining = BurgerItems.HOT_SECONDS
+	burgers.append(burger)
+	selected_burger = burgers.size() - 1
+	_sync_burger()
+	return true
+
+func take_selected_burger() -> Dictionary:
+	if burgers.is_empty(): return {}
+	var item: Dictionary = burgers[selected_burger]
+	burgers.remove_at(selected_burger)
+	_sync_burger()
+	return item
+
+func cycle_burger() -> void:
+	if burgers.is_empty(): return
+	selected_burger = (selected_burger + 1) % burgers.size()
+	_sync_burger()
+
+func unlock_burger_slots(wave_number: int) -> void:
+	burger_capacity = maxi(burger_capacity, mini(4, 1 + wave_number / 3))
+	_sync_burger()
+
+func _sync_burger() -> void:
+	selected_burger = clampi(selected_burger, 0, maxi(0, burgers.size() - 1))
+	held = "burger" if not burgers.is_empty() else ""
+	held_burger = burgers[selected_burger] if not burgers.is_empty() else {}
+	held_changed.emit(held)
 
 # ----------------------------------------------------------- stations ----
 func _update_focus() -> void:
