@@ -221,6 +221,7 @@ func shoot() -> bool:
   var direction: Vector3=(camera.global_basis*Vector3(cos(angle)*radius,sin(angle)*radius,-1)).normalized()
   var result: Dictionary=Hitscan.cast(camera.get_world_3d().direct_space_state,camera.global_position,camera.global_position+direction*reach,exclude)
   if result.is_empty(): continue
+  Hitscan.damage_prop(result,pellet_damage)
   var col: Object=result["collider"]
   var zombie: Node=null
   var headshot:=false

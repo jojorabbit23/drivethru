@@ -47,4 +47,6 @@ Three framed room posters supplied by the project owner: Low-poly fungal apocaly
 
 Morel drivers kitchen poster: owner-supplied artwork, lightly weathered with the built-in image generation tool (faded edges, paper grain, fold creases and restrained grease marks).
 
-Fridge room: owner-supplied Fridge_Room_Texture_Pack procedural materials, including decorative fungal stock surfaces.
+Fungal stock: owner-supplied carved wooden logs 3d model.glb, locally separated into six arrangements with original texture and UVs retained.
+
+Decorative empty bottles: owner-supplied glass bottle.glb. Glass break sound synthesized locally.

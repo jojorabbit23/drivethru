@@ -11,6 +11,7 @@ const P = preload("res://core/palette.gd")
 
 var b # the builder (tools/build_shop.gd)
 var rng := RandomNumberGenerator.new()
+var stored_fungus: Array=[]
 
 func build(builder) -> void:
 	b = builder
@@ -66,7 +67,7 @@ func wall_lamp(g: String, t: Transform3D, light_name: String, energy := 1.2, rea
 	b.light(light_name, t * Vector3(0, -0.35, 0.45), P.AMBER_GLOW.lerp(P.WARM_CHALK, 0.45), energy, reach)
 
 func crate(g: String, t: Transform3D, c: Vector3, size: float, yaw := 0.0, collide := true) -> void:
-	rbox(g, ("cold_crate_wood" if g == "Props_Storeroom" else "crate"), t, c + Vector3(0, size * 0.5, 0), Vector3.ONE * size, roty(yaw), collide)
+	rbox(g, "crate", t, c + Vector3(0, size * 0.5, 0), Vector3.ONE * size, roty(yaw), collide)
 
 func carton(g: String, t: Transform3D, c: Vector3, s: Vector3, yaw := 0.0) -> void:
 	rbox(g, "cardboard", t, c + Vector3(0, s.y * 0.5, 0), s, roty(yaw))
@@ -122,11 +123,11 @@ func shelf_unit(g: String, x0: float, x1: float, z0: float, z1: float, h: float,
 	var along_x := (x1 - x0) >= (z1 - z0)
 	for cx in [x0 + 0.02, x1 - 0.02]:
 		for cz in [z0 + 0.02, z1 - 0.02]:
-			b.box(g, ("cold_rack_navy" if g == "Props_Storeroom" else "metal"), Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
+			b.box(g, "metal", Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
 	var gap := (h - 0.1) / levels
 	for i in levels:
 		var y := 0.08 + i * gap
-		b.box(g, ("cold_shelf_steel" if g == "Props_Storeroom" else "steel"), Vector3(x0, y, z0), Vector3(x1, y + 0.03, z1), false)
+		b.box(g, "steel", Vector3(x0, y, z0), Vector3(x1, y + 0.03, z1), false)
 		var depth := (z1 - z0) if along_x else (x1 - x0)
 		var length := (x1 - x0) if along_x else (z1 - z0)
 		var cursor := 0.06
@@ -145,11 +146,13 @@ func shelf_unit(g: String, x0: float, x1: float, z0: float, z1: float, h: float,
 					var o := (k - 0.5) * (w * 0.45)
 					var tp := pos + (Vector3(o, 0, 0) if along_x else Vector3(0, 0, o))
 					b.prism(g, "paint_orange" if rng.randf() < 0.5 else "lettuce", tp, 0.06, minf(0.16, hh), 8)
-			elif g == "Props_Storeroom" and (i + int(cursor * 10)) % 3 == 0:
-				b.prism(g, "cold_fungal_flesh", pos, minf(w * 0.38, 0.13), hh * 0.65, 7)
-				b.prism(g, "cold_pipe_orange", pos + Vector3(0,hh * 0.65,0), minf(w * 0.48,0.17), 0.06, 7)
 			else:
-				b.obox(g, ("cold_carton_brown" if g == "Props_Storeroom" else "cardboard"), pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
+				if g == "Props_Storeroom" and i % 2 == 0 and cursor < 0.4:
+					stored_fungus.append([pos,stored_fungus.size()%6,0.0 if along_x else -90.0])
+				else:
+					b.obox(g, "cardboard", pos + Vector3(0, hh * 0.5, 0), sz, Basis.IDENTITY, false)
+				if g == "Props_Storeroom" and i == levels-1 and cursor < 0.4:
+					stored_fungus.append([pos+Vector3(0,hh,0),stored_fungus.size()%6,15.0])
 			cursor += w + rng.randf_range(0.02, 0.08)
 	b.col(g, Vector3(x0, 0, z0), Vector3(x1, h, z1))
 
@@ -413,8 +416,6 @@ func shelf_frame(g: String, x0: float, x1: float, z0: float, z1: float, h: float
 			b.box(g, "metal", Vector3(cx - 0.02, 0, cz - 0.02), Vector3(cx + 0.02, h, cz + 0.02), false)
 
 func storeroom() -> void:
-	var cold = preload("res://tools/fridge_room.gd").new()
-	cold.build(self)
 	var g := "Props_Storeroom"
 	var IX: float = b.IX
 	var IZ: float = b.IZ
@@ -447,3 +448,24 @@ func storeroom() -> void:
 		b.tprism(g, "metal", th, Vector3(sx * 1.25, 0.1, -0.05), 0.1, 0.05, 8, Basis(Vector3.BACK, PI / 2))
 	b.tbox(g, "metal", th, Vector3(0, 1.2, 0), Vector3(0.4, 0.04, 0.04))
 	b.col(g, Vector3(4.72, 0, 2.15), Vector3(5.23, 1.25, 2.65))
+
+# Shared static meshes; no additional lights, physics bodies or per-frame scripts.
+func add_stored_fungus(parent: Node3D) -> void:
+	stored_fungus.append([Vector3(0.96,1.19,3.85),4,-15.0])
+	stored_fungus.append([Vector3(0.68,0.64,4.36),2,25.0])
+	var stock:=Node3D.new();stock.name="Stored_Fungal_Cuts";parent.add_child(stock)
+	for i in stored_fungus.size():
+		var item: Array=stored_fungus[i]
+		var instance:=MeshInstance3D.new();instance.name="FungalCut_%02d"%i
+		instance.mesh=load("res://props/fungal_stock/cut_%d.res"%int(item[1]))
+		instance.position=item[0];instance.rotation_degrees.y=item[2]
+		instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		stock.add_child(instance)
+
+func add_empty_bottles(parent: Node3D) -> void:
+	var script: Script=load("res://props/empty_bottle/empty_bottle.gd")
+	for at: Vector3 in [Vector3(4.26,0.90,-0.25),Vector3(5.28,1.535,3.15),Vector3(1.38,0.69,3.80)]:
+		var bottle:=StaticBody3D.new();bottle.set_script(script);bottle.name="EmptyBottle_%d"%parent.get_child_count();bottle.position=at;bottle.collision_layer=1;bottle.collision_mask=0
+		var mesh:=MeshInstance3D.new();mesh.mesh=load("res://props/empty_bottle/bottle_mesh.res");bottle.add_child(mesh)
+		var shape:=CollisionShape3D.new();var capsule:=CylinderShape3D.new();capsule.radius=0.045;capsule.height=0.27;shape.shape=capsule;shape.position.y=0.135;bottle.add_child(shape)
+		parent.add_child(bottle)

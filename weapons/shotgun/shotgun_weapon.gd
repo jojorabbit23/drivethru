@@ -231,6 +231,7 @@ func shoot() -> Array:
 		var res := Hitscan.cast(space, from, from + dir * reach, ex)
 		if res.is_empty():
 			continue
+		Hitscan.damage_prop(res, damage_at(from.distance_to(res["position"])))
 		results.append(res)
 		_spark(res["position"])
 		var col: Object = res["collider"]
