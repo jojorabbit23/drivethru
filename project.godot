@@ -12,6 +12,10 @@ run/max_fps=0
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/version="2026.10.19"
 
+[autoload]
+
+FrameDiagnostics="*res://presentation/frame_diagnostics.gd"
+
 [display]
 
 window/size/viewport_width=1280
