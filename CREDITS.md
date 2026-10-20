@@ -42,3 +42,9 @@ Radio broadcast 01: audio from 2026-10-20 01-08-28.mp4 supplied by the project o
 Health bottle: blue beer bottle 3d model.glb supplied by the project owner; source retained in pickups/health/source/.
 
 Hollowhead: low-poly monster 3d model.glb and enemy profile supplied by the project owner. Static source retained in enemies/hollowhead/source/. Rig, retargeted project enemy animations, slam, clicking audio and behaviour prepared for this game.
+
+Three framed room posters supplied by the project owner: Low-poly fungal apocalypse monster (kitchen), Retro low-poly fungal pin-up poster and Chapter 3: The Last Selection (service room). Original PNGs retained unchanged in art/posters/.
+
+Morel drivers kitchen poster: owner-supplied artwork, lightly weathered with the built-in image generation tool (faded edges, paper grain, fold creases and restrained grease marks).
+
+Fridge room: owner-supplied Fridge_Room_Texture_Pack procedural materials, including decorative fungal stock surfaces.

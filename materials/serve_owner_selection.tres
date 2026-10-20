@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/posters/service_last_selection.png" id="1_4187h"]
+
+[resource]
+resource_name = "serve_owner_selection"
+albedo_texture = ExtResource("1_4187h")
+metallic_specular = 0.25
+texture_filter = 2
