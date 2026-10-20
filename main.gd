@@ -252,14 +252,18 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	z.died.connect(func(_z): _kills += 1; economy.add_cash(Economy.KILL_CASH); _update_health(); _drop_later(_z))
 	return z
 
+var _pending_mushrooms: Dictionary={"brown":0,"blue":0,"red":0}
+
 # Every dead enemy drops one glowing mushroom.
 func _drop_later(z: Node3D) -> void:
 	var at := z.global_position
 	var kind := drop_kind(z)
+	_pending_mushrooms[kind]+=1
 	var health_drop: bool=randf() < health_drop_chance
 	get_tree().create_timer(drop_delay).timeout.connect(func():
 		if is_instance_valid(z):
 			at = z.global_position
+		_pending_mushrooms[kind]-=1
 		drop_pickup(at, kind)
 		if health_drop:drop_health_pickup(at))
 
@@ -270,16 +274,43 @@ func drop_health_pickup(at: Vector3) -> Node3D:
 	bottle.drop(at,at.y)
 	return bottle
 
-# What each enemy drops (docs/COOKING_DESIGN.md: mushrooms are the livestock):
-# Shamblers mostly common brown, sometimes blue; Scuttlers blue, sometimes red;
-# Lancers (the tough one) always red.
+# Scarcity changes odds within each enemy's existing drop pool; never adds loot.
+# Include loose and already-rolled drops to avoid over-correcting after rapid kills.
+func mushroom_supply() -> Dictionary:
+	var supply: Dictionary=_pending_mushrooms.duplicate()
+	for kind: String in Economy.KINDS:
+		supply[kind]+=int(economy.stock.get(kind,0))+int(player.carried.get(kind,0))
+	for pickup: Node in get_tree().get_nodes_in_group("pickups"):
+		if not pickup._taken and not pickup.is_queued_for_deletion():
+			supply[pickup.kind]+=pickup.value
+	return supply
+
+func drop_weights(enemy: Node) -> Dictionary:
+	var path: String="" if enemy==null or enemy.get_script()==null else (enemy.get_script() as Script).resource_path
+	var weights: Dictionary={"brown":.8,"blue":.2}
+	if path.ends_with("lancer.gd"):return {"red":1.0}
+	if path.ends_with("scuttler.gd"):weights={"blue":.7,"red":.3}
+	var supply: Dictionary=mushroom_supply()
+	var highest: int=0
+	for kind: String in Economy.KINDS:highest=maxi(highest,int(supply[kind]))
+	var total: float=0.0
+	for kind: String in weights:
+		# A two-mushroom buffer softens small differences; boost is capped below 4x.
+		var shortage: float=float(highest-int(supply[kind]))/float(highest+2)
+		weights[kind]*=1.0+3.0*shortage
+		total+=float(weights[kind])
+	for kind: String in weights:weights[kind]/=total
+	return weights
+
 func drop_kind(enemy: Node) -> String:
-	var path := "" if enemy == null else (enemy.get_script() as Script).resource_path
-	if path.ends_with("lancer.gd"):
-		return "red"
-	if path.ends_with("scuttler.gd"):
-		return "red" if randf() < 0.3 else "blue"
-	return "blue" if randf() < 0.2 else "brown"
+	var weights: Dictionary=drop_weights(enemy)
+	var roll: float=randf()
+	var last: String="brown"
+	for kind: String in weights:
+		last=kind
+		roll-=float(weights[kind])
+		if roll<0:return kind
+	return last
 
 func drop_pickup(at: Vector3, kind := "brown") -> Node3D:
 	var p: Node3D = PICKUP.new()
