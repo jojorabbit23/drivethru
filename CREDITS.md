@@ -58,3 +58,5 @@ Owner-supplied stylized pistol model: supplied for The Drive Thru by the project
 Owner-supplied mushroom-headed scientist model: original retained in enemies/scientist/source/scientist.glb. Local skeleton, skinning, retargeted infected clips, detachable-head setup and generated fungal sound effects added for The Drive Thru. Existing source animation credits remain applicable.
 
 Garage motorcycle: owner-supplied "stylized motorcycle 3d model.glb", retained in props/motorcycle/source/motorcycle.glb; supplied colours preserved, optimized for the garage prop.
+
+Sawn-off sound selections: owner-supplied shotgun_sound_04.wav (fire), shotgun_sound_13.wav (shell insertion), shotgun_sound_14.wav (cock/open action), extracted from the owner-provided Shotgun sound (sound effect pack) video. Original split WAVs retained unchanged.
