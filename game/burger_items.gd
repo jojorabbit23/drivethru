@@ -25,6 +25,7 @@ static func state(item: Dictionary) -> String:
 	return "FRESH"
 static func payment(item: Dictionary) -> Array:
 	var pay: Array=Economy.payment(String(item.get("quality","standard")),String(item.get("kind","brown")))
+	if item.get("good_flip",false) and String(item.get("quality","")) in ["perfect","good"]:pay[1]+=2
 	var scale: float=0.0 if spoiled(item) else (0.25 if age(item)>=300.0 else (0.5 if cold(item) else 1.0))
 	return [int(float(pay[0])*scale),int(float(pay[1])*scale)]
 static func tick(items: Array,delta: float,heated: bool=false,source: Node=null) -> bool:

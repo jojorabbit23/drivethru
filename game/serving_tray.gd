@@ -78,13 +78,13 @@ func pick_up(player: Node,index: int) -> bool:
 	refresh()
 	changed.emit()
 	return true
-func take_matching(order: String) -> Dictionary:
+func take_matching(order: String,allow_discount: bool=true) -> Dictionary:
 	# No reservations: freshest matching item available at the time of purchase.
 	var chosen: int=-1
 	for i in 4:
 		if items[i].is_empty() or Items.spoiled(items[i]) or items[i].get("kind","")!=order:continue
 		if chosen<0 or Items.age(items[i])<Items.age(items[chosen]):chosen=i
-	if chosen<0:
+	if chosen<0 and allow_discount:
 		for i in 4:
 			if items[i].is_empty() or not items[i].get("discount",false) or Items.spoiled(items[i]):continue
 			if chosen<0 or Items.age(items[i])<Items.age(items[chosen]):chosen=i
@@ -100,7 +100,7 @@ func refresh() -> void:
 		boxes[i].visible=not item.is_empty()
 		timers[i].visible=not item.is_empty()
 		if item.is_empty():continue
-		(lids[i].material_override as StandardMaterial3D).albedo_color=Icons.KIND_COLOUR.get(String(item.get("kind","brown")),P.AMBER_GLOW)
+		(lids[i].material_override as StandardMaterial3D).albedo_color=Recipes.colour(String(item.get("kind","brown")))
 		badges[i].texture=Icons.texture(Items.icon(item))
 		timers[i].text=Items.timer(item)+("  SALE" if item.get("discount",false) else "")
 		timers[i].modulate=P.AMBER_GLOW if Items.cold(item) else P.WARM_CHALK
