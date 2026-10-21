@@ -45,6 +45,12 @@ static func _make(name: String) -> AudioStreamWAV:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(name)
 	match name:
+		"phone": # Original double ring, softened to sit above kitchen ambience.
+			for i in int(RATE*1.4):
+				var t: float=float(i)/RATE
+				var on: float=1.0 if t<.45 or (t>.65 and t<1.1) else 0.0
+				var envelope: float=minf(1.0,t*80.0)*(.65+.35*sin(TAU*22*t))
+				samples.append(on*envelope*(sin(TAU*440*t)+.45*sin(TAU*480*t))*.35)
 		"warning_tick", "storage_full":
 			for i in int(RATE*0.18):
 				var t: float=float(i)/RATE

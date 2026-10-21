@@ -4,6 +4,8 @@ const P=preload("res://core/palette.gd")
 const Icons=preload("res://game/icons.gd")
 const Items=preload("res://game/burger_items.gd")
 const Recipes=preload("res://game/recipes.gd")
+var delivery_panel: PanelContainer
+var delivery_text: RichTextLabel
 var main: Node3D
 var actor: Node3D
 var order_panel: PanelContainer
@@ -54,6 +56,7 @@ func _ready() -> void:
   var more:=Label.new();more.add_theme_font_size_override("font_size",22);names.add_child(more);more.hide();extra_orders.append(more)
  recipe_detail=Label.new();recipe_detail.add_theme_font_size_override("font_size",14);rows.add_child(recipe_detail)
  tray_match=Label.new();tray_match.add_theme_font_size_override("font_size",14);rows.add_child(tray_match)
+ build_delivery(root)
  build_grill(root)
  build_tray(root)
  wait_label=Label.new();wait_label.add_theme_font_size_override("font_size",14);rows.add_child(wait_label)
@@ -107,6 +110,7 @@ func refresh() -> void:
   if available[1]>0:tray_match.text+=" · %d COLD" % available[1]
   tray_match.add_theme_color_override("font_color",P.AMBER_GLOW if available[1]>0 else P.ELECTRIC_TEAL if available[0]>=remaining else P.WARM_CHALK)
   patience_fill.bg_color=colour
+ refresh_delivery(dead)
  refresh_grill(dead)
  refresh_tray(dead)
  grill_panel.size=Vector2(340,0);tray_panel.size=Vector2(340,0)
@@ -250,3 +254,27 @@ func matching_ticket(car: Node) -> Array:
   var fresh: int=mini(line.quantity,available[0]);hot+=fresh
   cold+=mini(line.quantity-fresh,available[1])
  return [hot,cold]
+
+# Independent phone ticket: never replaces the car order on the right.
+func build_delivery(root: Control) -> void:
+ delivery_panel=PanelContainer.new();delivery_panel.name="DeliveryOrders";delivery_panel.position=Vector2(16,220);delivery_panel.custom_minimum_size=Vector2(300,0);delivery_panel.mouse_filter=Control.MOUSE_FILTER_IGNORE;root.add_child(delivery_panel)
+ var style:=StyleBoxFlat.new();style.bg_color=Color(P.MIDNIGHT_TYNE,.94);style.border_color=P.OXIDISED_TEAL;style.set_border_width_all(2);style.set_content_margin_all(10);delivery_panel.add_theme_stylebox_override("panel",style)
+ delivery_text=RichTextLabel.new();delivery_text.bbcode_enabled=true;delivery_text.fit_content=true;delivery_text.scroll_active=false;delivery_text.custom_minimum_size=Vector2(280,0);delivery_text.mouse_filter=Control.MOUSE_FILTER_IGNORE;delivery_text.add_theme_font_size_override("normal_font_size",18);delivery_panel.add_child(delivery_text)
+func refresh_delivery(dead: bool) -> void:
+ var station: Node=main.delivery
+ delivery_panel.visible=not dead and is_instance_valid(station) and station.unlocked
+ if not delivery_panel.visible:return
+ var text: String="DELIVERY PHONE\n"
+ var c: Node=station.waiting_car()
+ if c:
+  for line: Dictionary in c.remaining_lines():text+="[color=#%s]%s[/color]\n"%[Recipes.colour(line.kind).to_html(false),Recipes.ticket_text(line.kind,line.quantity)]
+  text+="%ds LEFT\n"%maxi(0,ceili(c.patience-c.waited))
+ else:text+="WAITING FOR A CALL\n"
+ var stock:=PackedStringArray()
+ for i in 4:
+  var burger: Dictionary=station.serving_tray.items[i]
+  stock.append("%d --"%(i+1) if burger.is_empty() else "%d %s %s"%[i+1,Recipes.ticket_text(burger.kind,1).trim_suffix(" X1"),Items.state(burger)])
+ text+="\n"+stock[0]+" | "+stock[1]+"\n"+stock[2]+" | "+stock[3]
+ text+="\n\nPREP: %s\nG SWITCH CAR / DELIVERY"%("DELIVERY" if main.bench.delivery_selected else "CAR")
+ delivery_text.text=text
+ delivery_panel.size=Vector2(300,0)

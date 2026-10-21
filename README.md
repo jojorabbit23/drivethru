@@ -1,3 +1,14 @@
+## Undead Eats bike deliveries
+
+Buy the garage ($250), then open its new delivery hatch ($200). The wall phone
+rings for independent orders with roughly two minutes to cook. Stock its four-box
+tray for automatic collection while car orders continue at the original hatch.
+Press **G** to switch the prep ticket between CAR and DELIVERY, **E** to use the
+phone/tray/bin, and **V** to select a carried burger. Cold penalties and tips apply
+at both hatches. Quick boxing with every patty flipped at 40–60% adds a $2 tip.
+Bike/rider visuals will be connected when the owner's models arrive. See
+[delivery integration notes](docs/handover/UNDEAD_DELIVERY.md).
+
 ## Sawn-off sound update
 
 SAWN-OFF now uses the supplied explosive blast with a deeper bass impact. The
