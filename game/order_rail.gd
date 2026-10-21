@@ -80,14 +80,17 @@ func _process(delta: float) -> void:
 		_shown_car = c
 		if c:
 			_icon.texture = Icons.texture("burger_" + String(c.order))
-			_name.text = Recipes.ticket_text(c.order,maxi(0,c.quantity-c.received))
+			_name.text = c.ticket_text()
 			_drop = 1.0
 			Sfx.play_at(self, "click", global_position, -10.0)
 	_ticket.visible = c != null
 	_idle.visible = c == null
 	if c == null:
 		return
-	_name.text=Recipes.ticket_text(c.order,maxi(0,c.quantity-c.received))
+	_icon.texture=Icons.texture("burger_"+String(c.order))
+	_name.text=c.ticket_text()
+	_icon.visible=c.order_lines.is_empty()
+	_name.position.y=-.205 if c.order_lines.is_empty() else -.15
 	# the ticket slides down onto the rail
 	_drop = maxf(0.0, _drop - delta * 4.0)
 	_ticket.position.y = 0.12 * _drop * _drop
