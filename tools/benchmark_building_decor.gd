@@ -6,7 +6,7 @@ func run() -> void:
  Engine.max_fps=0
  DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
  root.size=Vector2i(1280,720)
- var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;root.add_child(main);main.hatch.auto=false
+ var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;main.building_decorations_enabled=true;root.add_child(main);main.hatch.auto=false
  main.player.set_physics_process(false);main.player.set_process_unhandled_input(false)
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
  var camera:=Camera3D.new();main.add_child(camera);camera.current=true;camera.far=500

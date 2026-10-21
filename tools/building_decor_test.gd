@@ -6,6 +6,8 @@ func check(ok: bool,message: String) -> void:
 func _initialize() -> void:run.call_deferred()
 func run() -> void:
  var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;root.add_child(main)
+ check(not main.building_decorations_enabled and not main.has_node("BuildingDecorations"),"decoration set is absent from normal play")
+ main.add_child(load("res://props/building_decor/generated/building_decor.tscn").instantiate())
  main.player.set_physics_process(false)
  for i in 3:await physics_frame
  var decor: Node3D=main.get_node("BuildingDecorations")

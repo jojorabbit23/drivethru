@@ -1,6 +1,12 @@
 # Building decoration guide
 
-All 64 owner guide IDs are installed by main.gd as BuildingDecorations. Each has
+Owner requested the whole set be removed from play on 21 October 2026.
+`main.building_decorations_enabled` defaults to false. All individual assets and
+builders remain saved for selective placement later. Decoration captures/tests
+explicitly opt in; normal play has none of these props, audio or lighting effects.
+
+
+When explicitly enabled, main.gd installs all 64 guide IDs as BuildingDecorations. Each has
 its own reusable scene under props/building_decor/generated; the combined scene
 stores layout only. Edit tools/build_building_decor.gd, then rebuild, never edit
 mesh scene output. Owner text and machine-readable catalogue are retained in

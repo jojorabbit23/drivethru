@@ -4,7 +4,7 @@ func _initialize() -> void:
  run.call_deferred()
 func run() -> void:
  Engine.max_fps=30;root.size=Vector2i(1440,810)
- var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;root.add_child(main)
+ var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;main.building_decorations_enabled=true;root.add_child(main)
  main.player.set_physics_process(false)
  for weapon in main.player.weapons:weapon.visible=false;weapon.set_physics_process(false)
  for child in main.get_children():

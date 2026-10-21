@@ -10,6 +10,7 @@ const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
 @export_range(0.0,1.0,0.001) var health_drop_chance: float=0.075
 
+@export var building_decorations_enabled: bool=false # saved set, opt in when placing later
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
@@ -96,7 +97,8 @@ func _ready() -> void:
 		_update_weapon())
 	_build_stations()
 	add_to_group("decorated_game")
-	add_child(preload("res://props/building_decor/generated/building_decor.tscn").instantiate())
+	if building_decorations_enabled:
+		add_child(load("res://props/building_decor/generated/building_decor.tscn").instantiate())
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
 	economy.changed.connect(_update_status)
