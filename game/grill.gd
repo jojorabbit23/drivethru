@@ -282,6 +282,7 @@ func _place(i: int, kind: String) -> void:
 	s["t"] = 0.0
 	s["kind"] = kind
 	s["flipped"] = false
+	s["flip_fraction"] = -1.0
 	_drop_and_smash(i)
 	(s["icon"] as Sprite3D).visible = true
 	(s["kind_icon"] as Sprite3D).texture = Icons.texture("mushroom_" + kind)
@@ -332,6 +333,7 @@ func flip(i: int) -> bool:
 		return false
 	var s := slots[i]
 	s["flipped"] = true
+	s["flip_fraction"] = float(s["t"])/COOK_TIME
 	var patty := s["patty"] as Node3D
 	var x := (s["root"] as Node3D).position.x
 	patty.set_meta("busy", true)
@@ -425,9 +427,9 @@ func count(state: String) -> int:
 func prompt(player: Node) -> String:
 	var a := aimed_slot(player)
 	if _can_discard(a, player):
-		return "E AGAIN  knock this patty onto the floor  ·  discard"
+		return "F AGAIN  knock this patty onto the floor  ·  discard"
 	if can_flip(a):
-		return "E  flip the %s patty  ·  tap E again quickly to discard" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
+		return "F  flip the %s patty  ·  tap F again quickly to discard" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
 	if a>=0 and a<slot_count():
 		var target: Dictionary=slots[a]
 		if target.state=="raw":return "RAW  ·  cooking starts automatically"
@@ -445,6 +447,10 @@ func menu_title() -> String:
 	return "GRILL  ·  %d of %d free" % [count(""), slot_count()]
 
 func interact(player: Node) -> void:
+	_reset_discard()
+	player.open_menu(self, options(player))
+
+func flip_input(player: Node) -> void:
 	var aimed := aimed_slot(player)
 	if _can_discard(aimed, player):
 		_discard(aimed)
@@ -455,7 +461,6 @@ func interact(player: Node) -> void:
 		_discard_left = DISCARD_TAP_WINDOW
 		_discard_player = player
 		return
-	player.open_menu(self, options(player))
 
 func _reset_discard() -> void:
 	_discard_slot = -1
@@ -537,7 +542,7 @@ func find_patty(want := "", ready_only := false) -> int:
 # {kind, ready_for, burnt} of slot i, without taking it.
 func describe(i: int) -> Dictionary:
 	var s := slots[i]
-	return {"kind": s["kind"], "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
+	return {"kind": s["kind"], "flip_fraction": float(s.get("flip_fraction",-1.0)), "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
 
 # Takes a patty off (see find_patty). Returns {kind, ready_for, burnt} or {}.
 func take_patty(want := "", ready_only := false) -> Dictionary:

@@ -9,7 +9,7 @@ func snap(label: String) -> void:
 func run() -> void:
  Engine.max_fps=30;root.size=Vector2i(1280,720)
  var main: Node3D=load("res://main.tscn").instantiate();main.auto_spawn=false;root.add_child(main);main.hatch.auto=false
- var player: Node=main.player;player.set_physics_process(false);player.set_process_unhandled_input(false)
+ var player: Node=main.player;player.set_physics_process(false);player.set_process_unhandled_input(true)
  for w: Node3D in player.weapons:w.hide();w.set_physics_process(false)
  Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
  var grill: Node=main.grill;grill.set_process(false);grill._layout()
@@ -19,10 +19,15 @@ func run() -> void:
  var at: Vector3=grill.slots[0].root.global_position+Vector3(0,.03,0)
  player.camera.global_position=at+Vector3(0,1.2,1.0);player.camera.look_at(at)
  player.focus=grill
- player.use_focus()
+ var key:=InputEventKey.new();key.physical_keycode=KEY_F;key.pressed=true
+ root.push_input(key)
+ await process_frame
  assert(grill.slots[0].flipped)
  await snap("flip")
- player.use_focus()
+ var release:=InputEventKey.new();release.physical_keycode=KEY_F;release.pressed=false
+ root.push_input(release)
+ root.push_input(key)
+ await process_frame
  assert(grill.state_of(0)=="" and get_nodes_in_group("discarded_grill_patties").size()==1,"second tap produces one waste visual")
  var waste: Node3D=get_nodes_in_group("discarded_grill_patties")[0]
  player.camera.look_at(grill.global_position+Vector3(0,-.35,.55))

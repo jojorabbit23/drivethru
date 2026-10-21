@@ -93,6 +93,8 @@ const DEFAULT_BINDINGS := {
 	"jump": [KEY_SPACE],
 	"sprint": [KEY_SHIFT],
 	"interact": [KEY_E],
+	"flip_patty": [KEY_F],
+	"switch_prep_ticket": [KEY_G],
 	"weapon_1": [KEY_1],
 	"weapon_2": [KEY_2],
 	"weapon_3": [KEY_3],
@@ -148,6 +150,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
 	elif menu_station and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_9:
 		choose(event.physical_keycode - KEY_1)
+	elif event.is_action_pressed("switch_prep_ticket") and not event.is_echo():
+		get_parent().bench.cycle_ticket()
+	elif event.is_action_pressed("flip_patty") and is_instance_valid(focus) and focus.has_method("flip_input"):
+		if menu_station == focus: close_menu()
+		focus.flip_input(self)
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("next_burger"):
 		cycle_burger()
 	elif event.is_action_pressed("interact") and focus:

@@ -18,5 +18,14 @@ func run() -> void:
   for i in 8:await process_frame
   await RenderingServer.frame_post_draw
   root.get_texture().get_image().save_png("res://docs/previews/kitchen_hud_"+view[0]+".png")
+ for kind: String in ["brown","blue","special"]:
+  car.queue_free();main.hatch.car=null
+  await process_frame
+  main.hatch.next_order=kind;main.hatch.next_vehicle="rugged_truck"
+  car=main.hatch.spawn_customer(1);car._process(5.0);car.state="waiting";car.set_process(false)
+  player.camera.global_position=Vector3(-3,1.65,-4.5);player.camera.look_at(car.global_position+Vector3(0,1.7,0));hud.refresh()
+  for i in 8:await process_frame
+  await RenderingServer.frame_post_draw
+  root.get_texture().get_image().save_png("res://docs/previews/order_colour_"+kind+".png")
  print("Kitchen HUD views captured")
  quit()

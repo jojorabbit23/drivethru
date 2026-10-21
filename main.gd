@@ -10,6 +10,7 @@ const PICKUP := preload("res://pickups/mushroom/mushroom_pickup.gd")
 const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
 @export_range(0.0,1.0,0.001) var health_drop_chance: float=0.075
 
+@export var building_decorations_enabled: bool=false # saved set, opt in when placing later
 @export var auto_spawn := true      # tests switch this off
 @export var first_zombie_delay := 3.0
 @export var spawn_interval := 11.0   # a new Shambler every this many seconds
@@ -54,6 +55,7 @@ var rail: Node3D
 var storage: Node3D
 var terminal: Node3D
 var bench: Node3D
+var delivery: Node3D
 var serving_tray: Node3D
 var burger_bin: Node3D
 var _toast_t := 0.0
@@ -95,6 +97,9 @@ func _ready() -> void:
 			w.ammo_changed.connect(_on_ammo_changed)
 		_update_weapon())
 	_build_stations()
+	add_to_group("decorated_game")
+	if building_decorations_enabled:
+		add_child(load("res://props/building_decor/generated/building_decor.tscn").instantiate())
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
 	economy.changed.connect(_update_status)
@@ -139,6 +144,14 @@ func _build_stations() -> void:
 	bench.grill = grill
 	bench.hatch = hatch
 	bench.tray = tray
+	delivery=preload("res://game/delivery_station.gd").new()
+	delivery.name="DeliveryStation";delivery.position=Vector3(5.70,0,6.25);delivery.rotation.y=-PI/2.0
+	delivery.garage=shop.get_node("Garage");delivery.bench=bench;delivery.auto=auto_spawn
+	add_child(delivery)
+	bench.delivery_hatch=delivery
+	delivery.customer_arrived.connect(func(_ticket: Node):_toast("DELIVERY CALL  ·  stock the garage tray",P.ELECTRIC_TEAL))
+	delivery.customer_served.connect(func(cash: int,tip: int):_toast("DELIVERY +$%d  TIP +$%d"%[cash,tip],P.AMBER_GLOW))
+	delivery.customer_missed.connect(func():_toast("DELIVERY CANCELLED",P.BURNT_ORANGE))
 	hatch.auto = auto_spawn
 	var m := shop.get_node_or_null("Markers")
 	if m:
