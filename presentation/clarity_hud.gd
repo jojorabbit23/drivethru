@@ -19,6 +19,7 @@ var tray_title: Label
 var tray_note: Label
 var tray_cards: Array[Dictionary]=[]
 var grill_action: Label
+var extra_orders: Array[Label]=[]
 var order_name: Label
 var patience: ProgressBar
 var wait_label: Label
@@ -47,7 +48,10 @@ func _ready() -> void:
  var rows:=VBoxContainer.new();rows.mouse_filter=Control.MOUSE_FILTER_IGNORE;order_panel.add_child(rows)
  var order_row:=HBoxContainer.new();order_row.add_theme_constant_override("separation",10);rows.add_child(order_row)
  order_icon=TextureRect.new();order_icon.custom_minimum_size=Vector2(38,38);order_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;order_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;order_icon.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;order_row.add_child(order_icon)
- order_name=Label.new();order_name.add_theme_font_size_override("font_size",24);order_row.add_child(order_name)
+ var names:=VBoxContainer.new();order_row.add_child(names)
+ order_name=Label.new();order_name.add_theme_font_size_override("font_size",24);names.add_child(order_name)
+ for i in 2:
+  var more:=Label.new();more.add_theme_font_size_override("font_size",22);names.add_child(more);more.hide();extra_orders.append(more)
  recipe_detail=Label.new();recipe_detail.add_theme_font_size_override("font_size",14);rows.add_child(recipe_detail)
  tray_match=Label.new();tray_match.add_theme_font_size_override("font_size",14);rows.add_child(tray_match)
  build_grill(root)
@@ -83,7 +87,13 @@ func refresh() -> void:
  order_panel.visible=not dead and is_instance_valid(car) and car.state in ["arriving","waiting"]
  if order_panel.visible:
   var remaining: int=maxi(0,car.quantity-car.received)
-  order_name.text=Recipes.ticket_text(car.order,remaining)
+  var lines: Array[Dictionary]=car.remaining_lines()
+  order_name.text=Recipes.ticket_text(lines[0].kind,lines[0].quantity) if not lines.is_empty() else "ORDER COMPLETE"
+  for i in extra_orders.size():
+   extra_orders[i].visible=i+1<lines.size()
+   if extra_orders[i].visible:
+    extra_orders[i].text=Recipes.ticket_text(lines[i+1].kind,lines[i+1].quantity)
+    extra_orders[i].add_theme_color_override("font_color",Recipes.colour(lines[i+1].kind))
   order_icon.texture=Icons.texture("burger_"+String(car.order))
   order_style.border_color=Recipes.colour(car.order)
   var seconds: int=maxi(0,ceili(car.patience-car.waited))
@@ -91,8 +101,8 @@ func refresh() -> void:
   patience.value=clampf(1.0-car.waited/car.patience,0.0,1.0)*100.0
   var colour: Color=P.AMBER_GLOW if seconds<=10 else (P.ELECTRIC_TEAL if "blue" in car.order else P.AMBER_GLOW if "red" in car.order else P.WARM_CHALK)
   order_name.add_theme_color_override("font_color",Recipes.colour(car.order))
-  recipe_detail.text=recipe_text(car.order)
-  var available: Array=matching_tray(car.order)
+  recipe_detail.text=recipe_text(car.order) if car.order_lines.is_empty() else "DBL: 2 SAME · SP: Y + B"
+  var available: Array=matching_ticket(car)
   tray_match.text="TRAY MATCH %d/%d" % [mini(remaining,available[0]+available[1]),remaining]
   if available[1]>0:tray_match.text+=" · %d COLD" % available[1]
   tray_match.add_theme_color_override("font_color",P.AMBER_GLOW if available[1]>0 else P.ELECTRIC_TEAL if available[0]>=remaining else P.WARM_CHALK)
@@ -232,3 +242,11 @@ func refresh_tray(dead: bool) -> void:
  if cold>0:tray_note.text="%d COLD: REDUCED PAY" % cold
  if spoiled>0:tray_note.text+=("\n" if cold>0 else "")+"%d SPOILED: BIN" % spoiled
  tray_note.visible=not tray_note.text.is_empty()
+
+func matching_ticket(car: Node) -> Array:
+ var hot: int=0;var cold: int=0
+ for line: Dictionary in car.remaining_lines():
+  var available: Array=matching_tray(line.kind)
+  var fresh: int=mini(line.quantity,available[0]);hot+=fresh
+  cold+=mini(line.quantity-fresh,available[1])
+ return [hot,cold]

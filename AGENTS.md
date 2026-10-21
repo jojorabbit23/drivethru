@@ -151,3 +151,10 @@ Hitscan.cast includes world Areas. Solid exterior cover and the booth use bodies
 Run building_decor_test.gd and all existing tests. Native captures on this Windows
 machine use --rendering-method mobile (Vulkan); do not switch to GL, which caused
 whole-machine slowdown. Keep existing shadow-budget limits and cooking APIs.
+
+Mixed orders: game/order_progression.gd owns wave-scaled demand and timing.
+CustomerCar.order remains the first outstanding recipe for legacy callers; use
+remaining_lines()/wants()/record_delivery()/ticket_text() for full mixed tickets.
+Keep single-recipe quantity/received compatibility and existing freshness/discount
+rules. See docs/handover/MIXED_CUSTOMER_ORDERS.md; run mixed_orders_test.gd and
+capture_mixed_orders.gd as well as all existing checks. Decorations stay disabled.

@@ -81,6 +81,14 @@ func ticket() -> String:
 #   {}                                                           nothing cooked
 func plan() -> Dictionary:
 	var t := ticket()
+	if hatch and is_instance_valid(hatch.car) and not hatch.car.order_lines.is_empty() and hatch.car.state!="leaving":
+		var pending: Array[Dictionary]=hatch.car.remaining_lines()
+		for line: Dictionary in pending:
+			var complete: Dictionary=_complete_order(line.kind)
+			if not complete.is_empty():return complete
+		# Preserve ingredients of an unfinished double/special while permitting spares.
+		for line: Dictionary in pending:
+			if not Recipes.is_single(line.kind):t=line.kind;break
 	if t != "" and not Recipes.is_single(t):
 		var picks := []
 		var missing := []
@@ -229,3 +237,13 @@ func bag(player: Node) -> bool:
 	add_child(show)
 	show.play(kinds, pl["burnt"])
 	return true
+
+# Mixed tickets may be served in any order; prefer a complete requested recipe.
+func _complete_order(recipe: String) -> Dictionary:
+	var picks: Array=[]
+	var used_tray: Dictionary={};var used_grill: Dictionary={}
+	for kind: String in Recipes.patties(recipe):
+		var pick: Dictionary=_find(kind,used_tray,used_grill)
+		if pick.is_empty():return {}
+		picks.append(pick)
+	return {"order":recipe,"picks":picks,"burnt":false}

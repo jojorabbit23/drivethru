@@ -358,3 +358,13 @@ Kitchen updated from the owner's two references and Kitchen_Texture_Pack.zip: st
 Hollowhead common infected: mixed into ordinary wave slots from wave 1, one at a time; no extra wave count or horde spawns. 80 HP, low-damage swipes/slam, clicking agitation, interruptible straight frenzy charge below 30% HP, brief minor-damage death spores. H spawns one for testing. Infection progression is deferred. See docs/handover/HOLLOWHEAD.md.
 
 Mushroom-headed scientist infected: normal scheduled wave slots (every fourth scheduled spawn unless Lancer/Scuttler priority wins), 100 HP, 12-damage claw attack, 3x headshots. Rigged walk, breach, climb, attack, flinch and death; fungal head detaches and tumbles on death with bounded cosmetic physics and cleanup. B spawns one for testing. See docs/handover/SCIENTIST_INFECTED.md.
+
+## Progressive mixed orders
+
+From wave 3, customers can request different burgers on one ticket, such as
+Regular + Blue. From wave 6, mixed tickets include doubles/Specials and can reach
+three burgers; from wave 9 those larger varied orders become more common. Delivery
+can happen in any order, manually or through the serving tray. Each item keeps its
+own quality payment and cold penalty. Larger orders get some extra patience, while
+late-wave customers become less forgiving and arrival gaps shorten gradually.
+The full balancing curve and shared APIs are in docs/handover/MIXED_CUSTOMER_ORDERS.md.
