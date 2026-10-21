@@ -10,10 +10,10 @@
 extends RefCounted
 
 const RECIPES := {
-	"brown": {"name": "Common", "patties": ["brown"], "price": 30},
+	"brown": {"name": "Regular", "patties": ["brown"], "price": 30},
 	"blue": {"name": "Blue", "patties": ["blue"], "price": 30},
 	"red": {"name": "Yellow", "patties": ["red"], "price": 30},
-	"double_brown": {"name": "Double Common", "patties": ["brown", "brown"], "price": 50},
+	"double_brown": {"name": "Double Regular", "patties": ["brown", "brown"], "price": 50},
 	"double_blue": {"name": "Double Blue", "patties": ["blue", "blue"], "price": 50},
 	"double_red": {"name": "Double Yellow", "patties": ["red", "red"], "price": 50},
 	"special": {"name": "Special", "patties": ["red", "blue"], "price": 60},
@@ -29,6 +29,18 @@ const WEIGHTS_LATER := {
 
 static func name_of(order: String) -> String:
 	return String(RECIPES.get(order, RECIPES["brown"])["name"])
+
+const CODES := {"brown":"R", "blue":"B", "red":"Y", "double_brown":"DBL R", "double_blue":"DBL B", "double_red":"DBL Y", "special":"SP"}
+static func code(order: String) -> String:
+	return String(CODES.get(order,"R"))
+static func ticket_text(order: String, quantity: int=1) -> String:
+	return "%s X%d" % [code(order),maxi(0,quantity)]
+static func colour(order: String) -> Color:
+	var palette=preload("res://core/palette.gd")
+	if order=="special": return palette.ELECTRIC_TEAL
+	if "blue" in order: return palette.ELECTRIC_TEAL
+	if "red" in order: return palette.AMBER_GLOW
+	return Color(0.52,0.31,0.18)
 
 static func patties(order: String) -> Array:
 	return RECIPES.get(order, RECIPES["brown"])["patties"]

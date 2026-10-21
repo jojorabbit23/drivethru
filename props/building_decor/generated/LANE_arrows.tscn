@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_opnbf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_jpoy6"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.0494975, -0.385, 1.035, 0.098995, 0.77),
+"attribute_data": PackedByteArray("4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 108,
+"vertex_data": PackedByteArray("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")
+}]
+
+[node name="LANE_arrows" type="Node3D"]
+script = ExtResource("1_opnbf")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "LANE_arrows",
+"object": "Faded arrows",
+"placement": "Asphalt",
+"type": "Decal"
+}
+metadata/guide_id = "LANE_arrows"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_jpoy6")

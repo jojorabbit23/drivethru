@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_xsqur"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ld6n3"]
+_surfaces = [{
+"aabb": AABB(-0.11, 0, -0.085, 0.22, 0.24, 0.181),
+"attribute_data": PackedByteArray("aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 72,
+"vertex_data": PackedByteArray("rkfhvY/CdT57FK49rkfhPY/CdT57FK49rkfhvQAAAAB7FK49rkfhPY/CdT57FK49rkfhPQAAAAB7FK49rkfhvQAAAAB7FK49rkfhPY/CdT57FK69rkfhvY/CdT57FK69rkfhPQAAAAB7FK69rkfhvY/CdT57FK69rkfhvQAAAAB7FK69rkfhPQAAAAB7FK69rkfhPY/CdT57FK49rkfhPY/CdT57FK69rkfhPQAAAAB7FK49rkfhPY/CdT57FK69rkfhPQAAAAB7FK69rkfhPQAAAAB7FK49rkfhvY/CdT57FK69rkfhvY/CdT57FK49rkfhvQAAAAB7FK69rkfhvY/CdT57FK49rkfhvQAAAAB7FK49rkfhvQAAAAB7FK69rkfhPY/CdT57FK49rkfhvY/CdT57FK49rkfhPY/CdT57FK69rkfhvY/CdT57FK49rkfhvY/CdT57FK69rkfhPY/CdT57FK69rkfhvQAAAAB7FK49rkfhPQAAAAB7FK49rkfhvQAAAAB7FK69rkfhPQAAAAB7FK49rkfhPQAAAAB7FK69rkfhvQAAAAB7FK69CtejvczMTD6mm8Q9CtejPczMTD6mm8Q9CtejvY/C9T2mm8Q9CtejPczMTD6mm8Q9CtejPY/C9T2mm8Q9CtejvY/C9T2mm8Q9CtejPczMTD4yCKw9CtejvczMTD4yCKw9CtejPY/C9T0yCKw9CtejvczMTD4yCKw9CtejvY/C9T0yCKw9CtejPY/C9T0yCKw9CtejPczMTD6mm8Q9CtejPczMTD4yCKw9CtejPY/C9T2mm8Q9CtejPczMTD4yCKw9CtejPY/C9T0yCKw9CtejPY/C9T2mm8Q9CtejvczMTD4yCKw9CtejvczMTD6mm8Q9CtejvY/C9T0yCKw9CtejvczMTD6mm8Q9CtejvY/C9T2mm8Q9CtejvY/C9T0yCKw9CtejPczMTD6mm8Q9CtejvczMTD6mm8Q9CtejPczMTD4yCKw9CtejvczMTD6mm8Q9CtejvczMTD4yCKw9CtejPczMTD4yCKw9CtejvY/C9T2mm8Q9CtejPY/C9T2mm8Q9CtejvY/C9T0yCKw9CtejPY/C9T2mm8Q9CtejPY/C9T0yCKw9CtejvY/C9T0yCKw9/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/")
+}]
+
+[node name="WIN_napkins" type="Node3D"]
+script = ExtResource("1_xsqur")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "WIN_napkins",
+"object": "Battered napkin dispenser",
+"placement": "Tray shelf",
+"type": "Prop"
+}
+metadata/guide_id = "WIN_napkins"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_ld6n3")

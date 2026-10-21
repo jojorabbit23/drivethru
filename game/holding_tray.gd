@@ -111,7 +111,7 @@ func store_from_grill() -> int:
 		var p: Dictionary = grill.take_patty("", true)
 		if p.is_empty():
 			break
-		held.append({"kind": p["kind"], "ready_for": p["ready_for"]})
+		held.append(p.duplicate())
 		n += 1
 	if n > 0:
 		Sfx.play_at(self, "thunk", global_position)
@@ -130,7 +130,9 @@ func take(want := "") -> Dictionary:
 	var p: Dictionary = held[idx]
 	held.remove_at(idx)
 	_refresh()
-	return {"kind": p["kind"], "ready_for": p["ready_for"], "burnt": false}
+	var result: Dictionary=p.duplicate()
+	result["burnt"]=false
+	return result
 
 func take_at(i: int) -> Dictionary:
 	if i < 0 or i >= held.size():
@@ -138,7 +140,9 @@ func take_at(i: int) -> Dictionary:
 	var p: Dictionary = held[i]
 	held.remove_at(i)
 	_refresh()
-	return {"kind": p["kind"], "ready_for": p["ready_for"], "burnt": false}
+	var result: Dictionary=p.duplicate()
+	result["burnt"]=false
+	return result
 
 func has_kind(kind: String) -> bool:
 	for p in held:
