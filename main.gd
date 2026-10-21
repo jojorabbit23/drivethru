@@ -95,6 +95,8 @@ func _ready() -> void:
 			w.ammo_changed.connect(_on_ammo_changed)
 		_update_weapon())
 	_build_stations()
+	add_to_group("decorated_game")
+	add_child(preload("res://props/building_decor/generated/building_decor.tscn").instantiate())
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
 	economy.changed.connect(_update_status)

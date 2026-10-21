@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_i7em3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_5284i"]
+_surfaces = [{
+"aabb": AABB(-0.214123, -0.22659, -0.0275, 0.428246, 0.45318, 0.055),
+"attribute_data": PackedByteArray("hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 108,
+"vertex_data": PackedByteArray("OXFRvuNXlr2uR+E8H0NbPi4V272uR+E8H0Nbvp2oRb6uR+E8H0NbPi4V272uR+E8OXFRPkIHaL6uR+E8H0Nbvp2oRb6uR+E8H0NbPi4V272uR+G8OXFRvuNXlr2uR+G8OXFRPkIHaL6uR+G8OXFRvuNXlr2uR+G8H0Nbvp2oRb6uR+G8OXFRPkIHaL6uR+G8H0NbPi4V272uR+E8H0NbPi4V272uR+G8OXFRPkIHaL6uR+E8H0NbPi4V272uR+G8OXFRPkIHaL6uR+G8OXFRPkIHaL6uR+E8OXFRvuNXlr2uR+G8OXFRvuNXlr2uR+E8H0Nbvp2oRb6uR+G8OXFRvuNXlr2uR+E8H0Nbvp2oRb6uR+E8H0Nbvp2oRb6uR+G8H0NbPi4V272uR+E8OXFRvuNXlr2uR+E8H0NbPi4V272uR+G8OXFRvuNXlr2uR+E8OXFRvuNXlr2uR+G8H0NbPi4V272uR+G8H0Nbvp2oRb6uR+E8OXFRPkIHaL6uR+E8H0Nbvp2oRb6uR+G8OXFRPkIHaL6uR+E8OXFRPkIHaL6uR+G8H0Nbvp2oRb6uR+G8PQpXvo/CdT2uR+E8PQpXPo/CdT2uR+E8PQpXvo/Cdb2uR+E8PQpXPo/CdT2uR+E8PQpXPo/Cdb2uR+E8PQpXvo/Cdb2uR+E8PQpXPo/CdT2uR+G8PQpXvo/CdT2uR+G8PQpXPo/Cdb2uR+G8PQpXvo/CdT2uR+G8PQpXvo/Cdb2uR+G8PQpXPo/Cdb2uR+G8PQpXPo/CdT2uR+E8PQpXPo/CdT2uR+G8PQpXPo/Cdb2uR+E8PQpXPo/CdT2uR+G8PQpXPo/Cdb2uR+G8PQpXPo/Cdb2uR+E8PQpXvo/CdT2uR+G8PQpXvo/CdT2uR+E8PQpXvo/Cdb2uR+G8PQpXvo/CdT2uR+E8PQpXvo/Cdb2uR+E8PQpXvo/Cdb2uR+G8PQpXPo/CdT2uR+E8PQpXvo/CdT2uR+E8PQpXPo/CdT2uR+G8PQpXvo/CdT2uR+E8PQpXvo/CdT2uR+G8PQpXPo/CdT2uR+G8PQpXvo/Cdb2uR+E8PQpXPo/Cdb2uR+E8PQpXvo/Cdb2uR+G8PQpXPo/Cdb2uR+E8PQpXPo/Cdb2uR+G8PQpXvo/Cdb2uR+G8H0Nbvp2oRT6uR+E8OXFRPkIHaD6uR+E8OXFRvuNXlj2uR+E8OXFRPkIHaD6uR+E8H0NbPi4V2z2uR+E8OXFRvuNXlj2uR+E8OXFRPkIHaD6uR+G8H0Nbvp2oRT6uR+G8H0NbPi4V2z2uR+G8H0Nbvp2oRT6uR+G8OXFRvuNXlj2uR+G8H0NbPi4V2z2uR+G8OXFRPkIHaD6uR+E8OXFRPkIHaD6uR+G8H0NbPi4V2z2uR+E8OXFRPkIHaD6uR+G8H0NbPi4V2z2uR+G8H0NbPi4V2z2uR+E8H0Nbvp2oRT6uR+G8H0Nbvp2oRT6uR+E8OXFRvuNXlj2uR+G8H0Nbvp2oRT6uR+E8OXFRvuNXlj2uR+E8OXFRvuNXlj2uR+G8OXFRPkIHaD6uR+E8H0Nbvp2oRT6uR+E8OXFRPkIHaD6uR+G8H0Nbvp2oRT6uR+E8H0Nbvp2oRT6uR+G8OXFRPkIHaD6uR+G8OXFRvuNXlj2uR+E8H0NbPi4V2z2uR+E8OXFRvuNXlj2uR+G8H0NbPi4V2z2uR+E8H0NbPi4V2z2uR+G8OXFRvuNXlj2uR+G8/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAfvZ/dj1/Rrt+9n92PX9Gu372f3Y9f0a7fvZ/dj1/Rrt+9n92PX9Gu372f3Y9f0a7gAl/iT1/RruACX+JPX9Gu4AJf4k9f0a7gAl/iT1/RruACX+JPX9Gu4AJf4k9f0a7f4l+9jMKuMR/iX72Mwq4xH+JfvYzCrjEf4l+9jMKuMR/iX72Mwq4xH+JfvYzCrjEf3aACTMKuMR/doAJMwq4xH92gAkzCrjEf3aACTMKuMR/doAJMwq4xH92gAkzCrjE/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAfvZ/iT1/uMR+9n+JPX+4xH72f4k9f7jEfvZ/iT1/uMR+9n+JPX+4xH72f4k9f7jEgAl/dj1/uMSACX92PX+4xIAJf3Y9f7jEgAl/dj1/uMSACX92PX+4xIAJf3Y9f7jEf3Z+9jMKRrt/dn72MwpGu392fvYzCka7f3Z+9jMKRrt/dn72MwpGu392fvYzCka7f4mACTMKRrt/iYAJMwpGu3+JgAkzCka7f4mACTMKRrt/iYAJMwpGu3+JgAkzCka7")
+}]
+
+[node name="EXT_plywood" type="Node3D"]
+script = ExtResource("1_i7em3")
+mode = "breakable"
+hit_size = Vector3(0.428246, 0.45318, 0.06)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Destructible",
+"id": "EXT_plywood",
+"object": "Plywood half-covering windows",
+"placement": "Front windows",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_plywood"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_5284i")

@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_3rmnr"]
+
+[node name="FX_audio_hold_music" type="Node3D"]
+script = ExtResource("1_3rmnr")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Looping",
+"id": "FX_audio_hold_music",
+"object": "Cheerful hold-music loop",
+"placement": "Intercom speaker",
+"type": "Audio"
+}
+metadata/guide_id = "FX_audio_hold_music"
+metadata/audio_emitter = true

@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_qsr50"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_drbcm"]
+_surfaces = [{
+"aabb": AABB(-0.9, -0.02, -0.02, 1.8, 0.04, 0.04),
+"attribute_data": PackedByteArray("8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 36,
+"vertex_data": PackedByteArray("ZmZmvwrXozwK16M8ZmZmPwrXozwK16M8ZmZmvwrXo7wK16M8ZmZmPwrXozwK16M8ZmZmPwrXo7wK16M8ZmZmvwrXo7wK16M8ZmZmPwrXozwK16O8ZmZmvwrXozwK16O8ZmZmPwrXo7wK16O8ZmZmvwrXozwK16O8ZmZmvwrXo7wK16O8ZmZmPwrXo7wK16O8ZmZmPwrXozwK16M8ZmZmPwrXozwK16O8ZmZmPwrXo7wK16M8ZmZmPwrXozwK16O8ZmZmPwrXo7wK16O8ZmZmPwrXo7wK16M8ZmZmvwrXozwK16O8ZmZmvwrXozwK16M8ZmZmvwrXo7wK16O8ZmZmvwrXozwK16M8ZmZmvwrXo7wK16M8ZmZmvwrXo7wK16O8ZmZmPwrXozwK16M8ZmZmvwrXozwK16M8ZmZmPwrXozwK16O8ZmZmvwrXozwK16M8ZmZmvwrXozwK16O8ZmZmPwrXozwK16O8ZmZmvwrXo7wK16M8ZmZmPwrXo7wK16M8ZmZmvwrXo7wK16O8ZmZmPwrXo7wK16M8ZmZmPwrXo7wK16O8ZmZmvwrXo7wK16O8/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/")
+}]
+
+[node name="FX_light_window_glow" type="Node3D"]
+script = ExtResource("1_qsr50")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox/Lights")
+metadata/guide = {
+"behaviour": "-",
+"id": "FX_light_window_glow",
+"object": "Window glow against dusk haze",
+"placement": "Exterior windows",
+"type": "Light"
+}
+metadata/guide_id = "FX_light_window_glow"
+metadata/reuses_existing = true
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_drbcm")

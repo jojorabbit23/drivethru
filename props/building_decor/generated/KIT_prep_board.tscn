@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_u0pu4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ntbl4"]
+_surfaces = [{
+"aabb": AABB(-0.15, -0.0125, -0.11, 0.3, 0.06, 0.315),
+"attribute_data": PackedByteArray("4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/4tW3/+LVt//i1bf/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/JSou/yUqLv8lKi7/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 108,
+"vertex_data": PackedByteArray("mpkZvs3MTDyuR+E9mpkZPs3MTDyuR+E9mpkZvs3MTLyuR+E9mpkZPs3MTDyuR+E9mpkZPs3MTLyuR+E9mpkZvs3MTLyuR+E9mpkZPs3MTDyuR+G9mpkZvs3MTDyuR+G9mpkZPs3MTLyuR+G9mpkZvs3MTDyuR+G9mpkZvs3MTLyuR+G9mpkZPs3MTLyuR+G9mpkZPs3MTDyuR+E9mpkZPs3MTDyuR+G9mpkZPs3MTLyuR+E9mpkZPs3MTDyuR+G9mpkZPs3MTLyuR+G9mpkZPs3MTLyuR+E9mpkZvs3MTDyuR+G9mpkZvs3MTDyuR+E9mpkZvs3MTLyuR+G9mpkZvs3MTDyuR+E9mpkZvs3MTLyuR+E9mpkZvs3MTLyuR+G9mpkZPs3MTDyuR+E9mpkZvs3MTDyuR+E9mpkZPs3MTDyuR+G9mpkZvs3MTDyuR+E9mpkZvs3MTDyuR+G9mpkZPs3MTDyuR+G9mpkZvs3MTLyuR+E9mpkZPs3MTLyuR+E9mpkZvs3MTLyuR+G9mpkZPs3MTLyuR+E9mpkZPs3MTLyuR+G9mpkZvs3MTLyuR+G961G4PQrXIz3sUTg9mZkZPgrXIz3sUTg961G4PZDC9TzsUTg9mZkZPgrXIz3sUTg9mZkZPpDC9TzsUTg961G4PZDC9TzsUTg9mZkZPgrXIz3sUTi961G4PQrXIz3sUTi9mZkZPpDC9TzsUTi961G4PQrXIz3sUTi961G4PZDC9TzsUTi9mZkZPpDC9TzsUTi9mZkZPgrXIz3sUTg9mZkZPgrXIz3sUTi9mZkZPpDC9TzsUTg9mZkZPgrXIz3sUTi9mZkZPpDC9TzsUTi9mZkZPpDC9TzsUTg961G4PQrXIz3sUTi961G4PQrXIz3sUTg961G4PZDC9TzsUTi961G4PQrXIz3sUTg961G4PZDC9TzsUTg961G4PZDC9TzsUTi9mZkZPgrXIz3sUTg961G4PQrXIz3sUTg9mZkZPgrXIz3sUTi961G4PQrXIz3sUTg961G4PQrXIz3sUTi9mZkZPgrXIz3sUTi961G4PZDC9TzsUTg9mZkZPpDC9TzsUTg961G4PZDC9TzsUTi9mZkZPpDC9TzsUTg9mZkZPpDC9TzsUTi961G4PZDC9TzsUTi9rkfhPVyPQj2F61E+uB4FPlyPQj2F61E+rkfhPexRuDyF61E+uB4FPlyPQj2F61E+uB4FPuxRuDyF61E+rkfhPexRuDyF61E+uB4FPlyPQj0oXA89rkfhPVyPQj0oXA89uB4FPuxRuDwoXA89rkfhPVyPQj0oXA89rkfhPexRuDwoXA89uB4FPuxRuDwoXA89uB4FPlyPQj2F61E+uB4FPlyPQj0oXA89uB4FPuxRuDyF61E+uB4FPlyPQj0oXA89uB4FPuxRuDwoXA89uB4FPuxRuDyF61E+rkfhPVyPQj0oXA89rkfhPVyPQj2F61E+rkfhPexRuDwoXA89rkfhPVyPQj2F61E+rkfhPexRuDyF61E+rkfhPexRuDwoXA89uB4FPlyPQj2F61E+rkfhPVyPQj2F61E+uB4FPlyPQj0oXA89rkfhPVyPQj2F61E+rkfhPVyPQj0oXA89uB4FPlyPQj0oXA89rkfhPexRuDyF61E+uB4FPuxRuDyF61E+rkfhPexRuDwoXA89uB4FPuxRuDyF61E+uB4FPuxRuDwoXA89rkfhPexRuDwoXA89/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/")
+}]
+
+[node name="KIT_prep_board" type="Node3D"]
+script = ExtResource("1_u0pu4")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("PrepBench")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_prep_board",
+"object": "Chipped cutting board and spatulas",
+"placement": "Prep counter",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_prep_board"
+metadata/reuses_existing = true
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_ntbl4")
