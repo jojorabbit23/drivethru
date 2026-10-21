@@ -25,7 +25,7 @@ func run() -> void:
  blocker.free();Input.action_release("interact")
  main.hatch.next_order="red";var car: Node3D=main.hatch.spawn_customer(3);car._process(5.0);car.set_process(false);car.received=1;car.waited=12.0
  player.global_position=Vector3(-3,0.1,2.4);hud.refresh()
- check(hud.order_panel.visible and "YELLOW" in hud.order_name.text and "2" in hud.order_name.text,"order persists in other rooms with remaining quantity")
+ check(hud.order_panel.visible and "Y X2" in hud.order_name.text and "2" in hud.order_name.text,"order persists in other rooms with remaining quantity")
  check(hud.wait_label.text.contains("38s"),"order card reports actual remaining patience")
  car.free();hud.refresh();check(not hud.order_panel.visible,"departed/freed customer clears order card safely")
  player.health=20;hud.refresh();check(hud.health_warning.visible,"critical health has explicit warning")

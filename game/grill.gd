@@ -1,5 +1,5 @@
 # Flat-top griddle (docs/COOKING_DESIGN.md "Grill Selection / Management").
-# Look at it, press E, pick a patty (Common / Blue / Red, with counts, or
+# Look at it, press E, pick a patty (Regular / Blue / Yellow, with counts, or
 # Cancel) and it goes on the first free slot. Under a second. Then it cooks in
 # the background while you defend the shop.
 #
@@ -246,7 +246,7 @@ func _show(i: int) -> void:
 	var t: float = s["t"]
 	var mesh := s["mesh"] as MeshInstance3D
 	var label := s["label"] as Label3D
-	var kind := String(Economy.KIND_NAME[s["kind"]]).to_upper()
+	var kind: String = preload("res://game/recipes.gd").code(s["kind"])
 	var cook := 0.0
 	var burnt := 0.0
 	match state:

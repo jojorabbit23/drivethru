@@ -43,7 +43,7 @@ func run() -> void:
  var car: Node=main.hatch.spawn_customer();car.state="waiting"
  prepare(0,"blue",8.0);prepare(1,"brown",7.0)
  var before: int=main.economy.buns
- check(main.bench.plan().order=="brown" and "common burger" in main.bench.prompt(player),"incomplete double selects unrelated single and shows correct prompt")
+ check(main.bench.plan().order=="brown" and "regular burger" in main.bench.prompt(player),"incomplete double selects unrelated single and shows correct prompt")
  check(main.bench.bag(player) and player.held_burger.kind=="brown" and main.economy.buns==before-1,"boxes spare with one bun")
  check(grill.state_of(0)=="ready" and grill.state_of(1)=="","matching patty stays ready and wrong patty frees slot")
  player.set_held("");prepare(1,"blue",7.0)
@@ -56,4 +56,3 @@ func run() -> void:
  for i in 3:await process_frame
  print("Grill recovery: %d failure(s)" % failures)
  quit(1 if failures else 0)
-

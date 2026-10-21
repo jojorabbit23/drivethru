@@ -10,7 +10,7 @@ signal changed
 # Mushroom kinds. Each makes its own patty and its own burger order.
 # Legacy "red" IDs are retained for saved stock/orders; the player-facing name is Yellow.
 const KINDS := ["brown", "blue", "red"]
-const KIND_NAME := {"brown": "Common", "blue": "Blue", "red": "Yellow"}
+const KIND_NAME := {"brown": "Regular", "blue": "Blue", "red": "Yellow"}
 
 const KILL_CASH := 2           # every kill
 const BURGER_PRICE := 30       # every correct burger

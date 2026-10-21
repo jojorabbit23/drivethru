@@ -100,7 +100,7 @@ func refresh() -> void:
 		boxes[i].visible=not item.is_empty()
 		timers[i].visible=not item.is_empty()
 		if item.is_empty():continue
-		(lids[i].material_override as StandardMaterial3D).albedo_color=Icons.KIND_COLOUR.get(String(item.get("kind","brown")),P.AMBER_GLOW)
+		(lids[i].material_override as StandardMaterial3D).albedo_color=Recipes.colour(String(item.get("kind","brown")))
 		badges[i].texture=Icons.texture(Items.icon(item))
 		timers[i].text=Items.timer(item)+("  SALE" if item.get("discount",false) else "")
 		timers[i].modulate=P.AMBER_GLOW if Items.cold(item) else P.WARM_CHALK

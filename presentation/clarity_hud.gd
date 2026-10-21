@@ -1,10 +1,16 @@
 # Readability only: no economy, order, cooking or damage rules.
 extends CanvasLayer
 const P=preload("res://core/palette.gd")
+const Icons=preload("res://game/icons.gd")
 const Recipes=preload("res://game/recipes.gd")
 var main: Node3D
 var actor: Node3D
 var order_panel: PanelContainer
+var order_icon: TextureRect
+var grill_panel: PanelContainer
+var grill_title: Label
+var grill_cards: Array[Dictionary]=[]
+var order_style: StyleBoxFlat
 var order_name: Label
 var patience: ProgressBar
 var wait_label: Label
@@ -23,10 +29,13 @@ func _ready() -> void:
  layer=9
  var root:=Control.new();root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);root.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(root)
  edge=Control.new();edge.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);edge.mouse_filter=Control.MOUSE_FILTER_IGNORE;root.add_child(edge);edge.draw.connect(draw_alerts)
- order_panel=PanelContainer.new();order_panel.name="CurrentCustomer";order_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);order_panel.position=Vector2(-305,70);order_panel.size=Vector2(285,94);order_panel.mouse_filter=Control.MOUSE_FILTER_IGNORE;root.add_child(order_panel)
- var style:=StyleBoxFlat.new();style.bg_color=Color(P.MIDNIGHT_TYNE,0.92);style.border_color=P.OXIDISED_TEAL;style.set_border_width_all(2);style.set_content_margin_all(10);order_panel.add_theme_stylebox_override("panel",style)
+ order_panel=PanelContainer.new();order_panel.name="CurrentCustomer";order_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);order_panel.position=Vector2(-360,70);order_panel.size=Vector2(340,94);order_panel.mouse_filter=Control.MOUSE_FILTER_IGNORE;root.add_child(order_panel)
+ var style:=StyleBoxFlat.new();style.bg_color=Color(P.MIDNIGHT_TYNE,0.92);style.border_color=P.OXIDISED_TEAL;style.set_border_width_all(2);style.set_content_margin_all(10);order_panel.add_theme_stylebox_override("panel",style);order_style=style
  var rows:=VBoxContainer.new();rows.mouse_filter=Control.MOUSE_FILTER_IGNORE;order_panel.add_child(rows)
- order_name=Label.new();order_name.add_theme_font_size_override("font_size",17);rows.add_child(order_name)
+ var order_row:=HBoxContainer.new();order_row.add_theme_constant_override("separation",10);rows.add_child(order_row)
+ order_icon=TextureRect.new();order_icon.custom_minimum_size=Vector2(38,38);order_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;order_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;order_icon.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;order_row.add_child(order_icon)
+ order_name=Label.new();order_name.add_theme_font_size_override("font_size",24);order_row.add_child(order_name)
+ build_grill(root)
  wait_label=Label.new();wait_label.add_theme_font_size_override("font_size",14);rows.add_child(wait_label)
  patience=ProgressBar.new();patience.mouse_filter=Control.MOUSE_FILTER_IGNORE;patience.custom_minimum_size=Vector2(240,7);patience.show_percentage=false;patience.add_theme_stylebox_override("fill",patience_fill);rows.add_child(patience)
  ammo_warning=Label.new();ammo_warning.name="AmmoWarning";ammo_warning.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT);ammo_warning.position=Vector2(-400,-80);ammo_warning.size=Vector2(384,28);ammo_warning.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;ammo_warning.add_theme_font_size_override("font_size",20);ammo_warning.add_theme_color_override("font_color",P.AMBER_GLOW);ammo_warning.add_theme_color_override("font_outline_color",P.MIDNIGHT_TYNE);ammo_warning.add_theme_constant_override("outline_size",5);root.add_child(ammo_warning)
@@ -58,13 +67,16 @@ func refresh() -> void:
  order_panel.visible=not dead and is_instance_valid(car) and car.state in ["arriving","waiting"]
  if order_panel.visible:
   var remaining: int=maxi(0,car.quantity-car.received)
-  order_name.text="%s BURGER  x%d"%[Recipes.name_of(car.order).to_upper(),remaining]
+  order_name.text=Recipes.ticket_text(car.order,remaining)
+  order_icon.texture=Icons.texture("burger_"+String(car.order))
+  order_style.border_color=Recipes.colour(car.order)
   var seconds: int=maxi(0,ceili(car.patience-car.waited))
   wait_label.text="ARRIVING" if car.state=="arriving" else "CUSTOMER WAITING  ·  %ds"%seconds
   patience.value=clampf(1.0-car.waited/car.patience,0.0,1.0)*100.0
   var colour: Color=P.AMBER_GLOW if seconds<=10 else (P.ELECTRIC_TEAL if "blue" in car.order else P.AMBER_GLOW if "red" in car.order else P.WARM_CHALK)
-  order_name.add_theme_color_override("font_color",colour)
+  order_name.add_theme_color_override("font_color",P.WARM_CHALK)
   patience_fill.bg_color=colour
+ refresh_grill(dead)
  var gun: Node=actor.current_weapon()
  ammo_warning.text=""
  if not dead and is_instance_valid(gun):
@@ -79,6 +91,51 @@ func refresh() -> void:
    elif reserve==0:ammo_warning.text="LAST ROUNDS  ·  %d LEFT"%int(amount)
    elif int(amount)<=low:ammo_warning.text="LOW AMMO  ·  R RELOAD"
  main._hud.weapon.add_theme_color_override("font_color",P.AMBER_GLOW if not ammo_warning.text.is_empty() else P.WARM_CHALK)
+func build_grill(root: Control) -> void:
+ grill_panel=PanelContainer.new();grill_panel.name="GrillSlots";grill_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);grill_panel.position=Vector2(-360,184);grill_panel.size=Vector2(340,126);grill_panel.mouse_filter=Control.MOUSE_FILTER_IGNORE;root.add_child(grill_panel)
+ var style:=StyleBoxFlat.new();style.bg_color=Color(P.MIDNIGHT_TYNE,.9);style.border_color=P.BLUE_SLATE;style.set_border_width_all(1);style.set_content_margin_all(8);grill_panel.add_theme_stylebox_override("panel",style)
+ var column:=VBoxContainer.new();grill_panel.add_child(column)
+ grill_title=Label.new();grill_title.add_theme_font_size_override("font_size",14);grill_title.add_theme_color_override("font_color",P.WARM_CHALK);column.add_child(grill_title)
+ var row:=HBoxContainer.new();row.add_theme_constant_override("separation",6);column.add_child(row)
+ for i in 4:
+  var panel:=PanelContainer.new();row.add_child(panel)
+  var card_style:=StyleBoxFlat.new();card_style.bg_color=Color(P.BLUE_SLATE,.5);card_style.border_color=P.BLUE_SLATE;card_style.set_border_width_all(1);card_style.set_content_margin_all(3);panel.add_theme_stylebox_override("panel",card_style)
+  var card:=VBoxContainer.new();card.custom_minimum_size=Vector2(60,0);panel.add_child(card)
+  var top:=HBoxContainer.new();card.add_child(top)
+  var icon:=TextureRect.new();icon.custom_minimum_size=Vector2(22,22);icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;top.add_child(icon)
+  var code_label:=Label.new();code_label.add_theme_font_size_override("font_size",16);top.add_child(code_label)
+  var state_label:=Label.new();state_label.add_theme_font_size_override("font_size",11);card.add_child(state_label)
+  var timer_label:=Label.new();timer_label.add_theme_font_size_override("font_size",11);card.add_child(timer_label)
+  grill_cards.append({"root":panel,"icon":icon,"code":code_label,"state":state_label,"timer":timer_label})
+ var legend:=Label.new();legend.text="R REGULAR · B BLUE\nY YELLOW · SP SPECIAL";legend.add_theme_font_size_override("font_size",10);legend.add_theme_color_override("font_color",P.WARM_CHALK);column.add_child(legend)
+func refresh_grill(dead: bool) -> void:
+ grill_panel.visible=not dead and is_instance_valid(main.grill)
+ if not grill_panel.visible:return
+ var grill: Node=main.grill
+ var occupied: int=grill.slot_count()-grill.count("")
+ grill_title.text="GRILL %d/%d · BURN IN" % [occupied,grill.slot_count()]
+ for i in 4:
+  var card: Dictionary=grill_cards[i]
+  card.root.visible=i<grill.slot_count()
+  if not card.root.visible:continue
+  var slot: Dictionary=grill.slots[i]
+  var state: String=slot.state
+  var empty: bool=state.is_empty()
+  card.icon.texture=Icons.texture("raw" if empty else "mushroom_"+String(slot.kind))
+  card.icon.modulate=Color(1,1,1,.25 if empty else 1.0)
+  card.code.text=str(i+1) if empty else Recipes.code(slot.kind)
+  card.code.add_theme_color_override("font_color",P.CONCRETE_GREY if empty else P.WARM_CHALK)
+  card.state.text="EMPTY" if empty else ("COOK" if state=="cooking" else state.to_upper())
+  var colour: Color=P.CONCRETE_GREY if empty else (P.ELECTRIC_TEAL if state=="ready" else P.AMBER_GLOW if state=="burnt" else P.WARM_CHALK)
+  card.state.add_theme_color_override("font_color",colour)
+  card.timer.add_theme_color_override("font_color",P.AMBER_GLOW if state=="ready" or state=="burnt" else P.WARM_CHALK)
+  if empty:card.timer.text="--"
+  elif state=="burnt":card.timer.text="BURNT!"
+  else:
+   var until_ready: float=maxf(0.0,grill.COOK_TIME-float(slot.t))/(grill.FLIP_RATE if slot.flipped else 1.0)
+   var until_burn: float=until_ready+grill.ready_window() if float(slot.t)<grill.COOK_TIME else maxf(0.0,grill.burn_time()-float(slot.t))
+   card.timer.text="%ds" % ceili(until_burn)
+
 func draw_alerts() -> void:
  var size: Vector2=edge.size
  if critical:

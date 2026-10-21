@@ -5,6 +5,7 @@
 # bar, waits, and drives off - paid or not (a missed order costs nothing).
 extends Node3D
 
+const Recipes = preload("res://game/recipes.gd")
 const P = preload("res://core/palette.gd")
 const Sfx = preload("res://game/sfx.gd")
 const Icons = preload("res://game/icons.gd")
@@ -126,31 +127,21 @@ func _add_bubble(at: Vector3) -> void:
 	back.render_priority = 0
 	_bubble.add_child(back)
 	var icon := Icons.sprite("burger_" + order, 0.035)
-	icon.position = Vector3(-0.19, -0.04, 0.01)
+	icon.position = Vector3(0, -0.04, 0.01)
 	icon.render_priority = 1
 	_bubble.add_child(icon)
 	var title:=Label3D.new()
 	title.name="BurgerColour"
-	title.text=order.replace("red","yellow").replace("_"," ").to_upper()+" BURGER"
+	title.text=Recipes.ticket_text(order,quantity)
+	_quantity_label=title
 	title.position=Vector3(0,0.32,0.02)
 	title.billboard=BaseMaterial3D.BILLBOARD_ENABLED
-	title.font_size=28
-	title.pixel_size=0.003
+	title.font_size=34
+	title.pixel_size=0.004
 	title.modulate=P.MIDNIGHT_TYNE
 	title.render_priority=2
 	title.outline_size=0
 	_bubble.add_child(title)
-	var count:=Label3D.new()
-	_quantity_label=count
-	count.text="x%d" % quantity
-	count.position=Vector3(0.30,-0.04,0.02)
-	count.billboard=BaseMaterial3D.BILLBOARD_ENABLED
-	count.font_size=40
-	count.pixel_size=0.006
-	count.modulate=P.MIDNIGHT_TYNE
-	count.render_priority=2
-	count.outline_size=0
-	_bubble.add_child(count)
 	_bar = MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(0.8, 0.06)
@@ -165,17 +156,19 @@ func _add_bubble(at: Vector3) -> void:
 	_bubble.visible = false
 
 func refresh_order_quantity() -> void:
-	if _quantity_label:_quantity_label.text="x%d" % maxi(0,quantity-received)
+	if _quantity_label:_quantity_label.text=Recipes.ticket_text(order,maxi(0,quantity-received))
 
 static func _bubble_texture(kind: String="brown") -> Texture2D:
 	var img := Image.create(32, 30, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
-	var colour: Color=Icons.KIND_COLOUR.get(kind,P.BURNT_ORANGE)
+	var colour: Color=Recipes.colour(kind)
 	for y in 26:
 		for x in 32:
 			var corner := (x < 2 or x > 29) and (y < 2 or y > 23)
 			if not corner:
-				img.set_pixel(x,y,P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==25 else (colour if x<3 or x>28 or y<3 else P.WARM_CHALK))
+				var border_colour: Color=colour
+				if kind=="special":border_colour=P.ELECTRIC_TEAL if x<16 else P.AMBER_GLOW
+				img.set_pixel(x,y,P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==25 else (border_colour if x<3 or x>28 or y<3 else P.WARM_CHALK))
 	for y in range(26, 30):            # tail
 		for x in range(8, 8 + (30 - y)):
 			img.set_pixel(x, y, colour)

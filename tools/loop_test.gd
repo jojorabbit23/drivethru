@@ -110,7 +110,7 @@ func _run() -> void:
 	check(f == main.grill and "place patty" in main.grill.prompt(player), "at the grill: '%s'" % main.grill.prompt(player))
 	player.use_focus()
 	var labels: Array = player.menu_options.map(func(o): return o["label"])
-	check(labels == ["Common patty  x3", "Blue patty  x2", "Yellow patty  x1", "Cancel"], "patty menu: %s" % str(labels))
+	check(labels == ["Regular patty  x3", "Blue patty  x2", "Yellow patty  x1", "Cancel"], "patty menu: %s" % str(labels))
 	player.choose(1)     # key 2: blue
 	check(main.grill.state_of(0) == "raw" and main.grill.kind_of(0) == "blue" and econ.stock["blue"] == 1, "key 2 puts a blue patty on")
 	player.use_focus()
@@ -125,10 +125,10 @@ func _run() -> void:
 	await wait(2.0)
 	check(main.grill.state_of(0) == "cooking", "cooking after a second")
 	check(is_equal_approx(main.grill.slots[0]["patty"].scale.y, main.grill.SMASHED.y) or main.grill.slots[0]["patty"].scale.y < 0.8, "the spatula has pressed it down (scale y %.2f)" % main.grill.slots[0]["patty"].scale.y)
-	# look at the common patty (slot 1): E flips it
+	# look at the regular patty (slot 1): E flips it
 	cam.look_at((main.grill.slots[1]["root"] as Node3D).global_position, Vector3.UP)
 	await physics_frame
-	check(main.grill.aimed_slot(player) == 1 and "flip the common patty" in main.grill.prompt(player), "looking at a cooking patty: '%s'" % main.grill.prompt(player))
+	check(main.grill.aimed_slot(player) == 1 and "flip the regular patty" in main.grill.prompt(player), "looking at a cooking patty: '%s'" % main.grill.prompt(player))
 	var ready_at := {}
 	var t_flip := Time.get_ticks_msec()
 	main.grill.patty_state.connect(func(i, st): if st == "ready": ready_at[i] = true)
@@ -157,7 +157,7 @@ func _run() -> void:
 		if c.get_script() == main.bench.BurgerStack:
 			stack = c
 	check(stack != null, "and you see it built on the board")
-	check(main.rail.current_car() == car and main.rail._ticket.visible and "BLUE" in main.rail._name.text, "the ticket rail shows the order: '%s'" % main.rail._name.text)
+	check(main.rail.current_car() == car and main.rail._ticket.visible and "B X1" in main.rail._name.text, "the ticket rail shows the order: '%s'" % main.rail._name.text)
 	await wait(5.5)
 
 	print("== serve")
@@ -169,15 +169,15 @@ func _run() -> void:
 	check(econ.cash - before == 36 and player.held == "", "PERFECT: $30 + $6 tip (got $%d)" % (econ.cash - before))
 	await wait(4.5)
 	check(not is_instance_valid(car), "the car drives off")
-	# the common patty: say it has sat READY for 6 s (GOOD), then bag it
+	# the regular patty: say it has sat READY for 6 s (GOOD), then bag it
 	main.hatch.next_order = "red"
 	car = main.hatch.spawn_customer()
 	await wait(5.5)
 	main.grill.slots[1]["t"] = 6.0 + 6.0
 	await wait(0.1)
 	main.bench.bag(player)
-	check(player.held_burger.get("kind", "") == "brown" and player.held_burger.get("quality", "") == "good", "no red ready: the bench bags the waiting common patty, now GOOD: %s" % str(player.held_burger))
-	check(not main.hatch.serve(player) and "WRONG BURGER" in main.hatch.prompt(player), "the red customer won't take a common burger")
+	check(player.held_burger.get("kind", "") == "brown" and player.held_burger.get("quality", "") == "good", "no red ready: the bench bags the waiting regular patty, now GOOD: %s" % str(player.held_burger))
+	check(not main.hatch.serve(player) and "WRONG BURGER" in main.hatch.prompt(player), "the red customer won't take a regular burger")
 	car.leave(false)
 	await wait(4.5)
 	main.hatch.next_order = "brown"
@@ -308,7 +308,7 @@ func _run() -> void:
 	check(main.hatch.get_node("Bell").visible, "and the bell sits on the hatch")
 	player.set_held("")
 	econ.add_supplies(2)
-	check("bag common burger" in main.bench.prompt(player) and "PERFECT" in main.bench.prompt(player) and "tray" in main.bench.prompt(player), "the bench takes the ordered kind from the tray, still perfect 10 s later: '%s'" % main.bench.prompt(player))
+	check("bag regular burger" in main.bench.prompt(player) and "PERFECT" in main.bench.prompt(player) and "tray" in main.bench.prompt(player), "the bench takes the ordered kind from the tray, still perfect 10 s later: '%s'" % main.bench.prompt(player))
 	main.bench.bag(player)
 	check(player.held_burger.get("kind") == "brown" and player.held_burger.get("quality") == "perfect" and main.tray.held.size() == 1, "bagged: %s" % str(player.held_burger))
 	player.set_held("")
@@ -440,4 +440,3 @@ func _run() -> void:
 
 func Economy_q(ready_for: float, burnt: bool) -> String:
 	return (load("res://game/economy.gd") as GDScript).quality_for(ready_for, burnt)
-
