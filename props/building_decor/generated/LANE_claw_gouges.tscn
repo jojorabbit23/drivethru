@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_a6h7n"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_c3pfy"]
+_surfaces = [{
+"aabb": AABB(-0.0131896, -0.0176472, -0.0117242, 0.586379, 0.0352944, 0.473448),
+"attribute_data": PackedByteArray("NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 108,
+"vertex_data": PackedByteArray("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")
+}]
+
+[node name="LANE_claw_gouges" type="Node3D"]
+script = ExtResource("1_a6h7n")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "LANE_claw_gouges",
+"object": "Claw gouges",
+"placement": "Asphalt",
+"type": "Decal"
+}
+metadata/guide_id = "LANE_claw_gouges"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_c3pfy")

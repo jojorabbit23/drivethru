@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_r1lbd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_xpcf6"]
+_surfaces = [{
+"aabb": AABB(-3.4, 2.8875, -2.435, 6.8, 0.0250001, 4.87),
+"attribute_data": PackedByteArray("8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 144,
+"vertex_data": PackedByteArray("mplZwGdmOkApXBfAZmYmwGdmOkApXBfAmplZwM3MOEApXBfAZmYmwGdmOkApXBfAZmYmwM3MOEApXBfAmplZwM3MOEApXBfAZmYmwGdmOkAL1xvAmplZwGdmOkAL1xvAZmYmwM3MOEAL1xvAmplZwGdmOkAL1xvAmplZwM3MOEAL1xvAZmYmwM3MOEAL1xvAZmYmwGdmOkApXBfAZmYmwGdmOkAL1xvAZmYmwM3MOEApXBfAZmYmwGdmOkAL1xvAZmYmwM3MOEAL1xvAZmYmwM3MOEApXBfAmplZwGdmOkAL1xvAmplZwGdmOkApXBfAmplZwM3MOEAL1xvAmplZwGdmOkApXBfAmplZwM3MOEApXBfAmplZwM3MOEAL1xvAZmYmwGdmOkApXBfAmplZwGdmOkApXBfAZmYmwGdmOkAL1xvAmplZwGdmOkApXBfAmplZwGdmOkAL1xvAZmYmwGdmOkAL1xvAmplZwM3MOEApXBfAZmYmwM3MOEApXBfAmplZwM3MOEAL1xvAZmYmwM3MOEApXBfAZmYmwM3MOEAL1xvAmplZwM3MOEAL1xvAZmYmQGdmOkApXBfAmplZQGdmOkApXBfAZmYmQM3MOEApXBfAmplZQGdmOkApXBfAmplZQM3MOEApXBfAZmYmQM3MOEApXBfAmplZQGdmOkAL1xvAZmYmQGdmOkAL1xvAmplZQM3MOEAL1xvAZmYmQGdmOkAL1xvAZmYmQM3MOEAL1xvAmplZQM3MOEAL1xvAmplZQGdmOkApXBfAmplZQGdmOkAL1xvAmplZQM3MOEApXBfAmplZQGdmOkAL1xvAmplZQM3MOEAL1xvAmplZQM3MOEApXBfAZmYmQGdmOkAL1xvAZmYmQGdmOkApXBfAZmYmQM3MOEAL1xvAZmYmQGdmOkApXBfAZmYmQM3MOEApXBfAZmYmQM3MOEAL1xvAmplZQGdmOkApXBfAZmYmQGdmOkApXBfAmplZQGdmOkAL1xvAZmYmQGdmOkApXBfAZmYmQGdmOkAL1xvAmplZQGdmOkAL1xvAZmYmQM3MOEApXBfAmplZQM3MOEApXBfAZmYmQM3MOEAL1xvAmplZQM3MOEApXBfAmplZQM3MOEAL1xvAZmYmQM3MOEAL1xvAmplZwGdmOkAL1xtAZmYmwGdmOkAL1xtAmplZwM3MOEAL1xtAZmYmwGdmOkAL1xtAZmYmwM3MOEAL1xtAmplZwM3MOEAL1xtAZmYmwGdmOkApXBdAmplZwGdmOkApXBdAZmYmwM3MOEApXBdAmplZwGdmOkApXBdAmplZwM3MOEApXBdAZmYmwM3MOEApXBdAZmYmwGdmOkAL1xtAZmYmwGdmOkApXBdAZmYmwM3MOEAL1xtAZmYmwGdmOkApXBdAZmYmwM3MOEApXBdAZmYmwM3MOEAL1xtAmplZwGdmOkApXBdAmplZwGdmOkAL1xtAmplZwM3MOEApXBdAmplZwGdmOkAL1xtAmplZwM3MOEAL1xtAmplZwM3MOEApXBdAZmYmwGdmOkAL1xtAmplZwGdmOkAL1xtAZmYmwGdmOkApXBdAmplZwGdmOkAL1xtAmplZwGdmOkApXBdAZmYmwGdmOkApXBdAmplZwM3MOEAL1xtAZmYmwM3MOEAL1xtAmplZwM3MOEApXBdAZmYmwM3MOEAL1xtAZmYmwM3MOEApXBdAmplZwM3MOEApXBdAZmYmQGdmOkAL1xtAmplZQGdmOkAL1xtAZmYmQM3MOEAL1xtAmplZQGdmOkAL1xtAmplZQM3MOEAL1xtAZmYmQM3MOEAL1xtAmplZQGdmOkApXBdAZmYmQGdmOkApXBdAmplZQM3MOEApXBdAZmYmQGdmOkApXBdAZmYmQM3MOEApXBdAmplZQM3MOEApXBdAmplZQGdmOkAL1xtAmplZQGdmOkApXBdAmplZQM3MOEAL1xtAmplZQGdmOkApXBdAmplZQM3MOEApXBdAmplZQM3MOEAL1xtAZmYmQGdmOkApXBdAZmYmQGdmOkAL1xtAZmYmQM3MOEApXBdAZmYmQGdmOkAL1xtAZmYmQM3MOEAL1xtAZmYmQM3MOEApXBdAmplZQGdmOkAL1xtAZmYmQGdmOkAL1xtAmplZQGdmOkApXBdAZmYmQGdmOkAL1xtAZmYmQGdmOkApXBdAmplZQGdmOkApXBdAZmYmQM3MOEAL1xtAmplZQM3MOEAL1xtAZmYmQM3MOEApXBdAmplZQM3MOEAL1xtAmplZQM3MOEApXBdAZmYmQM3MOEApXBdA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/")
+}]
+
+[node name="FX_light_fluoro" type="Node3D"]
+script = ExtResource("1_r1lbd")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox/Lights")
+metadata/guide = {
+"behaviour": "One per room flickers",
+"id": "FX_light_fluoro",
+"object": "Warm fluorescent tube",
+"placement": "Each interior room",
+"type": "Light"
+}
+metadata/guide_id = "FX_light_fluoro"
+metadata/reuses_existing = true
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_xpcf6")

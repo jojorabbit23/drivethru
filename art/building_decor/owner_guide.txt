@@ -1,0 +1,486 @@
+The Drive Thru: Building Decoration Guide
+Every decoration below is its own placeable object with a unique ID (AREA_name). Type says how to build it: Prop (mesh), Decal (texture on a surface), Sign (decal or flat mesh with text), Light, Audio (emitter), Fungal (growth mesh or decal). Behaviour lists interaction and damage states; a dash means purely static.
+Palette
+Every object uses these colours only; the Palette column in each table names which.
+Colour
+Hex
+Main use
+Signature teal
+#247C80
+Weapons, machinery, doors, main branding
+Light teal
+#62B6B0
+Painted edges, highlights, interface selections
+Deep teal
+#164B53
+Shaded teal surfaces, worn equipment
+Burnt orange
+#D9682B
+Jackets, signs, focal props
+Amber
+#F2AA4C
+Warm lamps, fire highlights, pickups
+Rust
+#86432F
+Corrosion, old metal, orange shadows
+Midnight blue
+#172B3B
+Night sky, distant buildings, deep shadows
+Slate blue
+#344B5B
+Concrete shadows, secondary structures
+Charcoal
+#252A2E
+Gloves, rubber, weapon grips, dark interiors
+Steel grey
+#69777B
+Metal, appliances, pavement
+Warm cream
+#E2D5B7
+Lettering, paper, mushroom flesh, light walls
+Dirty olive
+#73764D
+Fungal growth, vegetation, camouflage
+Spore green
+#ADC65A
+Toxic mushrooms, gas effects, hazard accents
+Ember red
+#B94435
+Damage, warnings, dangerous fungal details
+Exterior
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+EXT_roof_sign
+Mushroom-cap roof sign
+Prop + Light
+Roof above entrance, visible from the lane
+"DRIVE THRU" with the U missing; one dead bulb, one flickering amber; loses letters as the night goes on
+Cap #D9682B, lettering #E2D5B7, bulbs #F2AA4C, frame #252A2E
+EXT_barricade_table
+Picnic table on its side
+Prop
+Along zombie approach routes
+Destructible; breaks into planks
+Wood #86432F, paint #164B53, bolts #69777B
+EXT_barricade_menu
+Menu board bolted across the door
+Prop
+Front door
+Destructible; final barricade
+Board #252A2E, text #E2D5B7, trim #247C80
+EXT_barricade_cones
+Traffic cones
+Prop
+Scattered around barricades
+Knockable
+Body #D9682B, stripe #E2D5B7
+EXT_barricade_pallets
+Stacked pallets
+Prop
+Barricade lines
+Destructible
+Wood #86432F, shadow #344B5B
+EXT_tape_hazard
+Hazard tape
+Decal
+On barricades
+Tears when barricade is damaged
+Stripes #247C80 and #252A2E
+EXT_decal_nowserving
+"NOW SERVING" vinyl, peeling
+Decal
+Front windows
+Cracks with the window
+Lettering #E2D5B7, edge #62B6B0
+EXT_decal_combo
+"ASK ABOUT OUR COMBO" vinyl, peeling
+Decal
+Front windows
+Cracks with the window
+Lettering #E2D5B7, accent #D9682B
+EXT_plywood
+Plywood half-covering windows
+Prop
+Front windows
+Destructible
+Wood #86432F, grain #252A2E
+EXT_sign_norefunds
+"NO REFUNDS AFTER THE APOCALYPSE"
+Sign
+Beside the order window
+-
+Board #D9682B, lettering #E2D5B7
+EXT_sign_limbs
+"MANAGEMENT NOT RESPONSIBLE FOR LOST LIMBS" plate
+Sign
+Near the door
+-
+Plate #164B53, lettering #E2D5B7
+EXT_fungus_shelf
+Shelf mushrooms
+Fungal
+Gutters and base of the roof sign
+Denser near zombie approach routes
+Body #73764D, underside #E2D5B7, tips #B94435
+EXT_fungus_moss
+Glowing spore moss patches
+Fungal + Light
+Corners of the building
+Faint glow
+Moss #73764D, glow #ADC65A
+EXT_vehicle_pickup
+Rusted pickup, flat tyre
+Prop
+Car park
+Cover for the player
+Body #86432F, trim #69777B, shadow #344B5B, tyres #252A2E
+EXT_vehicle_minivan
+Minivan, sliding door open
+Prop
+Car park
+Cover for the player
+Body #62B6B0, trim #69777B, rust #86432F, tyres #252A2E
+EXT_decal_kidseatfree
+"KIDS EAT FREE" bumper sticker
+Decal
+Minivan rear window
+-
+Lettering #E2D5B7, ground #D9682B
+Drive-thru lane
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+LANE_menu_board
+Menu board, worn laminate, missing letters
+Prop + Sign
+Start of the lane
+Main place for menu text; damageable
+Board #252A2E, text #E2D5B7, prices #D9682B
+LANE_speaker_post
+Dented intercom with "WELCOME" sticker
+Prop
+Beside the lane
+Fungal threads curl from the grille
+Post #69777B, threads #73764D, sticker #E2D5B7
+LANE_clearance_bar
+"MAX HEIGHT 2.1M" bar bent into a hook
+Prop
+Over the lane entrance
+Something that isn't a rag hangs from it
+Bar #69777B, stripes #D9682B, stain #B94435
+LANE_arrows
+Faded arrows
+Decal
+Asphalt
+-
+Paint #E2D5B7 on #69777B
+LANE_oil_stains
+Oil stains
+Decal
+Asphalt
+-
+Stain #252A2E, sheen #172B3B
+LANE_claw_gouges
+Claw gouges
+Decal
+Asphalt
+-
+Gouge #344B5B, edge #252A2E
+Order and pickup window
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+WIN_sliding_window
+Scratched sliding window
+Prop
+Order window
+Cracks as the barricades fall
+Frame #69777B, glass tint #62B6B0
+WIN_sign_knock
+Hand-written "PLEASE KNOCK"
+Sign
+On the window
+-
+Paper #E2D5B7, ink #252A2E
+WIN_bell
+Service bell, too loud
+Prop + Audio
+Tray shelf
+Interactive: player rings it
+Dome #F2AA4C, base #86432F
+WIN_tray_shelf
+Stainless counter with burn marks
+Prop
+Under the window
+Gameplay: serving tray
+Top #69777B, burns #252A2E
+WIN_napkins
+Battered napkin dispenser
+Prop
+Tray shelf
+-
+Body #69777B, napkins #E2D5B7
+WIN_special_card
+Laminated "TODAY'S SPECIAL" card
+Sign
+Tray shelf
+-
+Card #E2D5B7, header #D9682B
+WIN_ticket_rail
+Order ticket rail under warm light
+Prop + Light
+Above the grill
+Interactive: shows current orders
+Rail #69777B, tickets #E2D5B7, light #F2AA4C
+WIN_feedback_box
+Customer feedback box, three padlocks
+Prop
+Wall by the window
+-
+Box #247C80, padlocks #69777B
+Kitchen
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+KIT_grill
+Blackened stainless grill
+Prop
+Kitchen centre
+Gameplay: cooking station
+Body #69777B, plate #252A2E, fire #F2AA4C
+KIT_fryer
+Fryer
+Prop
+Beside the grill
+Gameplay: cooking station
+Body #247C80, basket #69777B
+KIT_hood_vent
+Grease-stained hood vent
+Prop
+Above the grill
+-
+Metal #69777B, stains #86432F
+KIT_sign_cleangrill
+"CLEAN GRILL = HAPPY GRILL"
+Sign
+Wall by the grill
+-
+Board #D9682B, lettering #E2D5B7
+KIT_hooks_wall
+Aprons, hairnet, one-fingered oven glove, cleaver
+Prop
+Kitchen wall
+Cleaver could be a pickup
+Apron #D9682B, glove #252A2E, cleaver #69777B
+KIT_prep_board
+Chipped cutting board and spatulas
+Prop
+Prep counter
+-
+Board #E2D5B7, spatulas #69777B
+KIT_ticket_spike
+Ticket spike through old orders
+Prop
+Prep counter
+-
+Spike #69777B, tickets #E2D5B7
+KIT_health_cert
+Framed health certificate, score smudged, expired
+Sign
+Kitchen wall
+-
+Paper #E2D5B7, frame #86432F
+KIT_rota
+Shift rota with one name crossed out
+Sign
+Staff notice board
+-
+Paper #E2D5B7, cross-out #B94435
+KIT_notice_washhands
+"WASH HANDS" reminder with a handprint
+Sign
+Staff notice board
+-
+Paper #E2D5B7, header #62B6B0
+KIT_notice_infection
+"IN CASE OF INFECTION" flowchart
+Sign
+Staff notice board
+-
+Paper #E2D5B7, arrows #B94435
+KIT_floor_tiles
+Checkerboard with grease patches
+Decal
+Kitchen floor
+-
+Tiles #E2D5B7 and #164B53
+KIT_mop_bucket
+Mop bucket
+Prop
+Corner
+Knockable
+Bucket #344B5B, wringer #69777B
+KIT_sign_wetfloor
+"WET FLOOR" sign
+Prop
+Floor
+Knockable
+Body #F2AA4C, lettering #252A2E
+Dining area (what's left of it)
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+DIN_booth
+Vinyl booth with duct-tape repairs, ketchup stains, mould
+Prop
+Dining area
+Cover; damageable
+Vinyl #D9682B, tape #69777B, mould #73764D, stains #B94435
+DIN_poster_pinup
+1950s-style toadstool pin-up poster
+Decal
+Dining wall
+Tears as the night goes on
+Paper #E2D5B7, cap #D9682B, accent #B94435
+DIN_calendar
+"SPORE OF THE MONTH" calendar stuck on March
+Sign
+Dining wall
+-
+Paper #E2D5B7, art #ADC65A
+DIN_standee_cleatimus
+"CLEATIMUS SAYS: TRY THE DOUBLE!" cut-out with a bite taken out
+Prop
+Near the entrance
+Knockable
+Card #E2D5B7, jacket #D9682B
+DIN_figurine_display
+"COLLECT ALL 6 FUNGI FIGURINES" display, five slots empty
+Prop
+Counter
+-
+Case #62B6B0, card #E2D5B7
+DIN_jukebox
+Dead jukebox
+Prop
+Dining area
+Used as a weapons shelf
+Body #247C80, trim #252A2E
+DIN_clock
+Wall clock stopped at 12:00
+Prop
+Dining wall
+-
+Face #E2D5B7, rim #69777B
+Back room and storage
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+BACK_crates
+Mushroom crates stencilled "PREMIUM CAPS" and "DO NOT EAT RAW"
+Prop
+Storage room
+Stackable cover; could hold ingredient pickups
+Wood #86432F, stencil #E2D5B7, scribble #B94435
+BACK_freezer_door
+Frosted freezer door with a handwritten "DON'T."
+Prop + Sign
+Storage room
+Interactive: door
+Door #247C80, frost #62B6B0
+BACK_desk
+Office desk
+Prop
+Office
+-
+Top #344B5B, legs #69777B
+BACK_plant_dead
+Dead plant
+Prop
+On the desk
+-
+Pot #86432F, leaves #73764D
+BACK_phone_rotary
+Rotary phone, off the hook
+Prop
+On the desk
+-
+Body #252A2E, dial #E2D5B7
+BACK_invoices
+Stack of unpaid invoices
+Prop
+On the desk
+-
+Paper #E2D5B7, stamps #B94435
+BACK_photo_eotm
+Framed "EMPLOYEE OF THE MONTH" photo
+Sign
+Office wall
+Photo could change each shift
+Photo #E2D5B7, frame #86432F
+Lighting and atmosphere
+ID
+Object
+Type
+Placement
+Behaviour / states
+Model colours (hex)
+FX_light_fluoro
+Warm fluorescent tube
+Light
+Each interior room
+One per room flickers
+Light #F2AA4C, shadow #172B3B
+FX_light_fluoro_dead
+Dead fluorescent tube
+Prop
+Each interior room
+One per room
+Tube #69777B, shadow #172B3B
+FX_light_window_glow
+Window glow against dusk haze
+Light
+Exterior windows
+-
+Glow #F2AA4C, haze #172B3B
+FX_audio_ice_machine
+Ice machine clunk
+Audio
+Kitchen
+Random interval
+-
+FX_audio_fridge_hum
+Fridge hum
+Audio
+Kitchen and storage room
+Looping
+-
+FX_audio_hold_music
+Cheerful hold-music loop
+Audio
+Intercom speaker
+Looping
+-
+Tying decoration to gameplay
+• Decorations get damaged as the barricades fall. Windows crack, posters tear, and the roof sign loses letters, so the building shows how the night is going.
+• Hide a small recurring "Employee of the Month" gag that updates each shift.
+• Make some props interactive, like the ticket rail, the bell, and the freezer door, so the world feels worked in rather than just looked at.

@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_m33h7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ot0oi"]
+_surfaces = [{
+"aabb": AABB(-0.17, 0.01, -0.15, 0.34, 1.14177, 0.3),
+"attribute_data": PackedByteArray("NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/NEtb/zRLW/80S1v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/aXd7/2l3e/9pd3v/hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//hkMv/4ZDL/+GQy//"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 108,
+"vertex_data": PackedByteArray("exQuvuJ6lD4pXA8+exQuPuJ6lD4pXA8+exQuvhDXIzwpXA8+exQuPuJ6lD4pXA8+exQuPhDXIzwpXA8+exQuvhDXIzwpXA8+exQuPuJ6lD4pXA++exQuvuJ6lD4pXA++exQuPhDXIzwpXA++exQuvuJ6lD4pXA++exQuvhDXIzwpXA++exQuPhDXIzwpXA++exQuPuJ6lD4pXA8+exQuPuJ6lD4pXA++exQuPhDXIzwpXA8+exQuPuJ6lD4pXA++exQuPhDXIzwpXA++exQuPhDXIzwpXA8+exQuvuJ6lD4pXA++exQuvuJ6lD4pXA8+exQuvhDXIzwpXA++exQuvuJ6lD4pXA8+exQuvhDXIzwpXA8+exQuvhDXIzwpXA++exQuPuJ6lD4pXA8+exQuvuJ6lD4pXA8+exQuPuJ6lD4pXA++exQuvuJ6lD4pXA8+exQuvuJ6lD4pXA++exQuPuJ6lD4pXA++exQuvhDXIzwpXA8+exQuPhDXIzwpXA8+exQuvhDXIzwpXA++exQuPhDXIzwpXA8+exQuPhDXIzwpXA++exQuvhDXIzwpXA++kML1PBWuxz6amRk+exQuPhWuxz6amRk+kML1PHE9ij6amRk+exQuPhWuxz6amRk+exQuPnE9ij6amRk+kML1PHE9ij6amRk+exQuPhWuxz6amRm+kML1PBWuxz6amRm+exQuPnE9ij6amRm+kML1PBWuxz6amRm+kML1PHE9ij6amRm+exQuPnE9ij6amRm+exQuPhWuxz6amRk+exQuPhWuxz6amRm+exQuPnE9ij6amRk+exQuPhWuxz6amRm+exQuPnE9ij6amRm+exQuPnE9ij6amRk+kML1PBWuxz6amRm+kML1PBWuxz6amRk+kML1PHE9ij6amRm+kML1PBWuxz6amRk+kML1PHE9ij6amRk+kML1PHE9ij6amRm+exQuPhWuxz6amRk+kML1PBWuxz6amRk+exQuPhWuxz6amRm+kML1PBWuxz6amRk+kML1PBWuxz6amRm+exQuPhWuxz6amRm+kML1PHE9ij6amRk+exQuPnE9ij6amRk+kML1PHE9ij6amRm+exQuPnE9ij6amRk+exQuPnE9ij6amRm+kML1PHE9ij6amRm+vO0MPiBtkz/NzEw8eEUmPkb5kj/NzEw82L1KvKBr0D3NzEw8eEUmPkb5kj/NzEw86L1KPAAuyT3NzEw82L1KvKBr0D3NzEw8eEUmPkb5kj/NzEy8vO0MPiBtkz/NzEy86L1KPAAuyT3NzEy8vO0MPiBtkz/NzEy82L1KvKBr0D3NzEy86L1KPAAuyT3NzEy8eEUmPkb5kj/NzEw8eEUmPkb5kj/NzEy86L1KPAAuyT3NzEw8eEUmPkb5kj/NzEy86L1KPAAuyT3NzEy86L1KPAAuyT3NzEw8vO0MPiBtkz/NzEy8vO0MPiBtkz/NzEw82L1KvKBr0D3NzEy8vO0MPiBtkz/NzEw82L1KvKBr0D3NzEw82L1KvKBr0D3NzEy8eEUmPkb5kj/NzEw8vO0MPiBtkz/NzEw8eEUmPkb5kj/NzEy8vO0MPiBtkz/NzEw8vO0MPiBtkz/NzEy8eEUmPkb5kj/NzEy82L1KvKBr0D3NzEw86L1KPAAuyT3NzEw82L1KvKBr0D3NzEy86L1KPAAuyT3NzEw86L1KPAAuyT3NzEy82L1KvKBr0D3NzEy8/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA/+//b8B9I7j/7/9vwH0juP/v/2/AfSO4/+//b8B9I7j/7/9vwH0juP/v/2/AfSO4/w//j8B9I7j/D/+PwH0juP8P/4/AfSO4/w//j8B9I7j/D/+PwH0juP8P/4/AfSO4/4//7/YR28f/j//v9hHbx/+P/+/2EdvH/4//7/YR28f/j//v9hHbx/+P/+/2EdvH/2//D/YR28f/b/8P9hHbx/9v/w/2EdvH/2//D/YR28f/b/8P9hHbx/9v/w/2EdvH")
+}]
+
+[node name="KIT_mop_bucket" type="Node3D"]
+script = ExtResource("1_m33h7")
+mode = "knockable"
+hit_size = Vector3(0.34, 1.14177, 0.3)
+hit_centre = Vector3(0, 0.580884, 0)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Knockable",
+"id": "KIT_mop_bucket",
+"object": "Mop bucket",
+"placement": "Corner",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_mop_bucket"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_ot0oi")
