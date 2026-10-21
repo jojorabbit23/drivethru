@@ -377,7 +377,9 @@ func _run() -> void:
 	main.hatch.next_order = "double_red"
 	var wc: Node3D = main.hatch.spawn_customer()
 	wc.state = "waiting"
-	check(not main.bench.bag(player) and "double yellow needs 2 yellow patties" in main.bench.prompt(player), "with a double red on the ticket, the bench waits for 2 reds: '%s'" % main.bench.prompt(player))
+	check(main.bench.bag(player) and player.held_burger.get("kind") == "blue", "an unrelated ready Blue can be boxed while the double Yellow waits")
+	player.set_held("")
+	check(not main.bench.bag(player) and "double yellow needs 2 yellow patties" in main.bench.prompt(player), "without spare cooked patties, the bench waits for the double")
 	player.set_held("burger", {"kind": "red", "quality": "perfect", "patties": ["red"]})
 	check("WRONG BURGER" in main.hatch.prompt(player) and not main.hatch.serve(player), "and a double red customer won't take a single red")
 	player.set_held("")
@@ -438,3 +440,4 @@ func _run() -> void:
 
 func Economy_q(ready_for: float, burnt: bool) -> String:
 	return (load("res://game/economy.gd") as GDScript).quality_for(ready_for, burnt)
+

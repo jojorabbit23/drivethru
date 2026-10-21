@@ -21,6 +21,11 @@
 # Ready (or burnt) patties are taken off by the prep bench when it bags a burger.
 extends "res://game/station.gd"
 
+const DISCARD_TAP_WINDOW := 0.45
+var _discard_slot := -1
+var _discard_left := 0.0
+var _discard_player: Node
+
 const RAW_TIME := 1.0
 const COOK_TIME := 6.0
 const MUSHROOM := preload("res://pickups/mushroom/mushroom_pickup_mesh.res")
@@ -187,6 +192,8 @@ func _particles(colour: Color, size: float, amount: int, life: float) -> CPUPart
 	return p
 
 func _process(delta: float) -> void:
+	_discard_left = maxf(0.0, _discard_left - delta)
+	if is_instance_valid(_discard_player) and _discard_player.get("focus") != self: _reset_discard()
 	var noisy := false
 	var burning := false
 	for i in slots.size():
@@ -222,6 +229,7 @@ func _process(delta: float) -> void:
 		_alarm_t = 0.0
 
 func _enter(i: int, state: String) -> void:
+	if i == _discard_slot and state in ["ready", "burnt"]: _reset_discard()
 	var s := slots[i]
 	s["state"] = state
 	(s["icon"] as Sprite3D).texture = Icons.texture(state)
@@ -383,6 +391,7 @@ func _kill_tween(s: Dictionary) -> void:
 	(s["patty"] as Node3D).remove_meta("busy")
 
 func _clear(i: int) -> void:
+	if _discard_slot == i: _reset_discard()
 	var s := slots[i]
 	_kill_tween(s)
 	s["state"] = ""
@@ -415,8 +424,10 @@ func count(state: String) -> int:
 # --------------------------------------------------------------- use ----
 func prompt(player: Node) -> String:
 	var a := aimed_slot(player)
+	if _can_discard(a, player):
+		return "E AGAIN  knock this patty onto the floor  ·  discard"
 	if can_flip(a):
-		return "E  flip the %s patty  ·  cooks faster" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
+		return "E  flip the %s patty  ·  tap E again quickly to discard" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
 	if a>=0 and a<slot_count():
 		var target: Dictionary=slots[a]
 		if target.state=="raw":return "RAW  ·  cooking starts automatically"
@@ -434,9 +445,56 @@ func menu_title() -> String:
 	return "GRILL  ·  %d of %d free" % [count(""), slot_count()]
 
 func interact(player: Node) -> void:
-	if flip(aimed_slot(player)):
+	var aimed := aimed_slot(player)
+	if _can_discard(aimed, player):
+		_discard(aimed)
+		return
+	_reset_discard()
+	if flip(aimed):
+		_discard_slot = aimed
+		_discard_left = DISCARD_TAP_WINDOW
+		_discard_player = player
 		return
 	player.open_menu(self, options(player))
+
+func _reset_discard() -> void:
+	_discard_slot = -1
+	_discard_left = 0.0
+	_discard_player = null
+
+func _can_discard(i: int, player: Node) -> bool:
+	return i >= 0 and i < slot_count() and i == _discard_slot and player == _discard_player \
+		and _discard_left > 0.0 and slots[i]["state"] in ["raw", "cooking"] and float(slots[i]["t"]) < COOK_TIME
+
+func _discard(i: int) -> void:
+	var slot := slots[i]
+	# Duplicate only the visible mushroom, preserving its current material/pose.
+	# It is cosmetic waste, never a refundable ingredient or a physics body.
+	if DisplayServer.get_name() != "headless":
+		var old: Array[Node] = get_tree().get_nodes_in_group("discarded_grill_patties")
+		if old.size() >= 6: old[0].queue_free()
+		var waste := Node3D.new()
+		waste.name = "DiscardedPatty"
+		var parent: Node = get_tree().current_scene if get_tree().current_scene else get_parent()
+		parent.add_child(waste)
+		waste.add_to_group("discarded_grill_patties")
+		waste.global_transform = (slot["patty"] as Node3D).global_transform
+		var mesh: MeshInstance3D = (slot["mesh"] as MeshInstance3D).duplicate()
+		mesh.material_override = mesh.material_override.duplicate()
+		waste.add_child(mesh)
+		var landing: Vector3 = global_position + global_basis * Vector3((slot["root"] as Node3D).position.x, 0, 1.05)
+		landing.y = 0.045
+		var start: Vector3 = waste.global_position
+		var tw := waste.create_tween()
+		tw.tween_property(waste, "global_position", start + global_basis * Vector3(0, 0.2, 0.4), 0.16)
+		tw.tween_property(waste, "global_position", landing, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_callback(func() -> void: Sfx.play_at(self, "thunk", landing, -10.0))
+		tw.tween_interval(7.0)
+		tw.tween_property(waste, "scale", Vector3.ZERO, 0.35)
+		tw.tween_callback(waste.queue_free)
+	_clear(i)
+	_swing_spatula([[Vector3(0, 0.12, 0.2), 0.12, -0.6]])
+	Sfx.play_at(self, "thunk", global_position, -7.0)
 
 func options(_player: Node) -> Array:
 	var e := economy()

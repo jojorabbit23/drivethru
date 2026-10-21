@@ -94,6 +94,11 @@ func plan() -> Dictionary:
 				picks.append(p)
 		if missing.is_empty():
 			return {"order": t, "picks": picks, "burnt": false}
+		# Preserve every requested kind for the pending recipe, but let an unrelated
+		# cooked patty become a single so it can free a slot for the missing one.
+		var spare := _unrelated(Recipes.patties(t))
+		if not spare.is_empty():
+			return {"order": String(spare["patty"]["kind"]), "picks": [spare], "burnt": false}
 		var b := _burnt()
 		if not b.is_empty():
 			return {"order": "salvage", "picks": [b], "burnt": true, "missing": missing}
@@ -132,6 +137,19 @@ func _find(kind: String, used_tray: Dictionary, used_grill: Dictionary) -> Dicti
 		if best >= 0:
 			used_grill[best] = true
 			return {"from": "grill", "i": best, "patty": grill.describe(best)}
+	return {}
+
+func _unrelated(wanted: Array) -> Dictionary:
+	if tray != null:
+		for i in tray.held.size():
+			if not String(tray.held[i]["kind"]) in wanted:
+				return {"from": "tray", "i": i, "patty": tray.held[i]}
+	if grill != null:
+		var best := -1
+		for i in grill.slot_count():
+			if grill.state_of(i) == "ready" and not grill.kind_of(i) in wanted:
+				if best < 0 or float(grill.slots[i]["t"]) > float(grill.slots[best]["t"]): best = i
+		if best >= 0: return {"from": "grill", "i": best, "patty": grill.describe(best)}
 	return {}
 
 func _burnt() -> Dictionary:
