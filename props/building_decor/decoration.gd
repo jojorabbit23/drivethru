@@ -47,7 +47,7 @@ func interact(player: Node) -> void:
   "ticket":
    var target:=linked()
    var car: Node=target.current_car() if target else null
-   var text: String=preload("res://game/recipes.gd").ticket_text(car.order,car.quantity-car.received) if car else "NO ORDERS"
+   var text: String=car.ticket_text() if car else "NO ORDERS"
    player.open_menu(self,[{"label":text,"enabled":true,"icon":"burger","action":func()->void:pass}])
   "weapons":
    var rows: Array=[]

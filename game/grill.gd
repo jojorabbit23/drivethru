@@ -282,6 +282,7 @@ func _place(i: int, kind: String) -> void:
 	s["t"] = 0.0
 	s["kind"] = kind
 	s["flipped"] = false
+	s["flip_fraction"] = -1.0
 	_drop_and_smash(i)
 	(s["icon"] as Sprite3D).visible = true
 	(s["kind_icon"] as Sprite3D).texture = Icons.texture("mushroom_" + kind)
@@ -332,6 +333,7 @@ func flip(i: int) -> bool:
 		return false
 	var s := slots[i]
 	s["flipped"] = true
+	s["flip_fraction"] = float(s["t"])/COOK_TIME
 	var patty := s["patty"] as Node3D
 	var x := (s["root"] as Node3D).position.x
 	patty.set_meta("busy", true)
@@ -540,7 +542,7 @@ func find_patty(want := "", ready_only := false) -> int:
 # {kind, ready_for, burnt} of slot i, without taking it.
 func describe(i: int) -> Dictionary:
 	var s := slots[i]
-	return {"kind": s["kind"], "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
+	return {"kind": s["kind"], "flip_fraction": float(s.get("flip_fraction",-1.0)), "ready_for": (s["t"] as float) - COOK_TIME, "burnt": s["state"] == "burnt"}
 
 # Takes a patty off (see find_patty). Returns {kind, ready_for, burnt} or {}.
 func take_patty(want := "", ready_only := false) -> Dictionary:

@@ -32,6 +32,10 @@ var CAB_FROM_CENTRE := 1.6
 var order := "brown"        # which burger: brown (common) | blue | red
 var quantity: int=1
 var received: int=0
+# Empty retains the original single-recipe quantity API used by saved scenarios.
+var order_lines: Array[Dictionary]=[]
+var _mixed_rows: Array[Dictionary]=[]
+var _mixed_back: Sprite3D
 var _quantity_label: Label3D
 var state := "arriving"     # arriving | waiting | leaving
 var waited := 0.0
@@ -117,6 +121,9 @@ func _build(colour: Color) -> void:
 var _bubble_y := 2.15
 
 func _add_bubble(at: Vector3) -> void:
+	if not order_lines.is_empty():
+		_add_mixed_bubble(at)
+		return
 	_bubble = Node3D.new()
 	_bubble.position = at
 	_bubble_y = at.y
@@ -165,6 +172,21 @@ func _add_bubble(at: Vector3) -> void:
 	_bubble.visible = false
 
 func refresh_order_quantity() -> void:
+	if not order_lines.is_empty():
+		var pending: Array[Dictionary]=remaining_lines()
+		var active: int=0
+		for i in _mixed_rows.size():
+			var left_count: int=order_lines[i].quantity-order_lines[i].received
+			_mixed_rows[i].root.visible=left_count>0
+			_mixed_rows[i].label.text=Recipes.ticket_text(order_lines[i].kind,left_count)
+			if left_count>0:
+				_mixed_rows[i].root.position.y=(pending.size()-1)*.18-active*.36+.07
+				active+=1
+		if _mixed_back and not pending.is_empty():
+			var height: int=18 if pending.size()==1 else 26 if pending.size()==2 else 34
+			_mixed_back.texture=_mixed_background(pending,height)
+			_bar.position.y=-height*.035*.5-.12
+		return
 	if _quantity_label:_quantity_label.text=Recipes.ticket_text(order,maxi(0,quantity-received))
 
 static func _bubble_texture(kind: String="brown") -> Texture2D:
@@ -260,3 +282,72 @@ func leave(served: bool) -> void:
 	_t = 0.0
 	_bubble.visible = false
 	left.emit(served)
+
+func configure_order(kinds: Array[String]) -> void:
+	order_lines.clear();received=0;quantity=kinds.size();order=kinds[0]
+	var unique: Dictionary={}
+	for kind: String in kinds:unique[kind]=int(unique.get(kind,0))+1
+	if unique.size()<=1:return
+	for kind: String in unique:order_lines.append({"kind":kind,"quantity":unique[kind],"received":0})
+func remaining_lines() -> Array[Dictionary]:
+	var lines: Array[Dictionary]=[]
+	if order_lines.is_empty():
+		if received<quantity:lines.append({"kind":order,"quantity":quantity-received})
+	else:
+		for line: Dictionary in order_lines:
+			var count: int=line.quantity-line.received
+			if count>0:lines.append({"kind":line.kind,"quantity":count})
+	return lines
+func wants(kind: String) -> bool:
+	for line: Dictionary in remaining_lines():
+		if line.kind==kind:return true
+	return false
+func ticket_text(separator: String="\n") -> String:
+	var parts:=PackedStringArray()
+	for line: Dictionary in remaining_lines():parts.append(Recipes.ticket_text(line.kind,line.quantity))
+	return separator.join(parts)
+func record_delivery(kind: String,substitute: bool=false) -> bool:
+	var index: int=-1
+	if order_lines.is_empty():
+		if received>=quantity or (kind!=order and not substitute):return false
+	else:
+		for i in order_lines.size():
+			var line: Dictionary=order_lines[i]
+			if line.received<line.quantity and line.kind==kind:index=i;break
+		if index<0 and substitute:
+			for i in order_lines.size():
+				if order_lines[i].received<order_lines[i].quantity:index=i;break
+		if index<0:return false
+		order_lines[index].received+=1
+	received+=1
+	var left: Array[Dictionary]=remaining_lines()
+	if not left.is_empty():order=left[0].kind
+	refresh_order_quantity()
+	return true
+func _add_mixed_bubble(at: Vector3) -> void:
+	_bubble=Node3D.new();_bubble.position=at;_bubble_y=at.y;add_child(_bubble)
+	var rows: int=order_lines.size()
+	var height: int=26 if rows==2 else 34
+	_mixed_back=Icons.sprite("burger",.035);_mixed_back.texture=_mixed_background(order_lines,height);_bubble.add_child(_mixed_back)
+	for i in rows:
+		var line: Dictionary=order_lines[i]
+		var row:=Node3D.new();row.position.y=(rows-1)*.18-i*.36+.07;_bubble.add_child(row)
+		var icon:=Icons.sprite("burger_"+String(line.kind),.017);icon.position=Vector3(-.34,.02,.015);icon.render_priority=1;row.add_child(icon)
+		var label:=Label3D.new();label.text=Recipes.ticket_text(line.kind,line.quantity);label.position=Vector3(.08,.07,.025);label.font_size=18;label.pixel_size=.0055;label.modulate=Recipes.colour(line.kind);label.billboard=BaseMaterial3D.BILLBOARD_ENABLED;label.outline_size=3;label.outline_modulate=P.MIDNIGHT_TYNE;label.render_priority=2;row.add_child(label)
+		var caption:=Label3D.new();caption.text=Recipes.name_of(line.kind).to_upper();caption.position=Vector3(.08,-.065,.025);caption.font_size=18;caption.pixel_size=.0032;caption.modulate=P.MIDNIGHT_TYNE;caption.billboard=BaseMaterial3D.BILLBOARD_ENABLED;caption.outline_size=0;caption.render_priority=2;row.add_child(caption)
+		_mixed_rows.append({"root":row,"label":label})
+	_bar=MeshInstance3D.new();var quad:=QuadMesh.new();quad.size=Vector2(.8,.06);_bar.mesh=quad
+	var mat:=Station.flat(P.ELECTRIC_TEAL);mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;mat.billboard_mode=BaseMaterial3D.BILLBOARD_ENABLED;mat.render_priority=3;_bar.material_override=mat;_bar.position=Vector3(0,-height*.035*.5-.12,.03);_bubble.add_child(_bar)
+	_bubble.visible=false
+
+# Regenerated only on a delivered item, never in the frame update.
+func _mixed_background(lines: Array[Dictionary],height: int) -> Texture2D:
+	var image:=Image.create(32,height+4,false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT)
+	for y in height:
+		var row_index: int=mini(lines.size()-1,y*lines.size()/height)
+		for x in 32:
+			var rim: bool=x<3 or x>28 or y<3 or y>height-4
+			image.set_pixel(x,y,(P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==height-1 else Recipes.colour(lines[row_index].kind)) if rim else P.WARM_CHALK)
+	for y in range(height,height+4):
+		for x in range(8,8+height+4-y):image.set_pixel(x,y,Recipes.colour(lines[0].kind))
+	return ImageTexture.create_from_image(image)
