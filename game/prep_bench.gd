@@ -24,6 +24,18 @@ const Recipes = preload("res://game/recipes.gd")
 
 var grill: Node = null
 var hatch: Node = null
+var delivery_hatch: Node=null
+var delivery_selected: bool=false
+
+func active_hatch() -> Node:
+	return delivery_hatch if delivery_selected and is_instance_valid(delivery_hatch) and delivery_hatch.unlocked else hatch
+
+func select_delivery(on: bool) -> void:
+	delivery_selected=on and is_instance_valid(delivery_hatch) and delivery_hatch.unlocked
+	if get_parent().get("rail")!=null:get_parent().rail.hatch=active_hatch()
+
+func cycle_ticket() -> void:
+	select_delivery(not delivery_selected)
 var tray: Node = null
 var _buns: Array[Node3D] = []
 var _greens: Array[Node3D] = []
@@ -71,6 +83,7 @@ func _stock() -> void:
 
 # The order on the ticket rail: the customer waiting, or the one pulling in.
 func ticket() -> String:
+	var hatch: Node=active_hatch()
 	if hatch and hatch.car != null and is_instance_valid(hatch.car) and hatch.car.state != "leaving":
 		return hatch.car.order
 	return ""
@@ -80,6 +93,7 @@ func ticket() -> String:
 #   {order, missing: [kinds], have: n}                           a double/special that isn't ready
 #   {}                                                           nothing cooked
 func plan() -> Dictionary:
+	var hatch: Node=active_hatch()
 	var t := ticket()
 	if hatch and is_instance_valid(hatch.car) and not hatch.car.order_lines.is_empty() and hatch.car.state!="leaving":
 		var pending: Array[Dictionary]=hatch.car.remaining_lines()
@@ -175,6 +189,11 @@ static func _quality(picks: Array) -> String:
 	return Economy.quality_for(worst, false)
 
 func prompt(player: Node) -> String:
+	var result: String=_prep_prompt(player)
+	if is_instance_valid(delivery_hatch) and delivery_hatch.unlocked:result+="  ·  %s TICKET / G SWITCH"%("DELIVERY" if delivery_selected else "CAR")
+	return result
+
+func _prep_prompt(player: Node) -> String:
 	var e := economy()
 	if not player.can_carry_burger():
 		return "PREP  ·  burger inventory full: use the serving tray or bin"
@@ -214,6 +233,10 @@ func bag(player: Node) -> bool:
 	var picks: Array = pl["picks"]
 	var quality := "burnt" if pl["burnt"] else _quality(picks)
 	var kinds := []
+	var good_flip: bool=not pl["burnt"]
+	for pick: Dictionary in picks:
+		var fraction: float=float(pick.patty.get("flip_fraction",-1.0))
+		good_flip=good_flip and fraction>=.4 and fraction<=.6
 	# take them: tray indices high to low so the rest don't shift
 	var tray_idx := []
 	for p: Dictionary in picks:
@@ -230,7 +253,7 @@ func bag(player: Node) -> bool:
 	var order: String = pl["order"]
 	if pl["burnt"]:
 		order = String(kinds[0])
-	player.add_burger({"kind": order, "quality": quality, "patties": kinds})
+	player.add_burger({"kind": order, "quality": quality, "patties": kinds, "good_flip": good_flip})
 	Sfx.play_at(self, "thunk", global_position + Vector3(0, 0.2, 0))
 	var show := BurgerStack.new()
 	show.position = Vector3(0.33, 0.02, 0.05)

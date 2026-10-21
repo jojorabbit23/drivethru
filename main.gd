@@ -55,6 +55,7 @@ var rail: Node3D
 var storage: Node3D
 var terminal: Node3D
 var bench: Node3D
+var delivery: Node3D
 var serving_tray: Node3D
 var burger_bin: Node3D
 var _toast_t := 0.0
@@ -143,6 +144,14 @@ func _build_stations() -> void:
 	bench.grill = grill
 	bench.hatch = hatch
 	bench.tray = tray
+	delivery=preload("res://game/delivery_station.gd").new()
+	delivery.name="DeliveryStation";delivery.position=Vector3(5.70,0,6.25);delivery.rotation.y=-PI/2.0
+	delivery.garage=shop.get_node("Garage");delivery.bench=bench;delivery.auto=auto_spawn
+	add_child(delivery)
+	bench.delivery_hatch=delivery
+	delivery.customer_arrived.connect(func(_ticket: Node):_toast("DELIVERY CALL  ·  stock the garage tray",P.ELECTRIC_TEAL))
+	delivery.customer_served.connect(func(cash: int,tip: int):_toast("DELIVERY +$%d  TIP +$%d"%[cash,tip],P.AMBER_GLOW))
+	delivery.customer_missed.connect(func():_toast("DELIVERY CANCELLED",P.BURNT_ORANGE))
 	hatch.auto = auto_spawn
 	var m := shop.get_node_or_null("Markers")
 	if m:

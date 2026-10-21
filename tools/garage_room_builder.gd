@@ -1,6 +1,7 @@
 # Garage structure reuses shop materials; motorcycle uses the retained owner GLB.
 extends RefCounted
 const WINDOW: Dictionary={"id":"C","side":"east","at":8.0,"w":1.4,"bottom":.9,"top":2.1,"room":"Garage","origin":Vector3(6,1.5,8)}
+const DELIVERY: Dictionary={"at":6.25,"w":1.3,"bottom":1.0,"top":2.25}
 var b
 func build(builder,decor) -> void:
  b=builder
@@ -8,8 +9,8 @@ func build(builder,decor) -> void:
  b.box(g,"floor_concrete",Vector3(0,-.1,5),Vector3(6,0,11.5))
  b.wall(g,"ext_wall","z",.09,.18,5,11.5,[])
  b.wall(g,"int_wall","z",.215,.07,5,11.5,[])
- b.wall(g,"ext_wall","z",5.91,.18,5,11.5,[WINDOW])
- b.wall(g,"int_wall","z",5.785,.07,5,11.5,[WINDOW])
+ b.wall(g,"ext_wall","z",5.91,.18,5,11.5,[WINDOW,DELIVERY])
+ b.wall(g,"int_wall","z",5.785,.07,5,11.5,[WINDOW,DELIVERY])
  var opening: Dictionary={"at":3.0,"w":1.4,"bottom":0.0,"top":2.3}
  b.wall(g,"ext_wall","x",11.41,.18,0,6,[opening])
  b.wall(g,"int_wall","x",11.285,.07,0,6,[opening])

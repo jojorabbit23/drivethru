@@ -158,3 +158,11 @@ remaining_lines()/wants()/record_delivery()/ticket_text() for full mixed tickets
 Keep single-recipe quantity/received compatibility and existing freshness/discount
 rules. See docs/handover/MIXED_CUSTOMER_ORDERS.md; run mixed_orders_test.gd and
 capture_mixed_orders.gd as well as all existing checks. Decorations stay disabled.
+
+Delivery hatch: main.delivery extends the existing customer window with a phone
+ticket and independent four-box tray, gated by the $250 garage then a $200 hatch.
+Keep existing zombie Window_C separate and rear door closed. G selects prep channel;
+bench.hatch remains the original car hatch, active_hatch() returns the selected one.
+Grill flip_fraction metadata must survive the patty warmer and assembly; shared
+BurgerItems.payment applies the accurate-flip bonus before freshness scaling.
+See docs/handover/UNDEAD_DELIVERY.md; run delivery_test.gd and capture_delivery.gd.
