@@ -138,10 +138,19 @@ func _add_bubble(at: Vector3) -> void:
 	title.billboard=BaseMaterial3D.BILLBOARD_ENABLED
 	title.font_size=34
 	title.pixel_size=0.004
-	title.modulate=P.MIDNIGHT_TYNE
+	title.modulate=Recipes.colour(order)
 	title.render_priority=2
-	title.outline_size=0
+	title.outline_size=3
+	title.outline_modulate=P.MIDNIGHT_TYNE
 	_bubble.add_child(title)
+	var caption:=Label3D.new()
+	caption.name="MushroomName"
+	caption.text="BLUE + YELLOW" if order=="special" else String(Station.Economy.KIND_NAME[Recipes.patties(order)[0]]).to_upper()
+	caption.position=Vector3(0,-0.265,0.025)
+	caption.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+	caption.font_size=18;caption.pixel_size=.0036
+	caption.modulate=P.MIDNIGHT_TYNE;caption.outline_size=0;caption.render_priority=2
+	_bubble.add_child(caption)
 	_bar = MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(0.8, 0.06)
@@ -151,7 +160,7 @@ func _add_bubble(at: Vector3) -> void:
 	bm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	bm.render_priority = 3
 	_bar.material_override = bm
-	_bar.position = Vector3(0, -0.36, 0.03)
+	_bar.position = Vector3(0, -0.59, 0.03)
 	_bubble.add_child(_bar)
 	_bubble.visible = false
 
@@ -168,7 +177,7 @@ static func _bubble_texture(kind: String="brown") -> Texture2D:
 			if not corner:
 				var border_colour: Color=colour
 				if kind=="special":border_colour=P.ELECTRIC_TEAL if x<16 else P.AMBER_GLOW
-				img.set_pixel(x,y,P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==25 else (border_colour if x<3 or x>28 or y<3 else P.WARM_CHALK))
+				img.set_pixel(x,y,P.MIDNIGHT_TYNE if x==0 or x==31 or y==0 or y==25 else (border_colour if x<3 or x>28 or y<3 or y>22 or y>22 else P.WARM_CHALK))
 	for y in range(26, 30):            # tail
 		for x in range(8, 8 + (30 - y)):
 			img.set_pixel(x, y, colour)

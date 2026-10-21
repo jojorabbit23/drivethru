@@ -9,3 +9,5 @@ ClarityHUD has compact grill slot cards: mushroom icon, type code, state and sec
 Tests cover every code, legacy labels, quantity semantics, matching bubble/HUD after partial service, Double Yellow border, Special dual stripes, burn timers before/after flipping, upgraded slots and hidden HUD on death. capture_kitchen_hud.gd renders a four-slot mixed grill and DBL Y X2 customer view for native visual QA.
 
 Verification: validator, import, touched-script checks and all 36 test suites passed (cooking loop updated for code-based rail text and rerun). Native mixed-grill/customer captures inspected after layout corrections; standard room/weapon captures also rendered. Double-Blue tray lids now resolve base recipe colour consistently and are covered by the HUD regression suite.
+
+Speech bubble refinements: the actual order letters and rim use Recipes.colour for the requested mushroom, with a dark text outline. A separate full REGULAR / BLUE / YELLOW caption distinguishes pixel-font R and B; Special says BLUE + YELLOW with a split rim. Native captures include Regular, Blue and Special separately.

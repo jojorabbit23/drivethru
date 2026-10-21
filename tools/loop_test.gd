@@ -125,15 +125,18 @@ func _run() -> void:
 	await wait(2.0)
 	check(main.grill.state_of(0) == "cooking", "cooking after a second")
 	check(is_equal_approx(main.grill.slots[0]["patty"].scale.y, main.grill.SMASHED.y) or main.grill.slots[0]["patty"].scale.y < 0.8, "the spatula has pressed it down (scale y %.2f)" % main.grill.slots[0]["patty"].scale.y)
-	# look at the regular patty (slot 1): E flips it
+	# look at the regular patty (slot 1): F flips it
 	cam.look_at((main.grill.slots[1]["root"] as Node3D).global_position, Vector3.UP)
 	await physics_frame
 	check(main.grill.aimed_slot(player) == 1 and "flip the regular patty" in main.grill.prompt(player), "looking at a cooking patty: '%s'" % main.grill.prompt(player))
 	var ready_at := {}
 	var t_flip := Time.get_ticks_msec()
 	main.grill.patty_state.connect(func(i, st): if st == "ready": ready_at[i] = true)
-	player.use_focus()
-	check(main.grill.slots[1]["flipped"] and player.menu_station == null, "E flips it (no menu)")
+	var flip_key := InputEventKey.new()
+	flip_key.physical_keycode = KEY_F
+	flip_key.pressed = true
+	player._unhandled_input(flip_key)
+	check(main.grill.slots[1]["flipped"] and player.menu_station == null, "F flips it (no menu)")
 	check(not main.grill.can_flip(1), "only once")
 	await wait(0.5)
 	check(is_equal_approx(main.grill.slots[1]["patty"].rotation.x, 0.0) or absf(main.grill.slots[1]["patty"].rotation.x) < 0.05 or absf(main.grill.slots[1]["patty"].rotation.x - TAU) < 0.05, "turned over: seared cap up (rot %.2f)" % main.grill.slots[1]["patty"].rotation.x)

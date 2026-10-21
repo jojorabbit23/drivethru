@@ -425,9 +425,9 @@ func count(state: String) -> int:
 func prompt(player: Node) -> String:
 	var a := aimed_slot(player)
 	if _can_discard(a, player):
-		return "E AGAIN  knock this patty onto the floor  ·  discard"
+		return "F AGAIN  knock this patty onto the floor  ·  discard"
 	if can_flip(a):
-		return "E  flip the %s patty  ·  tap E again quickly to discard" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
+		return "F  flip the %s patty  ·  tap F again quickly to discard" % String(Economy.KIND_NAME[slots[a]["kind"]]).to_lower()
 	if a>=0 and a<slot_count():
 		var target: Dictionary=slots[a]
 		if target.state=="raw":return "RAW  ·  cooking starts automatically"
@@ -445,6 +445,10 @@ func menu_title() -> String:
 	return "GRILL  ·  %d of %d free" % [count(""), slot_count()]
 
 func interact(player: Node) -> void:
+	_reset_discard()
+	player.open_menu(self, options(player))
+
+func flip_input(player: Node) -> void:
 	var aimed := aimed_slot(player)
 	if _can_discard(aimed, player):
 		_discard(aimed)
@@ -455,7 +459,6 @@ func interact(player: Node) -> void:
 		_discard_left = DISCARD_TAP_WINDOW
 		_discard_player = player
 		return
-	player.open_menu(self, options(player))
 
 func _reset_discard() -> void:
 	_discard_slot = -1
