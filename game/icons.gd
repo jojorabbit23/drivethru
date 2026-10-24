@@ -22,11 +22,11 @@ const KEY := {
 const KIND_SWAP := {
 	"burger": {"rows": [8, 9, 10], "brown": {}, "blue": {"c": "s", "o": "e"}, "red": {"c": "o", "o": "a"}},
 	"burger_double": {"rows": [5, 6, 8, 9, 10], "brown": {}, "blue": {"c": "s", "o": "e"}, "red": {"c": "o", "o": "a"}},
-	"mushroom": {"rows": [1, 2, 3, 4, 5, 6], "brown": {"o": "b", "a": "o"}, "blue": {"o": "t", "a": "e"}, "red": {}},
+	"mushroom": {"rows": [1, 2, 3, 4, 5, 6], "brown": {"o": "b", "a": "o"}, "blue": {"o": "t", "a": "e"}, "red": {"o": "a", "a": "w"}},
 }
 
 # The world colour of each kind (patty tint on the grill, pickup tint, halo).
-const KIND_COLOUR := {"brown": Color(0.52, 0.31, 0.18), "blue": P.ELECTRIC_TEAL, "red": P.BURNT_ORANGE}
+const KIND_COLOUR := {"brown": Color(0.52, 0.31, 0.18), "blue": P.ELECTRIC_TEAL, "red": P.AMBER_GLOW}
 
 const ART := {
 	"freshness_fresh": [".......a........", "......aa........", ".....aao........", "....aaaoa.......", "...aaoooaa......", "...aoawooa......", "...aowwaoa......", "....aaaaa.......", "................", "................", "................", "................", "................", "................", "................", "................"],

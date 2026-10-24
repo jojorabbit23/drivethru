@@ -8,6 +8,9 @@ extends "res://game/station.gd"
 
 const Car = preload("res://game/customer_car.gd")
 const Recipes = preload("res://game/recipes.gd")
+const Progression=preload("res://game/order_progression.gd")
+var next_orders: Array[String]=[]
+var _order_rng:=RandomNumberGenerator.new()
 const BurgerItems = preload("res://game/burger_items.gd")
 var serving_tray: Node = null
 var _tray_check: float = 0.0
@@ -43,6 +46,7 @@ var _next := 0.0
 var _bell: Node3D
 
 func _ready() -> void:
+	_order_rng.randomize()
 	add_zone(Vector3(1.8, 1.0, 0.9), Vector3(0, 0.5, 0))
 	_next = first_delay
 	_bell = Node3D.new()
@@ -92,7 +96,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_next -= delta
 	if _next <= 0.0:
-		spawn_customer(randi_range(1,3 if int(get_parent().get("wave"))>=6 else 2))
+		spawn_customer(0) # automatic wave-scaled demand; explicit quantities remain deterministic
 
 func spawn_customer(quantity: int=1) -> Node3D:
 	if car != null and is_instance_valid(car):
@@ -102,9 +106,18 @@ func spawn_customer(quantity: int=1) -> Node3D:
 	c.name = "CustomerCar"
 	get_parent().add_child(c)
 	var e := economy()
-	c.order = next_order if next_order != "" else Recipes.pick(e.served if e else 0)
-	c.quantity=clampi(quantity,1,3)
+	var wave: int=int(get_parent().get("wave"))
+	var automatic: bool=quantity<=0 and next_order.is_empty() and next_orders.is_empty()
+	var kinds: Array[String]=[]
+	if not next_orders.is_empty():kinds.assign(next_orders.slice(0,3))
+	elif automatic:kinds=Progression.generate(wave,e.served if e else 0,_order_rng)
+	else:
+		var kind: String=next_order if next_order!="" else Recipes.pick(e.served if e else 0)
+		for i in clampi(quantity,1,3):kinds.append(kind)
+	c.configure_order(kinds)
+	if automatic and wave>=3:c.patience+=Progression.patience_bonus(kinds,wave)
 	c.patience *= patience_scale()
+	next_orders.clear()
 	c.vehicle = next_vehicle
 	next_order = ""
 	next_vehicle = ""
@@ -118,7 +131,8 @@ func spawn_customer(quantity: int=1) -> Node3D:
 		customer_arrived.emit(c)
 		collect_from_tray())
 	c.left.connect(func(served: bool):
-		_next = randf_range(gap_min, gap_max)
+		var spacing: Vector2=Progression.gap(int(get_parent().get("wave")),gap_min,gap_max)
+		_next = randf_range(spacing.x,spacing.y)
 		if not served:
 			customer_missed.emit())
 	car = c
@@ -136,17 +150,17 @@ func prompt(player: Node) -> String:
 			return "DRIVE-THRU  ·  customer pulling in"
 		return "DRIVE-THRU  ·  no customer yet"
 	var left := ceili(c.patience - c.waited)
-	var want: String = Recipes.name_of(c.order).to_upper()
-	if c.quantity-c.received>1:want+=" x%d" % (c.quantity-c.received)
+	var want: String = c.ticket_text(" + ") if not c.order_lines.is_empty() else Recipes.name_of(c.order).to_upper()
+	if c.order_lines.is_empty() and c.quantity-c.received>1:want+=" x%d" % (c.quantity-c.received)
 	if player.held == "burger":
 		var b: Dictionary = player.held_burger
 		if BurgerItems.spoiled(b):return "SPOILED BURGER  ·  use the kitchen bin"
 		if b.get("quality", "") == "burnt":
 			return "E  serve burnt salvage  ·  $%d%s" % [int(BurgerItems.payment(b)[0]),"  COLD (-50%)" if BurgerItems.cold(b) else ""]
-		if b.get("kind", "") != c.order:
+		if not c.wants(b.get("kind", "")):
 			return "WRONG BURGER  ·  they want %s" % want
 		var pay := BurgerItems.payment(b)
-		return "E  serve %s burger  ·  %s  $%d%s" % [want, (BurgerItems.state(b)+" (-75%)" if BurgerItems.age(b)>=300.0 else "COLD (-50%)") if BurgerItems.cold(b) else (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
+		return "E  serve %s burger  ·  %s  $%d%s" % [Recipes.name_of(String(b.get("kind","brown"))).to_upper(), (BurgerItems.state(b)+" (-75%)" if BurgerItems.age(b)>=300.0 else "COLD (-50%)") if BurgerItems.cold(b) else (b["quality"] as String).to_upper(), pay[0], (" + $%d tip" % pay[1]) if pay[1] > 0 else ""]
 	return "DRIVE-THRU  ·  wants %s  ·  %ds" % [want, left]
 
 func interact(player: Node) -> void:
@@ -161,7 +175,7 @@ func serve(player: Node) -> bool:
 	var b: Dictionary = player.held_burger
 	if BurgerItems.spoiled(b):return false
 	var quality: String = b.get("quality", "standard")
-	if quality != "burnt" and b.get("kind", "brown") != c.order:
+	if quality != "burnt" and not c.wants(b.get("kind", "brown")):
 		Sfx.play(self, "click", -6.0)
 		return false
 	player.take_selected_burger()
@@ -173,21 +187,25 @@ func collect_from_tray() -> int:
 	if c==null or serving_tray==null:return 0
 	var taken: int=0
 	while c.state=="waiting" and c.received<c.quantity:
-		var item: Dictionary=serving_tray.take_matching(c.order)
+		var item: Dictionary={}
+		# Look for every requested recipe before allowing discount substitution.
+		for line: Dictionary in c.remaining_lines():
+			item=serving_tray.take_matching(line.kind,false)
+			if not item.is_empty():break
+		if item.is_empty():item=serving_tray.take_matching(c.order)
 		if item.is_empty():break
 		_pay(c,item,true)
 		taken+=1
 	return taken
 
 func _pay(c: Node3D,b: Dictionary,from_tray: bool=false) -> void:
+	if not c.record_delivery(String(b.get("kind","brown")),String(b.get("quality",""))=="burnt" or (from_tray and b.get("discount",false))):return
 	var pay: Array=BurgerItems.payment(b)
 	BurgerItems.prepare(b)
 	if from_tray and not BurgerItems.cold(b) and c.waited<=3.0 and b.burger_id in c.get_meta("prepared_ids",[]):
 		pay[1]=roundi(float(pay[1])*1.25)
 	var e := economy()
 	e.add_cash(int(pay[0]) + int(pay[1]))
-	c.received+=1
-	c.refresh_order_quantity()
 	if c.received>=c.quantity:
 		e.served += 1
 		c.leave(true)

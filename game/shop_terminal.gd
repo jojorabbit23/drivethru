@@ -7,6 +7,7 @@
 # screen shows the page you're on and your balance.
 extends "res://game/station.gd"
 
+const DesertEagle = preload("res://weapons/desert_eagle/desert_eagle.gd")
 const Shotgun = preload("res://weapons/shotgun/shotgun_weapon.gd")
 
 signal bought(item: String)
@@ -78,6 +79,10 @@ func options(player: Node) -> Array:
 				opts.append(_buy("%d shotgun shells  $%d" % [Economy.SHELL_PACK, Economy.SHELL_PRICE], Economy.SHELL_PRICE, "shells", buy_shells.bind(player)))
 			else:
 				opts.append(_buy("Pump shotgun (wheel to equip)  $%d" % Economy.SHOTGUN_PRICE, Economy.SHOTGUN_PRICE, "shotgun", buy_shotgun.bind(player)))
+			if player.has_weapon("DESERT EAGLE"):
+				opts.append(_buy("%d Desert Eagle rounds  $%d" % [Economy.EAGLE_AMMO_PACK, Economy.EAGLE_AMMO_PRICE], Economy.EAGLE_AMMO_PRICE,"ammo",buy_eagle_ammo.bind(player)))
+			else:
+				opts.append(_buy("Desert Eagle (60 damage)  $%d" % Economy.DESERT_EAGLE_PRICE,Economy.DESERT_EAGLE_PRICE,"ammo",buy_desert_eagle.bind(player)))
 			opts.append(back)
 			return opts
 		"supplies":
@@ -127,6 +132,19 @@ func buy_ammo(player: Node) -> bool:
 		return false
 	gun.add_ammo(Economy.AMMO_PACK)
 	return _done(player, "ammo")
+
+func buy_desert_eagle(player: Node) -> bool:
+	if player.has_weapon("DESERT EAGLE") or not economy().spend(Economy.DESERT_EAGLE_PRICE): return false
+	var eagle: Node = DesertEagle.new()
+	eagle.name = "DesertEagle"
+	player.add_weapon(eagle)
+	return _done(player,"desert_eagle")
+
+func buy_eagle_ammo(player: Node) -> bool:
+	var eagle: Node = player.weapon_named("DESERT EAGLE")
+	if eagle == null or not economy().spend(Economy.EAGLE_AMMO_PRICE): return false
+	eagle.add_ammo(Economy.EAGLE_AMMO_PACK)
+	return _done(player,"eagle_ammo")
 
 func buy_shotgun(player: Node) -> bool:
 	if player.has_weapon("SHOTGUN") or not economy().spend(Economy.SHOTGUN_PRICE):

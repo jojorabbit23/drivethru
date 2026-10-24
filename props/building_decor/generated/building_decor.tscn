@@ -1,0 +1,1234 @@
+[gd_scene load_steps=67 format=3]
+
+[ext_resource type="Script" path="res://props/building_decor/building_decor.gd" id="1_208nb"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_roof_sign.tscn" id="2_co5ce"]
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="3_ldqn0"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_barricade_table.tscn" id="4_omqwc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_barricade_menu.tscn" id="5_kt8jc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_barricade_cones.tscn" id="6_sm3ce"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_barricade_pallets.tscn" id="7_rygeh"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_tape_hazard.tscn" id="8_34m24"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_decal_nowserving.tscn" id="9_nbqd7"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_decal_combo.tscn" id="10_d60rv"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_plywood.tscn" id="11_2eanb"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_sign_norefunds.tscn" id="12_vu6d2"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_sign_limbs.tscn" id="13_wnydc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_fungus_shelf.tscn" id="14_720sm"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_fungus_moss.tscn" id="15_881na"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_vehicle_pickup.tscn" id="16_amv0y"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_vehicle_minivan.tscn" id="17_oet2l"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/EXT_decal_kidseatfree.tscn" id="18_lv5kx"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_menu_board.tscn" id="19_fpe4t"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_speaker_post.tscn" id="20_j36ie"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_clearance_bar.tscn" id="21_41tft"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_arrows.tscn" id="22_vbbvn"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_oil_stains.tscn" id="23_q6r8a"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/LANE_claw_gouges.tscn" id="24_8dmnc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_sliding_window.tscn" id="25_7ysxh"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_sign_knock.tscn" id="26_d2uxw"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_bell.tscn" id="27_pk0ym"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_tray_shelf.tscn" id="28_ggxru"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_napkins.tscn" id="29_uv5fp"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_special_card.tscn" id="30_4l0hg"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_ticket_rail.tscn" id="31_uq0uc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/WIN_feedback_box.tscn" id="32_28dl4"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_grill.tscn" id="33_3sy4w"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_fryer.tscn" id="34_dpifh"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_hood_vent.tscn" id="35_m6tkm"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_sign_cleangrill.tscn" id="36_ltqu1"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_hooks_wall.tscn" id="37_8y77d"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_prep_board.tscn" id="38_uts6g"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_ticket_spike.tscn" id="39_2gdqi"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_health_cert.tscn" id="40_wvnmc"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_rota.tscn" id="41_5k25t"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_notice_washhands.tscn" id="42_c2imu"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_notice_infection.tscn" id="43_74fb6"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_floor_tiles.tscn" id="44_6v5wr"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_mop_bucket.tscn" id="45_u8rd2"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/KIT_sign_wetfloor.tscn" id="46_loa7a"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_booth.tscn" id="47_g2fee"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_poster_pinup.tscn" id="48_1k1eh"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_calendar.tscn" id="49_3e2ov"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_standee_cleatimus.tscn" id="50_rpgsp"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_figurine_display.tscn" id="51_2p6e5"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_jukebox.tscn" id="52_vqu36"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/DIN_clock.tscn" id="53_3pp74"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_crates.tscn" id="54_laow3"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_freezer_door.tscn" id="55_lmi7q"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_desk.tscn" id="56_bk2en"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_plant_dead.tscn" id="57_0nxrm"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_phone_rotary.tscn" id="58_0bd8g"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_invoices.tscn" id="59_2hx55"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/BACK_photo_eotm.tscn" id="60_i2b0m"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_light_fluoro.tscn" id="61_u4xp1"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_light_fluoro_dead.tscn" id="62_mwt43"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_light_window_glow.tscn" id="63_4v41j"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_audio_ice_machine.tscn" id="64_wrb3b"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_audio_fridge_hum.tscn" id="65_2pgxi"]
+[ext_resource type="PackedScene" path="res://props/building_decor/generated/FX_audio_hold_music.tscn" id="66_jug0t"]
+
+[node name="BuildingDecorations" type="Node3D"]
+script = ExtResource("1_208nb")
+
+[node name="EXT_roof_sign" type="Node3D" parent="." instance=ExtResource("2_co5ce")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3, 3.15, -4.85)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "\"DRIVE THRU\" with the U missing; one dead bulb, one flickering amber; loses letters as the night goes on",
+"id": "EXT_roof_sign",
+"object": "Mushroom-cap roof sign",
+"placement": "Roof above entrance, visible from the lane",
+"type": "Prop + Light"
+}
+metadata/guide_id = "EXT_roof_sign"
+
+[node name="EXT_barricade_table" type="Node3D" parent="." instance=ExtResource("4_omqwc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, 0, 0.2)
+script = ExtResource("3_ldqn0")
+mode = "breakable"
+hit_size = Vector3(0.74, 1.3, 0.872361)
+hit_centre = Vector3(0, 0.65, 0.38618)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Destructible; breaks into planks",
+"id": "EXT_barricade_table",
+"object": "Picnic table on its side",
+"placement": "Along zombie approach routes",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_barricade_table"
+
+[node name="EXT_barricade_menu" type="Node3D" parent="." instance=ExtResource("5_kt8jc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.2, 11.66)
+script = ExtResource("3_ldqn0")
+mode = "breakable"
+hit_size = Vector3(1.15, 1.5, 0.06)
+hit_centre = Vector3(0, 0, 0.00475)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Destructible; final barricade",
+"id": "EXT_barricade_menu",
+"object": "Menu board bolted across the door",
+"placement": "Front door",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_barricade_menu"
+
+[node name="EXT_barricade_cones" type="Node3D" parent="." instance=ExtResource("6_sm3ce")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0, 1.1)
+script = ExtResource("3_ldqn0")
+mode = "knockable"
+hit_size = Vector3(0.48, 0.595, 0.48)
+hit_centre = Vector3(0, 0.2975, 0)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Knockable",
+"id": "EXT_barricade_cones",
+"object": "Traffic cones",
+"placement": "Scattered around barricades",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_barricade_cones"
+
+[node name="EXT_barricade_pallets" type="Node3D" parent="." instance=ExtResource("7_rygeh")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -10, 0, 4.5)
+script = ExtResource("3_ldqn0")
+mode = "breakable"
+hit_size = Vector3(0.97, 0.55, 0.95)
+hit_centre = Vector3(0, 0.275, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Destructible",
+"id": "EXT_barricade_pallets",
+"object": "Stacked pallets",
+"placement": "Barricade lines",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_barricade_pallets"
+
+[node name="EXT_tape_hazard" type="Node3D" parent="." instance=ExtResource("8_34m24")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, 0.85, 0.29)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Tears when barricade is damaged",
+"id": "EXT_tape_hazard",
+"object": "Hazard tape",
+"placement": "On barricades",
+"type": "Decal"
+}
+metadata/guide_id = "EXT_tape_hazard"
+
+[node name="EXT_decal_nowserving" type="Node3D" parent="." instance=ExtResource("9_nbqd7")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3.7, 1.65, -5.17)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cracks with the window",
+"id": "EXT_decal_nowserving",
+"object": "\"NOW SERVING\" vinyl, peeling",
+"placement": "Front windows",
+"type": "Decal"
+}
+metadata/guide_id = "EXT_decal_nowserving"
+
+[node name="EXT_decal_combo" type="Node3D" parent="." instance=ExtResource("10_d60rv")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2.25, 1.65, -5.17)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cracks with the window",
+"id": "EXT_decal_combo",
+"object": "\"ASK ABOUT OUR COMBO\" vinyl, peeling",
+"placement": "Front windows",
+"type": "Decal"
+}
+metadata/guide_id = "EXT_decal_combo"
+
+[node name="EXT_plywood" type="Node3D" parent="." instance=ExtResource("11_2eanb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.15, 1.75, -5.17)
+script = ExtResource("3_ldqn0")
+mode = "breakable"
+hit_size = Vector3(0.428246, 0.45318, 0.06)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Destructible",
+"id": "EXT_plywood",
+"object": "Plywood half-covering windows",
+"placement": "Front windows",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_plywood"
+
+[node name="EXT_sign_norefunds" type="Node3D" parent="." instance=ExtResource("12_vu6d2")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.85, 1.8, -5.2)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "EXT_sign_norefunds",
+"object": "\"NO REFUNDS AFTER THE APOCALYPSE\"",
+"placement": "Beside the order window",
+"type": "Sign"
+}
+metadata/guide_id = "EXT_sign_norefunds"
+
+[node name="EXT_sign_limbs" type="Node3D" parent="." instance=ExtResource("13_wnydc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 1.9, 11.74)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "EXT_sign_limbs",
+"object": "\"MANAGEMENT NOT RESPONSIBLE FOR LOST LIMBS\" plate",
+"placement": "Near the door",
+"type": "Sign"
+}
+metadata/guide_id = "EXT_sign_limbs"
+
+[node name="EXT_fungus_shelf" type="Node3D" parent="." instance=ExtResource("14_720sm")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 5.95, 2.8, -2.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Denser near zombie approach routes",
+"id": "EXT_fungus_shelf",
+"object": "Shelf mushrooms",
+"placement": "Gutters and base of the roof sign",
+"type": "Fungal"
+}
+metadata/guide_id = "EXT_fungus_shelf"
+
+[node name="EXT_fungus_moss" type="Node3D" parent="." instance=ExtResource("15_881na")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 6.22, 0.35, 4.3)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Faint glow",
+"id": "EXT_fungus_moss",
+"object": "Glowing spore moss patches",
+"placement": "Corners of the building",
+"type": "Fungal + Light"
+}
+metadata/guide_id = "EXT_fungus_moss"
+
+[node name="EXT_vehicle_pickup" type="Node3D" parent="." instance=ExtResource("16_amv0y")]
+transform = Transform3D(0.906308, 0, -0.422618, 0, 1, 0, 0.422618, 0, 0.906308, -14, 0, 10)
+script = ExtResource("3_ldqn0")
+mode = "cover"
+hit_size = Vector3(2.0984, 1.74, 4.01)
+hit_centre = Vector3(0, 0.845, -0.0549998)
+solid = true
+max_health = 250.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cover for the player",
+"id": "EXT_vehicle_pickup",
+"object": "Rusted pickup, flat tyre",
+"placement": "Car park",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_vehicle_pickup"
+
+[node name="EXT_vehicle_minivan" type="Node3D" parent="." instance=ExtResource("17_oet2l")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -13, 0, -15)
+script = ExtResource("3_ldqn0")
+mode = "cover"
+hit_size = Vector3(2.40928, 1.74, 4.01)
+hit_centre = Vector3(0.155442, 0.845, -0.0549998)
+solid = true
+max_health = 250.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cover for the player",
+"id": "EXT_vehicle_minivan",
+"object": "Minivan, sliding door open",
+"placement": "Car park",
+"type": "Prop"
+}
+metadata/guide_id = "EXT_vehicle_minivan"
+
+[node name="EXT_decal_kidseatfree" type="Node3D" parent="." instance=ExtResource("18_lv5kx")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12.49, 1.2, -13.1)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "EXT_decal_kidseatfree",
+"object": "\"KIDS EAT FREE\" bumper sticker",
+"placement": "Minivan rear window",
+"type": "Decal"
+}
+metadata/guide_id = "EXT_decal_kidseatfree"
+
+[node name="LANE_menu_board" type="Node3D" parent="." instance=ExtResource("19_fpe4t")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -14, 0, -11.3)
+script = ExtResource("3_ldqn0")
+mode = "breakable"
+hit_size = Vector3(1.35, 2.65, 0.12)
+hit_centre = Vector3(0, 1.325, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Main place for menu text; damageable",
+"id": "LANE_menu_board",
+"object": "Menu board, worn laminate, missing letters",
+"placement": "Start of the lane",
+"type": "Prop + Sign"
+}
+metadata/guide_id = "LANE_menu_board"
+
+[node name="LANE_speaker_post" type="Node3D" parent="." instance=ExtResource("20_j36ie")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -11.5, 0, -11.15)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Fungal threads curl from the grille",
+"id": "LANE_speaker_post",
+"object": "Dented intercom with \"WELCOME\" sticker",
+"placement": "Beside the lane",
+"type": "Prop"
+}
+metadata/guide_id = "LANE_speaker_post"
+
+[node name="LANE_clearance_bar" type="Node3D" parent="." instance=ExtResource("21_41tft")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -18, 0, -8)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Something that isn't a rag hangs from it",
+"id": "LANE_clearance_bar",
+"object": "\"MAX HEIGHT 2.1M\" bar bent into a hook",
+"placement": "Over the lane entrance",
+"type": "Prop"
+}
+metadata/guide_id = "LANE_clearance_bar"
+
+[node name="LANE_arrows" type="Node3D" parent="." instance=ExtResource("22_vbbvn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.012, -8)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "LANE_arrows",
+"object": "Faded arrows",
+"placement": "Asphalt",
+"type": "Decal"
+}
+metadata/guide_id = "LANE_arrows"
+
+[node name="LANE_oil_stains" type="Node3D" parent="." instance=ExtResource("23_q6r8a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.012, -8)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "LANE_oil_stains",
+"object": "Oil stains",
+"placement": "Asphalt",
+"type": "Decal"
+}
+metadata/guide_id = "LANE_oil_stains"
+
+[node name="LANE_claw_gouges" type="Node3D" parent="." instance=ExtResource("24_8dmnc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.015, -10.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "LANE_claw_gouges",
+"object": "Claw gouges",
+"placement": "Asphalt",
+"type": "Decal"
+}
+metadata/guide_id = "LANE_claw_gouges"
+
+[node name="WIN_sliding_window" type="Node3D" parent="." instance=ExtResource("25_7ysxh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.5, -4.99)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cracks as the barricades fall",
+"id": "WIN_sliding_window",
+"object": "Scratched sliding window",
+"placement": "Order window",
+"type": "Prop"
+}
+metadata/guide_id = "WIN_sliding_window"
+
+[node name="WIN_sign_knock" type="Node3D" parent="." instance=ExtResource("26_d2uxw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.65, 1.76, -4.91)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "WIN_sign_knock",
+"object": "Hand-written \"PLEASE KNOCK\"",
+"placement": "On the window",
+"type": "Sign"
+}
+metadata/guide_id = "WIN_sign_knock"
+
+[node name="WIN_bell" type="Node3D" parent="." instance=ExtResource("27_pk0ym")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.52, 1.02, -4.31)
+script = ExtResource("3_ldqn0")
+mode = "bell"
+hit_size = Vector3(0.25, 0.25, 0.25)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Interactive: player rings it",
+"id": "WIN_bell",
+"object": "Service bell, too loud",
+"placement": "Tray shelf",
+"type": "Prop + Audio"
+}
+metadata/guide_id = "WIN_bell"
+
+[node name="WIN_tray_shelf" type="Node3D" parent="." instance=ExtResource("28_ggxru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.02, -4.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ServingTray")
+metadata/guide = {
+"behaviour": "Gameplay: serving tray",
+"id": "WIN_tray_shelf",
+"object": "Stainless counter with burn marks",
+"placement": "Under the window",
+"type": "Prop"
+}
+metadata/guide_id = "WIN_tray_shelf"
+metadata/reuses_existing = true
+
+[node name="WIN_napkins" type="Node3D" parent="." instance=ExtResource("29_uv5fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.14, 1.02, -4.5)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "WIN_napkins",
+"object": "Battered napkin dispenser",
+"placement": "Tray shelf",
+"type": "Prop"
+}
+metadata/guide_id = "WIN_napkins"
+
+[node name="WIN_special_card" type="Node3D" parent="." instance=ExtResource("30_4l0hg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 1.17, -4.15)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "WIN_special_card",
+"object": "Laminated \"TODAY'S SPECIAL\" card",
+"placement": "Tray shelf",
+"type": "Sign"
+}
+metadata/guide_id = "WIN_special_card"
+
+[node name="WIN_ticket_rail" type="Node3D" parent="." instance=ExtResource("31_uq0uc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 2.15, -4.72)
+script = ExtResource("3_ldqn0")
+mode = "ticket"
+hit_size = Vector3(0.6, 0.35, 0.25)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("OrderRail")
+metadata/guide = {
+"behaviour": "Interactive: shows current orders",
+"id": "WIN_ticket_rail",
+"object": "Order ticket rail under warm light",
+"placement": "Above the grill",
+"type": "Prop + Light"
+}
+metadata/guide_id = "WIN_ticket_rail"
+metadata/reuses_existing = true
+
+[node name="WIN_feedback_box" type="Node3D" parent="." instance=ExtResource("32_28dl4")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.16, 1.8, -3.5)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "WIN_feedback_box",
+"object": "Customer feedback box, three padlocks",
+"placement": "Wall by the window",
+"type": "Prop"
+}
+metadata/guide_id = "WIN_feedback_box"
+
+[node name="KIT_grill" type="Node3D" parent="." instance=ExtResource("33_3sy4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.92, -4.425)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("Grill")
+metadata/guide = {
+"behaviour": "Gameplay: cooking station",
+"id": "KIT_grill",
+"object": "Blackened stainless grill",
+"placement": "Kitchen centre",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_grill"
+metadata/reuses_existing = true
+
+[node name="KIT_fryer" type="Node3D" parent="." instance=ExtResource("34_dpifh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.12, 0.95, -4.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Gameplay: cooking station",
+"id": "KIT_fryer",
+"object": "Fryer",
+"placement": "Beside the grill",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_fryer"
+
+[node name="KIT_hood_vent" type="Node3D" parent="." instance=ExtResource("35_m6tkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 2.45, -4.55)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_hood_vent",
+"object": "Grease-stained hood vent",
+"placement": "Above the grill",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_hood_vent"
+metadata/reuses_existing = true
+
+[node name="KIT_sign_cleangrill" type="Node3D" parent="." instance=ExtResource("36_ltqu1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 1.9, -4.68)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_sign_cleangrill",
+"object": "\"CLEAN GRILL = HAPPY GRILL\"",
+"placement": "Wall by the grill",
+"type": "Sign"
+}
+metadata/guide_id = "KIT_sign_cleangrill"
+
+[node name="KIT_hooks_wall" type="Node3D" parent="." instance=ExtResource("37_8y77d")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.16, 1.7, -3.5)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cleaver could be a pickup",
+"id": "KIT_hooks_wall",
+"object": "Aprons, hairnet, one-fingered oven glove, cleaver",
+"placement": "Kitchen wall",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_hooks_wall"
+
+[node name="KIT_prep_board" type="Node3D" parent="." instance=ExtResource("38_uts6g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.96, -4.22)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("PrepBench")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_prep_board",
+"object": "Chipped cutting board and spatulas",
+"placement": "Prep counter",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_prep_board"
+metadata/reuses_existing = true
+
+[node name="KIT_ticket_spike" type="Node3D" parent="." instance=ExtResource("39_2gdqi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.97, -4.3)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_ticket_spike",
+"object": "Ticket spike through old orders",
+"placement": "Prep counter",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_ticket_spike"
+
+[node name="KIT_health_cert" type="Node3D" parent="." instance=ExtResource("40_wvnmc")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.18, 2.3, -3.55)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_health_cert",
+"object": "Framed health certificate, score smudged, expired",
+"placement": "Kitchen wall",
+"type": "Sign"
+}
+metadata/guide_id = "KIT_health_cert"
+
+[node name="KIT_rota" type="Node3D" parent="." instance=ExtResource("41_5k25t")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.18, 2.1, -1.1)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_rota",
+"object": "Shift rota with one name crossed out",
+"placement": "Staff notice board",
+"type": "Sign"
+}
+metadata/guide_id = "KIT_rota"
+
+[node name="KIT_notice_washhands" type="Node3D" parent="." instance=ExtResource("42_c2imu")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.65, 2.45, -0.17)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_notice_washhands",
+"object": "\"WASH HANDS\" reminder with a handprint",
+"placement": "Staff notice board",
+"type": "Sign"
+}
+metadata/guide_id = "KIT_notice_washhands"
+
+[node name="KIT_notice_infection" type="Node3D" parent="." instance=ExtResource("43_74fb6")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.18, 2.3, -0.5)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_notice_infection",
+"object": "\"IN CASE OF INFECTION\" flowchart",
+"placement": "Staff notice board",
+"type": "Sign"
+}
+metadata/guide_id = "KIT_notice_infection"
+
+[node name="KIT_floor_tiles" type="Node3D" parent="." instance=ExtResource("44_6v5wr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.017, -3.5)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox")
+metadata/guide = {
+"behaviour": "-",
+"id": "KIT_floor_tiles",
+"object": "Checkerboard with grease patches",
+"placement": "Kitchen floor",
+"type": "Decal"
+}
+metadata/guide_id = "KIT_floor_tiles"
+metadata/reuses_existing = true
+
+[node name="KIT_mop_bucket" type="Node3D" parent="." instance=ExtResource("45_u8rd2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.35, 0, -0.55)
+script = ExtResource("3_ldqn0")
+mode = "knockable"
+hit_size = Vector3(0.34, 1.14177, 0.3)
+hit_centre = Vector3(0, 0.580884, 0)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Knockable",
+"id": "KIT_mop_bucket",
+"object": "Mop bucket",
+"placement": "Corner",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_mop_bucket"
+
+[node name="KIT_sign_wetfloor" type="Node3D" parent="." instance=ExtResource("46_loa7a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.9, 0, -0.7)
+script = ExtResource("3_ldqn0")
+mode = "knockable"
+hit_size = Vector3(0.3, 0.499083, 0.308869)
+hit_centre = Vector3(0, 0.25, -0.09)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Knockable",
+"id": "KIT_sign_wetfloor",
+"object": "\"WET FLOOR\" sign",
+"placement": "Floor",
+"type": "Prop"
+}
+metadata/guide_id = "KIT_sign_wetfloor"
+
+[node name="DIN_booth" type="Node3D" parent="." instance=ExtResource("47_g2fee")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.35, 0, -0.27)
+script = ExtResource("3_ldqn0")
+mode = "cover"
+hit_size = Vector3(1.2, 1.125, 0.65)
+hit_centre = Vector3(0, 0.5625, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Cover; damageable",
+"id": "DIN_booth",
+"object": "Vinyl booth with duct-tape repairs, ketchup stains, mould",
+"placement": "Dining area",
+"type": "Prop"
+}
+metadata/guide_id = "DIN_booth"
+
+[node name="DIN_poster_pinup" type="Node3D" parent="." instance=ExtResource("48_1k1eh")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -5.68, 1.8, -1.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Tears as the night goes on",
+"id": "DIN_poster_pinup",
+"object": "1950s-style toadstool pin-up poster",
+"placement": "Dining wall",
+"type": "Decal"
+}
+metadata/guide_id = "DIN_poster_pinup"
+
+[node name="DIN_calendar" type="Node3D" parent="." instance=ExtResource("49_3e2ov")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.16, 1.9, -1)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "DIN_calendar",
+"object": "\"SPORE OF THE MONTH\" calendar stuck on March",
+"placement": "Dining wall",
+"type": "Sign"
+}
+metadata/guide_id = "DIN_calendar"
+
+[node name="DIN_standee_cleatimus" type="Node3D" parent="." instance=ExtResource("50_rpgsp")]
+transform = Transform3D(0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, 0.5, -4.45, 0, -2)
+script = ExtResource("3_ldqn0")
+mode = "knockable"
+hit_size = Vector3(0.821609, 1.775, 0.369)
+hit_centre = Vector3(-0.00349417, 0.8875, -0.0045)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Knockable",
+"id": "DIN_standee_cleatimus",
+"object": "\"CLEATIMUS SAYS: TRY THE DOUBLE!\" cut-out with a bite taken out",
+"placement": "Near the entrance",
+"type": "Prop"
+}
+metadata/guide_id = "DIN_standee_cleatimus"
+
+[node name="DIN_figurine_display" type="Node3D" parent="." instance=ExtResource("51_2p6e5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.02, -4.2)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "DIN_figurine_display",
+"object": "\"COLLECT ALL 6 FUNGI FIGURINES\" display, five slots empty",
+"placement": "Counter",
+"type": "Prop"
+}
+metadata/guide_id = "DIN_figurine_display"
+
+[node name="DIN_jukebox" type="Node3D" parent="." instance=ExtResource("52_vqu36")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.53, 0, -1.35)
+script = ExtResource("3_ldqn0")
+mode = "weapons"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Used as a weapons shelf",
+"id": "DIN_jukebox",
+"object": "Dead jukebox",
+"placement": "Dining area",
+"type": "Prop"
+}
+metadata/guide_id = "DIN_jukebox"
+
+[node name="DIN_clock" type="Node3D" parent="." instance=ExtResource("53_3pp74")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3.9, 2.4, -0.16)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "DIN_clock",
+"object": "Wall clock stopped at 12:00",
+"placement": "Dining wall",
+"type": "Prop"
+}
+metadata/guide_id = "DIN_clock"
+
+[node name="BACK_crates" type="Node3D" parent="." instance=ExtResource("54_laow3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 0, 3.6)
+script = ExtResource("3_ldqn0")
+mode = "cover"
+hit_size = Vector3(1.15, 0.89, 0.519)
+hit_centre = Vector3(0.3, 0.445, 0.0095)
+solid = false
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Stackable cover; could hold ingredient pickups",
+"id": "BACK_crates",
+"object": "Mushroom crates stencilled \"PREMIUM CAPS\" and \"DO NOT EAT RAW\"",
+"placement": "Storage room",
+"type": "Prop"
+}
+metadata/guide_id = "BACK_crates"
+
+[node name="BACK_freezer_door" type="Node3D" parent="." instance=ExtResource("55_lmi7q")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 3, 1.2, 4.74)
+script = ExtResource("3_ldqn0")
+mode = "door"
+hit_size = Vector3(1.1, 2.1, 0.12)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox/Garage")
+metadata/guide = {
+"behaviour": "Interactive: door",
+"id": "BACK_freezer_door",
+"object": "Frosted freezer door with a handwritten \"DON'T.\"",
+"placement": "Storage room",
+"type": "Prop + Sign"
+}
+metadata/guide_id = "BACK_freezer_door"
+metadata/reuses_existing = true
+
+[node name="BACK_desk" type="Node3D" parent="." instance=ExtResource("56_bk2en")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.775, 4.35)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox")
+metadata/guide = {
+"behaviour": "-",
+"id": "BACK_desk",
+"object": "Office desk",
+"placement": "Office",
+"type": "Prop"
+}
+metadata/guide_id = "BACK_desk"
+metadata/reuses_existing = true
+
+[node name="BACK_plant_dead" type="Node3D" parent="." instance=ExtResource("57_0nxrm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.18, 0.79, 4.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "BACK_plant_dead",
+"object": "Dead plant",
+"placement": "On the desk",
+"type": "Prop"
+}
+metadata/guide_id = "BACK_plant_dead"
+
+[node name="BACK_phone_rotary" type="Node3D" parent="." instance=ExtResource("58_0bd8g")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3.43, 0.79, 4.2)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "BACK_phone_rotary",
+"object": "Rotary phone, off the hook",
+"placement": "On the desk",
+"type": "Prop"
+}
+metadata/guide_id = "BACK_phone_rotary"
+
+[node name="BACK_invoices" type="Node3D" parent="." instance=ExtResource("59_2hx55")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.38, 0.79, 4.1)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "-",
+"id": "BACK_invoices",
+"object": "Stack of unpaid invoices",
+"placement": "On the desk",
+"type": "Prop"
+}
+metadata/guide_id = "BACK_invoices"
+
+[node name="BACK_photo_eotm" type="Node3D" parent="." instance=ExtResource("60_i2b0m")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2, 2.3, 4.7)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Photo could change each shift",
+"id": "BACK_photo_eotm",
+"object": "Framed \"EMPLOYEE OF THE MONTH\" photo",
+"placement": "Office wall",
+"type": "Sign"
+}
+metadata/guide_id = "BACK_photo_eotm"
+
+[node name="FX_light_fluoro" type="Node3D" parent="." instance=ExtResource("61_u4xp1")]
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox/Lights")
+metadata/guide = {
+"behaviour": "One per room flickers",
+"id": "FX_light_fluoro",
+"object": "Warm fluorescent tube",
+"placement": "Each interior room",
+"type": "Light"
+}
+metadata/guide_id = "FX_light_fluoro"
+metadata/reuses_existing = true
+
+[node name="FX_light_fluoro_dead" type="Node3D" parent="." instance=ExtResource("62_mwt43")]
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "One per room",
+"id": "FX_light_fluoro_dead",
+"object": "Dead fluorescent tube",
+"placement": "Each interior room",
+"type": "Prop"
+}
+metadata/guide_id = "FX_light_fluoro_dead"
+
+[node name="FX_light_window_glow" type="Node3D" parent="." instance=ExtResource("63_4v41j")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -3, 2.08, -5.2)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("ShopGreybox/Lights")
+metadata/guide = {
+"behaviour": "-",
+"id": "FX_light_window_glow",
+"object": "Window glow against dusk haze",
+"placement": "Exterior windows",
+"type": "Light"
+}
+metadata/guide_id = "FX_light_window_glow"
+metadata/reuses_existing = true
+
+[node name="FX_audio_ice_machine" type="Node3D" parent="." instance=ExtResource("64_wrb3b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4, 1, -4.4)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Random interval",
+"id": "FX_audio_ice_machine",
+"object": "Ice machine clunk",
+"placement": "Kitchen",
+"type": "Audio"
+}
+metadata/guide_id = "FX_audio_ice_machine"
+metadata/audio_emitter = true
+
+[node name="FX_audio_fridge_hum" type="Node3D" parent="." instance=ExtResource("65_2pgxi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 2)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Looping",
+"id": "FX_audio_fridge_hum",
+"object": "Fridge hum",
+"placement": "Kitchen and storage room",
+"type": "Audio"
+}
+metadata/guide_id = "FX_audio_fridge_hum"
+metadata/audio_emitter = true
+
+[node name="FX_audio_hold_music" type="Node3D" parent="." instance=ExtResource("66_jug0t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 1.4, -11.15)
+script = ExtResource("3_ldqn0")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Looping",
+"id": "FX_audio_hold_music",
+"object": "Cheerful hold-music loop",
+"placement": "Intercom speaker",
+"type": "Audio"
+}
+metadata/guide_id = "FX_audio_hold_music"
+metadata/audio_emitter = true

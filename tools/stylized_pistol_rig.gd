@@ -109,6 +109,11 @@ func build() -> Node3D:
  track(reload,"pistol_magazine:position",[0.0,0.16,0.44,0.7,0.98,1.13,1.6],[mag_pos,mag_pos,mag_pos+Vector3(0,-0.12,-0.028),mag_pos+Vector3(0,-0.17,-0.04),mag_pos+Vector3(0,-0.07,-0.015),mag_pos,mag_pos])
  track(reload,"pistol_slide:position",[0.0,1.14,1.26,1.37,1.48,1.6],[Vector3.ZERO,Vector3.ZERO,Vector3(0,0,-0.033),Vector3(0,0,-0.033),Vector3.ZERO,Vector3.ZERO])
  track(reload,"pistol_hammer:rotation",[0.0,1.14,1.3,1.48,1.6],[Vector3(-0.5,0,0),Vector3(-0.5,0,0),Vector3(-0.68,0,0),Vector3(-0.5,0,0),Vector3(-0.5,0,0)])
+ var rack:=Animation.new()
+ rack.length=0.28
+ track(rack,"pistol_slide:position",[0.0,0.08,0.15,0.26],[Vector3.ZERO,Vector3(0,0,-0.033),Vector3(0,0,-0.033),Vector3.ZERO])
+ track(rack,"pistol_hammer:rotation",[0.0,0.1,0.26],[Vector3(-0.5,0,0),Vector3(-0.68,0,0),Vector3(-0.5,0,0)])
+ library.add_animation("rack",rack)
  library.add_animation("idle",idle)
  library.add_animation("RESET",reset)
  library.add_animation("fire",fire)

@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_jroy4"]
+[ext_resource type="Shader" path="res://props/building_decor/worn_paper.gdshader" id="2_yhirb"]
+[ext_resource type="Texture2D" path="res://art/posters/service_yeasty_pinup.png" id="3_thl8c"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u30oc"]
+render_priority = 0
+shader = ExtResource("2_yhirb")
+shader_parameter/wear = null
+shader_parameter/paper = ExtResource("3_thl8c")
+
+[sub_resource type="QuadMesh" id="QuadMesh_ue7wh"]
+size = Vector2(0.48, 0.65)
+
+[node name="DIN_poster_pinup" type="Node3D"]
+script = ExtResource("1_jroy4")
+mode = "static"
+hit_size = Vector3(0, 0, 0)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("")
+metadata/guide = {
+"behaviour": "Tears as the night goes on",
+"id": "DIN_poster_pinup",
+"object": "1950s-style toadstool pin-up poster",
+"placement": "Dining wall",
+"type": "Decal"
+}
+metadata/guide_id = "DIN_poster_pinup"
+
+[node name="Paper" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_u30oc")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ue7wh")

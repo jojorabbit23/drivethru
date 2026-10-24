@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://props/building_decor/decoration.gd" id="1_u842j"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wccjx"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_kpani"]
+_surfaces = [{
+"aabb": AABB(-0.25, 0.0775, -0.02, 0.5, 0.025, 0.06),
+"attribute_data": PackedByteArray("8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/8qpM//KqTP/yqkz/"),
+"format": 34359738383,
+"material": SubResource("StandardMaterial3D_wccjx"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 36,
+"vertex_data": PackedByteArray("AACAvobr0T0K1yM9AACAPobr0T0K1yM9AACAvlK4nj0K1yM9AACAPobr0T0K1yM9AACAPlK4nj0K1yM9AACAvlK4nj0K1yM9AACAPobr0T0K16O8AACAvobr0T0K16O8AACAPlK4nj0K16O8AACAvobr0T0K16O8AACAvlK4nj0K16O8AACAPlK4nj0K16O8AACAPobr0T0K1yM9AACAPobr0T0K16O8AACAPlK4nj0K1yM9AACAPobr0T0K16O8AACAPlK4nj0K16O8AACAPlK4nj0K1yM9AACAvobr0T0K16O8AACAvobr0T0K1yM9AACAvlK4nj0K16O8AACAvobr0T0K1yM9AACAvlK4nj0K1yM9AACAvlK4nj0K16O8AACAPobr0T0K1yM9AACAvobr0T0K1yM9AACAPobr0T0K16O8AACAvobr0T0K1yM9AACAvobr0T0K16O8AACAPobr0T0K16O8AACAvlK4nj0K1yM9AACAPlK4nj0K1yM9AACAvlK4nj0K16O8AACAPlK4nj0K1yM9AACAPlK4nj0K16O8AACAvlK4nj0K16O8/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/")
+}]
+
+[node name="WIN_ticket_rail" type="Node3D"]
+script = ExtResource("1_u842j")
+mode = "ticket"
+hit_size = Vector3(0.6, 0.35, 0.25)
+hit_centre = Vector3(0, 0, 0)
+solid = true
+max_health = 50.0
+linked_path = NodePath("OrderRail")
+metadata/guide = {
+"behaviour": "Interactive: shows current orders",
+"id": "WIN_ticket_rail",
+"object": "Order ticket rail under warm light",
+"placement": "Above the grill",
+"type": "Prop + Light"
+}
+metadata/guide_id = "WIN_ticket_rail"
+metadata/reuses_existing = true
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_kpani")

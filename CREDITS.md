@@ -61,4 +61,5 @@ Garage motorcycle: owner-supplied "stylized motorcycle 3d model.glb", retained i
 
 Sawn-off sound selections: owner-supplied shotgun_sound_04.wav (fire), shotgun_sound_13.wav (shell insertion), shotgun_sound_14.wav (cock/open action), extracted from the owner-provided Shotgun sound (sound effect pack) video. Original split WAVs retained unchanged.
 
-Pistol firing: owner-selected gun_103.wav and gun_105.wav from the Gentler Cleanup sound pack, alternating per shot.
+Historical pistol audio alternatives: owner-selected gun_103.wav and gun_105.wav from the Gentler Cleanup sound pack (retained, currently inactive).
+Desert Eagle slide and shot: extracted from owner-supplied videoplayback.mp4; source retained under weapons/desert_eagle/audio/source/.
