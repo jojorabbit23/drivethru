@@ -30,6 +30,7 @@ const P = preload("res://core/palette.gd")
 const Economy = preload("res://game/economy.gd")
 const Icons = preload("res://game/icons.gd")
 const StorageBin = preload("res://game/storage_bin.gd")
+const GrinderStation = preload("res://game/grinder_station.gd")
 const Grill = preload("res://game/grill.gd")
 const CustomerWindow = preload("res://game/customer_window.gd")
 const ShopTerminal = preload("res://game/shop_terminal.gd")
@@ -53,6 +54,7 @@ var hatch: Node3D
 var tray: Node3D
 var rail: Node3D
 var storage: Node3D
+var grinder_station: Node3D
 var terminal: Node3D
 var bench: Node3D
 var delivery: Node3D
@@ -126,6 +128,8 @@ func _build_stations() -> void:
 	add_child(economy)
 	var iz := 4.75   # interior half-depth (tools/build_shop.gd: HALF_D - EXT_OUTER - EXT_INNER)
 	storage = _station(StorageBin, "MushroomStore", Vector3(0.55, 0.0, 1.4), 0.0)
+	# second drop-off at Codex's kitchen grinder (presentation/kitchen/visuals.gd)
+	grinder_station = _station(GrinderStation, "GrinderStation", Vector3(5.42, 0.95, -0.42), PI)
 	grill = _station(Grill, "Grill", Vector3(2.1, 0.92, -iz + 0.325), 0.0)
 	hatch = _station(CustomerWindow, "DriveThruWindow", Vector3(-3.0, 1.0, -5.0), 0.0)
 	serving_tray = _station(ServingTray,"ServingTray",Vector3(-3.0,1.02,-4.40),0.0)

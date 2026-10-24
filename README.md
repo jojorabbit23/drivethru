@@ -9,6 +9,18 @@ at both hatches. Quick boxing with every patty flipped at 40–60% adds a $2 tip
 Bike/rider visuals will be connected when the owner's models arrive. See
 [delivery integration notes](docs/handover/UNDEAD_DELIVERY.md).
 
+## Kitchen grinder
+
+The grinder on the kitchen sink counter is a second mushroom drop-off. Look at it
+with mushrooms in hand and press **E** to grind them: they go into the same stock
+as the storeroom bin (one patty per mushroom, as before), the crank turns and mince
+drops into its tray. While it's mid-cycle (about two seconds) it shows GRINDING...
+and E does nothing, so nothing is lost or counted twice. The storeroom bin still
+works and never waits; it also plays the grinder when it's free.
+Code: `game/grinder_station.gd` (transaction) driving Codex's
+`presentation/kitchen/grinder.gd` (visuals). Test: `tools/grinder_test.gd`.
+Renders: `tools/capture_grinder_station.gd`.
+
 ## Sawn-off sound update
 
 SAWN-OFF now uses the supplied explosive blast with a deeper bass impact. The
@@ -78,7 +90,7 @@ All 84 owned scripts parse; all 15 suites pass (validate, movement, zombie, ooze
 
 See docs/handover/FINAL_COMBINED.md for provenance, integration and verification. Esc now pauses; F1 toggles detailed controls. Audio, sensitivity and comfort settings persist between sessions. The kitchen uses calmer serving-room tiles and steel. See docs/handover/PRESENTATION_POLISH.md for this pass. Older sections below describe earlier development stages and may use superseded controls.
 
-Original sawn-off update: over-chamber reload hand, stronger recoil/report, brief vapor and 22 damage per pellet. Kitchen grinder/bin visuals and distant ambience are included. These props await Claude’s transaction/interaction wiring. See docs/handover/CODEX_SIDE_IMPLEMENTED.md and docs/video/sawn_off_updated.mp4.
+Original sawn-off update: over-chamber reload hand, stronger recoil/report, brief vapor and 22 damage per pellet. Kitchen grinder/bin visuals and distant ambience are included. The grinder is now a working drop-off (see Kitchen grinder below); the kitchen bin model is still visual-only. See docs/handover/CODEX_SIDE_IMPLEMENTED.md and docs/video/sawn_off_updated.mp4.
 
 ---
 

@@ -3,6 +3,8 @@
 # of each kind (common brown, blue, red) as icon + count.
 extends "res://game/station.gd"
 
+const GrinderStation = preload("res://game/grinder_station.gd")
+
 var _signs := {}
 var _pile: Array[MeshInstance3D] = []
 
@@ -74,5 +76,7 @@ func interact(player: Node) -> void:
 	var carrying: int = player.mushrooms
 	if carrying <= 0:
 		return
-	economy().store_all(player.drop_carried())
+	var n: int = economy().store_all(player.drop_carried())
 	Sfx.play_at(self, "thunk", global_position + Vector3(0, 0.5, 0))
+	# the kitchen grinder shows the mushrooms being minced, if it's free
+	GrinderStation.play_grinder(self, n)

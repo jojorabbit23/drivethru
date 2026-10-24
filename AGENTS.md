@@ -166,3 +166,5 @@ bench.hatch remains the original car hatch, active_hatch() returns the selected 
 Grill flip_fraction metadata must survive the patty warmer and assembly; shared
 BurgerItems.payment applies the accurate-flip bonus before freshness scaling.
 See docs/handover/UNDEAD_DELIVERY.md; run delivery_test.gd and capture_delivery.gd.
+
+Mushroom grinder: game/grinder_station.gd owns the deposit transaction at Codex's grinder (group mushroom_grinder; play_deposit is cosmetic only). Never create stock from the visual, and keep exactly one grinder model. Run tools/grinder_test.gd and tools/capture_grinder_station.gd.
