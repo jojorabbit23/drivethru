@@ -42,7 +42,9 @@ func run() -> void:
  var main: Node3D=load("res://main.tscn").instantiate()
  main.auto_spawn=false
  root.add_child(main)
- var gun: Node3D=main.player.get_node("Head/Camera3D/TestGun")
+ main.economy.cash=180
+ check(main.terminal.buy_desert_eagle(main.player),"gold pistol is purchased separately")
+ var gun: Node3D=main.player.weapon_named("DESERT EAGLE")
  gun.set_physics_process(false)
  gun._physics_process(0.4)
  gun.mag=5
@@ -54,8 +56,8 @@ func run() -> void:
  gun.set_active(true)
  gun.reload()
  gun._view_anim.seek(0.7,true)
- gun._physics_process(1.2)
- check(live_mag.position.is_equal_approx(mag_rest) and gun.mag==12 and gun.reserve==29,"completed reload restores rig and transfers exact ammo")
+ gun._physics_process(1.5)
+ check(live_mag.position.is_equal_approx(mag_rest) and gun.mag==7 and gun.reserve==19,"completed reload restores rig and transfers exact ammo")
  main.free()
  for i in 3:await process_frame
  print("%d failure(s)"%failures)

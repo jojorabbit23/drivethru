@@ -1,18 +1,22 @@
 # The pistol, slot 1. Lives under Head/Camera3D. Left click to fire.
 # Body shot 34, headshot x3 (one-shot kill on a Shambler).
 # The shot itself is still hitscan; the viewmodel
-# (weapons/pistol/pistol_viewmodel.tscn, tools/build_pistol.gd) uses the
-# owner's stylized pistol in Cleatimus's gloved hands. Code supplies draw rise
-# and recoil; its AnimationPlayer cycles the hammer, slide and magazine.
-# Owner-selected firing clips alternate through a bounded voice pool.
+# is selected per weapon: original teal starter or gold Desert Eagle, both
+# in Cleatimus's gloved hands. Code supplies draw rise and recoil; each
+# AnimationPlayer drives its own mechanical parts.
+# Starter pistol and purchasable Desert Eagle share mechanics and bounded audio voices.
 extends Node3D
 
 const Hitscan = preload("res://core/hitscan.gd")
 const Sfx = preload("res://game/sfx.gd")
-const MODEL := preload("res://weapons/pistol/pistol_viewmodel.tscn")
+@export var viewmodel_scene: PackedScene = preload("res://weapons/pistol/starter_pistol_viewmodel.tscn")
 
 # Rest pose (camera space): low right, muzzle forward.
-const SHOT_SOUNDS := [preload("res://weapons/pistol/audio/gun_103.wav"), preload("res://weapons/pistol/audio/gun_105.wav")]
+@export var shot_sounds: Array[AudioStream] = [preload("res://weapons/pistol/audio/shot.wav")]
+@export var slide_sound: AudioStream
+@export var shot_volume_db := -6.0
+var _slide_voice: AudioStreamPlayer
+var _reload_slide_played := false
 var _shot_voices: Array[AudioStreamPlayer] = []
 var _shot_index := 0
 const REST_POS := Vector3(0.13, -0.15, -0.26)
@@ -51,9 +55,14 @@ func set_active(on: bool) -> void:
 	active = on
 	if not on:
 		for voice in _shot_voices: voice.stop()
+		if _slide_voice: _slide_voice.stop()
 	_cooldown = maxf(_cooldown, 0.25)  # brief draw delay
 	if on:
 		_draw_t = DRAW_TIME
+		if _view_anim and _view_anim.has_animation("rack"):
+			_view_anim.speed_scale = 1.0
+			_view_anim.play("rack", 0.0)
+			_play_slide()
 	else:
 		_reloading = 0.0
 		if _view_anim:
@@ -68,12 +77,16 @@ func _ready() -> void:
 	for i in 4:
 		var voice := AudioStreamPlayer.new()
 		voice.bus = "Effects"
-		voice.volume_db = -6.0
+		voice.volume_db = shot_volume_db
 		add_child(voice)
 		_shot_voices.append(voice)
+	_slide_voice = AudioStreamPlayer.new()
+	_slide_voice.bus = "Effects"
+	_slide_voice.volume_db = -9.0
+	add_child(_slide_voice)
 	mag = mag_size
 	reserve = start_reserve
-	_pivot = MODEL.instantiate() as Node3D
+	_pivot = viewmodel_scene.instantiate() as Node3D
 	_pivot.name = "Pivot"
 	add_child(_pivot)
 	_pivot.visible = active
@@ -98,6 +111,9 @@ func _physics_process(delta: float) -> void:
 	_shot_t += delta
 	if _reloading > 0.0:
 		_reloading -= delta
+		if not _reload_slide_played and _reloading <= reload_time * (1.0 - 1.14 / 1.6):
+			_reload_slide_played = true
+			_play_slide()
 		if _reloading <= 0.0:
 			var n := mini(mag_size - mag, reserve)
 			mag += n
@@ -133,6 +149,7 @@ func add_ammo(n: int) -> void:
 func reload() -> void:
 	if not can_act() or _reloading > 0.0 or mag >= mag_size or reserve <= 0:
 		return
+	_reload_slide_played = false
 	_reloading = reload_time
 	_play_reload()
 	ammo_changed.emit(mag, reserve)
@@ -213,9 +230,14 @@ func shoot() -> Dictionary:
 func _play_shot() -> void:
 	if DisplayServer.get_name() == "headless": return
 	var voice: AudioStreamPlayer = _shot_voices[_shot_index % _shot_voices.size()]
-	voice.stream = SHOT_SOUNDS[_shot_index % SHOT_SOUNDS.size()]
+	voice.stream = shot_sounds[_shot_index % shot_sounds.size()]
 	voice.play()
 	_shot_index += 1
+
+func _play_slide() -> void:
+	if slide_sound == null or not _slide_voice or DisplayServer.get_name() == "headless": return
+	_slide_voice.stream = slide_sound
+	_slide_voice.play()
 
 func _spark(at: Vector3) -> void:
 	if DisplayServer.get_name() == "headless": return

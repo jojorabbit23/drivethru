@@ -25,7 +25,7 @@ func run() -> void:
   gun._cooldown=0.0
   gun.request_fire()
   assert(gun._shot_index==i+1,"successful shot advances audio")
-  assert(gun._shot_voices[i%4].stream==gun.SHOT_SOUNDS[i%2],"clips alternate")
+  assert(gun._shot_voices[i%4].stream==gun.shot_sounds[i%gun.shot_sounds.size()],"starter plays its original shot")
   assert(gun._shot_voices[i%4].playing,"selected clip plays")
   gun.request_fire()
   assert(gun._shot_index==i+1,"cooldown does not play another clip")
@@ -37,6 +37,6 @@ func run() -> void:
  assert(peak>.01 and peak<.99,"audible and unclipped")
  gun.set_active(false)
  assert(gun._shot_voices.all(func(v: AudioStreamPlayer)->bool:return not v.playing),"holster stops sound")
- print("Pistol audio: alternating clips, cooldown, holster, peak=",peak,"; 0 failure(s)")
+ print("Starter pistol audio: original sample, cooldown, holster, peak=",peak,"; 0 failure(s)")
  quit(0)
 

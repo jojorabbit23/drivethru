@@ -1,0 +1,450 @@
+[
+  {
+    "id": "EXT_roof_sign",
+    "object": "Mushroom-cap roof sign",
+    "type": "Prop + Light",
+    "placement": "Roof above entrance, visible from the lane",
+    "behaviour": "\"DRIVE THRU\" with the U missing; one dead bulb, one flickering amber; loses letters as the night goes on"
+  },
+  {
+    "id": "EXT_barricade_table",
+    "object": "Picnic table on its side",
+    "type": "Prop",
+    "placement": "Along zombie approach routes",
+    "behaviour": "Destructible; breaks into planks"
+  },
+  {
+    "id": "EXT_barricade_menu",
+    "object": "Menu board bolted across the door",
+    "type": "Prop",
+    "placement": "Front door",
+    "behaviour": "Destructible; final barricade"
+  },
+  {
+    "id": "EXT_barricade_cones",
+    "object": "Traffic cones",
+    "type": "Prop",
+    "placement": "Scattered around barricades",
+    "behaviour": "Knockable"
+  },
+  {
+    "id": "EXT_barricade_pallets",
+    "object": "Stacked pallets",
+    "type": "Prop",
+    "placement": "Barricade lines",
+    "behaviour": "Destructible"
+  },
+  {
+    "id": "EXT_tape_hazard",
+    "object": "Hazard tape",
+    "type": "Decal",
+    "placement": "On barricades",
+    "behaviour": "Tears when barricade is damaged"
+  },
+  {
+    "id": "EXT_decal_nowserving",
+    "object": "\"NOW SERVING\" vinyl, peeling",
+    "type": "Decal",
+    "placement": "Front windows",
+    "behaviour": "Cracks with the window"
+  },
+  {
+    "id": "EXT_decal_combo",
+    "object": "\"ASK ABOUT OUR COMBO\" vinyl, peeling",
+    "type": "Decal",
+    "placement": "Front windows",
+    "behaviour": "Cracks with the window"
+  },
+  {
+    "id": "EXT_plywood",
+    "object": "Plywood half-covering windows",
+    "type": "Prop",
+    "placement": "Front windows",
+    "behaviour": "Destructible"
+  },
+  {
+    "id": "EXT_sign_norefunds",
+    "object": "\"NO REFUNDS AFTER THE APOCALYPSE\"",
+    "type": "Sign",
+    "placement": "Beside the order window",
+    "behaviour": "-"
+  },
+  {
+    "id": "EXT_sign_limbs",
+    "object": "\"MANAGEMENT NOT RESPONSIBLE FOR LOST LIMBS\" plate",
+    "type": "Sign",
+    "placement": "Near the door",
+    "behaviour": "-"
+  },
+  {
+    "id": "EXT_fungus_shelf",
+    "object": "Shelf mushrooms",
+    "type": "Fungal",
+    "placement": "Gutters and base of the roof sign",
+    "behaviour": "Denser near zombie approach routes"
+  },
+  {
+    "id": "EXT_fungus_moss",
+    "object": "Glowing spore moss patches",
+    "type": "Fungal + Light",
+    "placement": "Corners of the building",
+    "behaviour": "Faint glow"
+  },
+  {
+    "id": "EXT_vehicle_pickup",
+    "object": "Rusted pickup, flat tyre",
+    "type": "Prop",
+    "placement": "Car park",
+    "behaviour": "Cover for the player"
+  },
+  {
+    "id": "EXT_vehicle_minivan",
+    "object": "Minivan, sliding door open",
+    "type": "Prop",
+    "placement": "Car park",
+    "behaviour": "Cover for the player"
+  },
+  {
+    "id": "EXT_decal_kidseatfree",
+    "object": "\"KIDS EAT FREE\" bumper sticker",
+    "type": "Decal",
+    "placement": "Minivan rear window",
+    "behaviour": "-"
+  },
+  {
+    "id": "LANE_menu_board",
+    "object": "Menu board, worn laminate, missing letters",
+    "type": "Prop + Sign",
+    "placement": "Start of the lane",
+    "behaviour": "Main place for menu text; damageable"
+  },
+  {
+    "id": "LANE_speaker_post",
+    "object": "Dented intercom with \"WELCOME\" sticker",
+    "type": "Prop",
+    "placement": "Beside the lane",
+    "behaviour": "Fungal threads curl from the grille"
+  },
+  {
+    "id": "LANE_clearance_bar",
+    "object": "\"MAX HEIGHT 2.1M\" bar bent into a hook",
+    "type": "Prop",
+    "placement": "Over the lane entrance",
+    "behaviour": "Something that isn't a rag hangs from it"
+  },
+  {
+    "id": "LANE_arrows",
+    "object": "Faded arrows",
+    "type": "Decal",
+    "placement": "Asphalt",
+    "behaviour": "-"
+  },
+  {
+    "id": "LANE_oil_stains",
+    "object": "Oil stains",
+    "type": "Decal",
+    "placement": "Asphalt",
+    "behaviour": "-"
+  },
+  {
+    "id": "LANE_claw_gouges",
+    "object": "Claw gouges",
+    "type": "Decal",
+    "placement": "Asphalt",
+    "behaviour": "-"
+  },
+  {
+    "id": "WIN_sliding_window",
+    "object": "Scratched sliding window",
+    "type": "Prop",
+    "placement": "Order window",
+    "behaviour": "Cracks as the barricades fall"
+  },
+  {
+    "id": "WIN_sign_knock",
+    "object": "Hand-written \"PLEASE KNOCK\"",
+    "type": "Sign",
+    "placement": "On the window",
+    "behaviour": "-"
+  },
+  {
+    "id": "WIN_bell",
+    "object": "Service bell, too loud",
+    "type": "Prop + Audio",
+    "placement": "Tray shelf",
+    "behaviour": "Interactive: player rings it"
+  },
+  {
+    "id": "WIN_tray_shelf",
+    "object": "Stainless counter with burn marks",
+    "type": "Prop",
+    "placement": "Under the window",
+    "behaviour": "Gameplay: serving tray"
+  },
+  {
+    "id": "WIN_napkins",
+    "object": "Battered napkin dispenser",
+    "type": "Prop",
+    "placement": "Tray shelf",
+    "behaviour": "-"
+  },
+  {
+    "id": "WIN_special_card",
+    "object": "Laminated \"TODAY'S SPECIAL\" card",
+    "type": "Sign",
+    "placement": "Tray shelf",
+    "behaviour": "-"
+  },
+  {
+    "id": "WIN_ticket_rail",
+    "object": "Order ticket rail under warm light",
+    "type": "Prop + Light",
+    "placement": "Above the grill",
+    "behaviour": "Interactive: shows current orders"
+  },
+  {
+    "id": "WIN_feedback_box",
+    "object": "Customer feedback box, three padlocks",
+    "type": "Prop",
+    "placement": "Wall by the window",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_grill",
+    "object": "Blackened stainless grill",
+    "type": "Prop",
+    "placement": "Kitchen centre",
+    "behaviour": "Gameplay: cooking station"
+  },
+  {
+    "id": "KIT_fryer",
+    "object": "Fryer",
+    "type": "Prop",
+    "placement": "Beside the grill",
+    "behaviour": "Gameplay: cooking station"
+  },
+  {
+    "id": "KIT_hood_vent",
+    "object": "Grease-stained hood vent",
+    "type": "Prop",
+    "placement": "Above the grill",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_sign_cleangrill",
+    "object": "\"CLEAN GRILL = HAPPY GRILL\"",
+    "type": "Sign",
+    "placement": "Wall by the grill",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_hooks_wall",
+    "object": "Aprons, hairnet, one-fingered oven glove, cleaver",
+    "type": "Prop",
+    "placement": "Kitchen wall",
+    "behaviour": "Cleaver could be a pickup"
+  },
+  {
+    "id": "KIT_prep_board",
+    "object": "Chipped cutting board and spatulas",
+    "type": "Prop",
+    "placement": "Prep counter",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_ticket_spike",
+    "object": "Ticket spike through old orders",
+    "type": "Prop",
+    "placement": "Prep counter",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_health_cert",
+    "object": "Framed health certificate, score smudged, expired",
+    "type": "Sign",
+    "placement": "Kitchen wall",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_rota",
+    "object": "Shift rota with one name crossed out",
+    "type": "Sign",
+    "placement": "Staff notice board",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_notice_washhands",
+    "object": "\"WASH HANDS\" reminder with a handprint",
+    "type": "Sign",
+    "placement": "Staff notice board",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_notice_infection",
+    "object": "\"IN CASE OF INFECTION\" flowchart",
+    "type": "Sign",
+    "placement": "Staff notice board",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_floor_tiles",
+    "object": "Checkerboard with grease patches",
+    "type": "Decal",
+    "placement": "Kitchen floor",
+    "behaviour": "-"
+  },
+  {
+    "id": "KIT_mop_bucket",
+    "object": "Mop bucket",
+    "type": "Prop",
+    "placement": "Corner",
+    "behaviour": "Knockable"
+  },
+  {
+    "id": "KIT_sign_wetfloor",
+    "object": "\"WET FLOOR\" sign",
+    "type": "Prop",
+    "placement": "Floor",
+    "behaviour": "Knockable"
+  },
+  {
+    "id": "DIN_booth",
+    "object": "Vinyl booth with duct-tape repairs, ketchup stains, mould",
+    "type": "Prop",
+    "placement": "Dining area",
+    "behaviour": "Cover; damageable"
+  },
+  {
+    "id": "DIN_poster_pinup",
+    "object": "1950s-style toadstool pin-up poster",
+    "type": "Decal",
+    "placement": "Dining wall",
+    "behaviour": "Tears as the night goes on"
+  },
+  {
+    "id": "DIN_calendar",
+    "object": "\"SPORE OF THE MONTH\" calendar stuck on March",
+    "type": "Sign",
+    "placement": "Dining wall",
+    "behaviour": "-"
+  },
+  {
+    "id": "DIN_standee_cleatimus",
+    "object": "\"CLEATIMUS SAYS: TRY THE DOUBLE!\" cut-out with a bite taken out",
+    "type": "Prop",
+    "placement": "Near the entrance",
+    "behaviour": "Knockable"
+  },
+  {
+    "id": "DIN_figurine_display",
+    "object": "\"COLLECT ALL 6 FUNGI FIGURINES\" display, five slots empty",
+    "type": "Prop",
+    "placement": "Counter",
+    "behaviour": "-"
+  },
+  {
+    "id": "DIN_jukebox",
+    "object": "Dead jukebox",
+    "type": "Prop",
+    "placement": "Dining area",
+    "behaviour": "Used as a weapons shelf"
+  },
+  {
+    "id": "DIN_clock",
+    "object": "Wall clock stopped at 12:00",
+    "type": "Prop",
+    "placement": "Dining wall",
+    "behaviour": "-"
+  },
+  {
+    "id": "BACK_crates",
+    "object": "Mushroom crates stencilled \"PREMIUM CAPS\" and \"DO NOT EAT RAW\"",
+    "type": "Prop",
+    "placement": "Storage room",
+    "behaviour": "Stackable cover; could hold ingredient pickups"
+  },
+  {
+    "id": "BACK_freezer_door",
+    "object": "Frosted freezer door with a handwritten \"DON'T.\"",
+    "type": "Prop + Sign",
+    "placement": "Storage room",
+    "behaviour": "Interactive: door"
+  },
+  {
+    "id": "BACK_desk",
+    "object": "Office desk",
+    "type": "Prop",
+    "placement": "Office",
+    "behaviour": "-"
+  },
+  {
+    "id": "BACK_plant_dead",
+    "object": "Dead plant",
+    "type": "Prop",
+    "placement": "On the desk",
+    "behaviour": "-"
+  },
+  {
+    "id": "BACK_phone_rotary",
+    "object": "Rotary phone, off the hook",
+    "type": "Prop",
+    "placement": "On the desk",
+    "behaviour": "-"
+  },
+  {
+    "id": "BACK_invoices",
+    "object": "Stack of unpaid invoices",
+    "type": "Prop",
+    "placement": "On the desk",
+    "behaviour": "-"
+  },
+  {
+    "id": "BACK_photo_eotm",
+    "object": "Framed \"EMPLOYEE OF THE MONTH\" photo",
+    "type": "Sign",
+    "placement": "Office wall",
+    "behaviour": "Photo could change each shift"
+  },
+  {
+    "id": "FX_light_fluoro",
+    "object": "Warm fluorescent tube",
+    "type": "Light",
+    "placement": "Each interior room",
+    "behaviour": "One per room flickers"
+  },
+  {
+    "id": "FX_light_fluoro_dead",
+    "object": "Dead fluorescent tube",
+    "type": "Prop",
+    "placement": "Each interior room",
+    "behaviour": "One per room"
+  },
+  {
+    "id": "FX_light_window_glow",
+    "object": "Window glow against dusk haze",
+    "type": "Light",
+    "placement": "Exterior windows",
+    "behaviour": "-"
+  },
+  {
+    "id": "FX_audio_ice_machine",
+    "object": "Ice machine clunk",
+    "type": "Audio",
+    "placement": "Kitchen",
+    "behaviour": "Random interval"
+  },
+  {
+    "id": "FX_audio_fridge_hum",
+    "object": "Fridge hum",
+    "type": "Audio",
+    "placement": "Kitchen and storage room",
+    "behaviour": "Looping"
+  },
+  {
+    "id": "FX_audio_hold_music",
+    "object": "Cheerful hold-music loop",
+    "type": "Audio",
+    "placement": "Intercom speaker",
+    "behaviour": "Looping"
+  }
+]

@@ -144,7 +144,7 @@ func _unhandled_input(event: InputEvent) -> void:
  if not can_act() or Input.mouse_mode!=Input.MOUSE_MODE_CAPTURED: return
  if event is InputEventKey and event.pressed and not event.echo:
   if event.physical_keycode==KEY_R: reload()
-  elif event.physical_keycode==KEY_F and not is_busy():
+  elif event.physical_keycode==KEY_I and not is_busy():
    state="inspect"
    clock=0.0
 func _physics_process(delta: float) -> void:

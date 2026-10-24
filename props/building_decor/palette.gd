@@ -1,0 +1,16 @@
+extends RefCounted
+# Local palette explicitly supplied with the owner's decoration guide.
+const TEAL=Color("#247C80")
+const LIGHT_TEAL=Color("#62B6B0")
+const DEEP_TEAL=Color("#164B53")
+const ORANGE=Color("#D9682B")
+const AMBER=Color("#F2AA4C")
+const RUST=Color("#86432F")
+const MIDNIGHT=Color("#172B3B")
+const SLATE=Color("#344B5B")
+const CHARCOAL=Color("#252A2E")
+const STEEL=Color("#69777B")
+const CREAM=Color("#E2D5B7")
+const OLIVE=Color("#73764D")
+const SPORE=Color("#ADC65A")
+const EMBER=Color("#B94435")

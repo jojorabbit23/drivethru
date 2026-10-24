@@ -14,6 +14,7 @@ const ZOMBIES := 8
 
 static func cast(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude: Array[RID] = []) -> Dictionary:
 	var wq := PhysicsRayQueryParameters3D.create(from, to, WORLD, exclude)
+	wq.collide_with_areas = true # lightweight decoration hit areas do not block movement
 	var world := space.intersect_ray(wq)
 	var limit := INF if world.is_empty() else from.distance_to(world["position"])
 	var hq := PhysicsRayQueryParameters3D.create(from, to, ZOMBIES, exclude)
