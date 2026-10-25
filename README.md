@@ -9,6 +9,17 @@ at both hatches. Quick boxing with every patty flipped at 40–60% adds a $2 tip
 Bike/rider visuals will be connected when the owner's models arrive. See
 [delivery integration notes](docs/handover/UNDEAD_DELIVERY.md).
 
+## Wave flow
+
+One new enemy type joins per wave and is announced: wave 1 Shamblers and
+Hollowheads, 2 Scuttlers, 3 Scientists, 4 Lancers. Waves 1-3 come single file,
+4-6 in pairs, 7-9 in threes, then fours, each group through different
+windows. Breaks grow from 20 s to 30 s, and a cleared wave reports its kills
+and cash. Toasts warn at 3 buns left, when supplies run out, and when a
+customer orders a mushroom you have none of anywhere. Two-burger orders get
+their extra patience from wave 1. Details: [docs/handover/WAVE_FLOW.md](docs/handover/WAVE_FLOW.md);
+simulate with `tools/wave_flow_sim.gd -- <waves> <kill_after_s> [--spawns]`.
+
 ## First-person arms (all weapons)
 
 Every weapon now uses shared rigged arms, recoloured to the palette (teal

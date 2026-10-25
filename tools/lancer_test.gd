@@ -229,7 +229,7 @@ func _run() -> void:
 
 	print("== waves")
 	await fresh()
-	main.wave = 2
+	main.wave = main.lancer_from_wave
 	main.set("_wave_left", 1)
 	main.set("_spawned", 4)
 	main.set("_spawn_t", 0.0)
@@ -237,9 +237,9 @@ func _run() -> void:
 	await frames(2)
 	main.auto_spawn = false
 	var lancers := get_root().find_children("Lancer*", "CharacterBody3D", true, false)
-	check(lancers.size() == 1, "wave 2: every 5th spawn is a Lancer")
+	check(lancers.size() == 1, "wave %d (Lancers join): every 5th spawn is a Lancer" % main.lancer_from_wave)
 	await fresh()
-	main.wave = 1
+	main.wave = main.lancer_from_wave - 1
 	main.set("_wave_left", 1)
 	main.set("_spawned", 4)
 	main.set("_spawn_t", 0.0)
@@ -247,7 +247,7 @@ func _run() -> void:
 	await frames(2)
 	main.auto_spawn = false
 	lancers = get_root().find_children("Lancer*", "CharacterBody3D", true, false)
-	check(lancers.is_empty(), "none in wave 1")
+	check(lancers.is_empty(), "none before wave %d" % main.lancer_from_wave)
 
 	print("== mixed crowd")
 	for spot in ["office desk", "kitchen line"]:

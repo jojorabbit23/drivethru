@@ -130,10 +130,12 @@ func run() -> void:
   await frames(180)
   check(enemy.state==enemy.State.HUNT or enemy.state==enemy.State.ATTACK,"scientist climbs through "+window.name+" and hunts")
   enemy.free()
- main._spawned=3;main._start_wave(1);main._spawn_t=0;main.auto_spawn=true
+ # scientists join at main.scientist_from_wave (one new enemy type per wave)
+ var w: int=main.scientist_from_wave
+ main._spawned=3;main._start_wave(w);main._spawn_t=0;main.auto_spawn=true
  main._physics_process(.016);main.auto_spawn=false
  var roster: Array=get_nodes_in_group("zombies")
- check(roster.size()==1 and roster[0].get_script().resource_path.ends_with("scientist.gd") and main._wave_left==main.wave_size(1)-1,"scientist uses one scheduled wave slot, never an extra swarm")
+ check(roster.size()==1 and roster[0].get_script().resource_path.ends_with("scientist.gd") and main._wave_left==main.wave_size(w)-1,"scientist uses one scheduled wave slot, never an extra swarm")
  main.free()
  await frames(3)
  print("%d failure(s)"%failures)

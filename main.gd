@@ -17,10 +17,18 @@ const HEALTH_PICKUP := preload("res://pickups/health/health_pickup.gd")
 @export var max_zombies := 12        # alive at once; pending wave enemies wait at the cap
 @export var scientist_every := 4     # occupies an ordinary wave slot, never adds enemies
 @export var scuttler_every := 3      # every Nth spawn is a Scuttler (0 = never)
-@export var lancer_every := 5        # from wave 2, every Nth spawn is a Lancer (0 = never; beats a Scuttler)
-@export var lancer_from_wave := 2
+@export var lancer_every := 5        # every Nth spawn is a Lancer (0 = never; beats a Scuttler)
+# One new enemy type per wave, each announced as it arrives: wave 1 is
+# Shamblers and Hollowheads only.
+@export var scuttler_from_wave := 2
+@export var scientist_from_wave := 3
+@export var lancer_from_wave := 4
+@export var max_group := 4           # later waves arrive in groups of up to this many
+const GROUP_STAGGER := 0.35          # seconds between members of one group
+const CAP_RETRY := 1.0               # a spawn held back by max_zombies retries this soon
 @export var drop_delay := 0.6        # seconds after a kill before its mushroom pops out
-@export var wave_break := 20.0       # seconds between clearing a wave and the next
+@export var wave_break := 20.0       # seconds between clearing wave 1 and wave 2;
+                                     # +2 s per wave after that, up to 30 s (orders grow too)
 @export var auto_collect := false    # accessibility: pickups fly to you from anywhere (F2)
 
 signal wave_started(n: int)
@@ -64,6 +72,10 @@ var _toast_t := 0.0
 
 var _spawn_t := 0.0
 var _spawned := 0
+var _group_left := 0                 # members of the current group still to spawn
+var _group_windows: Array[String] = []  # windows this group has used: spread it out
+var _wave_kills_at_start := 0
+var _wave_earned_at_start := 0
 var _last_sides: Array[String] = []  # recent lanes, to avoid long streaks on one side
 
 @onready var player: CharacterBody3D = $Player
@@ -105,7 +117,10 @@ func _ready() -> void:
 	player.held_changed.connect(func(_i): _update_status())
 	player.menu_changed.connect(_update_menu)
 	economy.changed.connect(_update_status)
-	hatch.customer_arrived.connect(func(_c): _toast("CUSTOMER AT THE WINDOW", P.ELECTRIC_TEAL))
+	hatch.customer_arrived.connect(func(c: Node):
+		_toast("CUSTOMER AT THE WINDOW", P.ELECTRIC_TEAL)
+		_warn_missing(c))
+	economy.changed.connect(_check_supplies)
 	hatch.customer_served.connect(func(c: int, tip: int):
 		var q: String = hatch.last_quality
 		_toast("%s  +$%d%s" % ["SALVAGE" if q == "burnt" else q.to_upper(), c + tip, ("  (tip $%d)" % tip) if tip > 0 else ""], P.AMBER_GLOW))
@@ -180,48 +195,95 @@ func _physics_process(delta: float) -> void:
 	if _wave_left > 0:
 		_spawn_t -= delta
 		if _spawn_t <= 0.0:
-			_spawn_t += wave_interval(wave)
-			# The cap delays a spawn; it must not erase enemies from the wave.
+			# The cap delays a spawn (soon retried); it must not erase enemies from the wave.
 			if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
+				_spawn_t = CAP_RETRY
 				return
+			if _group_left <= 0:
+				_group_left = mini(group_size(wave), _wave_left)
+				_group_windows.clear()
+			_group_left -= 1
+			# the next member of this group follows quickly; then the next group
+			_spawn_t += GROUP_STAGGER if _group_left > 0 else wave_interval(wave) * group_size(wave) - GROUP_STAGGER * (group_size(wave) - 1)
 			_wave_left -= 1
-			var n := _spawned + 1
-			if lancer_every > 0 and wave >= lancer_from_wave and n % lancer_every == 0:
-				spawn_lancer(_pick_window())
-			elif scuttler_every > 0 and n % scuttler_every == 0:
-				spawn_scuttler(_pick_window())
-			elif scientist_every > 0 and n % scientist_every == 0:
-				spawn_scientist(_pick_window())
-			elif n % 2 == 1:
-				spawn_hollowhead(_pick_window())
-			else:
-				spawn_zombie(_pick_window())
+			_spawn_next()
 	elif get_tree().get_nodes_in_group("zombies").is_empty():
 		if _break_t < 0.0:
-			_break_t = wave_break
+			_break_t = break_length(wave)
 			wave_cleared.emit(wave)
-			_toast("WAVE %d CLEARED" % wave, P.ELECTRIC_TEAL)
+			_toast("WAVE %d CLEARED  ·  %d KILLS  ·  +$%d" % [wave, _kills - _wave_kills_at_start, economy.earned - _wave_earned_at_start], P.ELECTRIC_TEAL)
 		_break_t -= delta
 		if _break_t <= 0.0:
 			_start_wave(wave + 1)
 
+# Which enemy the next wave slot is: a fixed rotation on the running spawn
+# count, each type joining from its own wave.
+func _spawn_next() -> void:
+	var n := _spawned + 1
+	var window := _pick_window(_group_windows)
+	_group_windows.append(window.name)
+	if lancer_every > 0 and wave >= lancer_from_wave and n % lancer_every == 0:
+		spawn_lancer(window)
+	elif scuttler_every > 0 and wave >= scuttler_from_wave and n % scuttler_every == 0:
+		spawn_scuttler(window)
+	elif scientist_every > 0 and wave >= scientist_from_wave and n % scientist_every == 0:
+		spawn_scientist(window)
+	elif n % 2 == 1:
+		spawn_hollowhead(window)
+	else:
+		spawn_zombie(window)
+
 func _start_wave(n: int) -> void:
 	wave = n
 	_wave_left = wave_size(n)
+	_group_left = 0
 	_spawn_t = first_zombie_delay if n == 1 else 0.5
 	_break_t = -1.0
+	_wave_kills_at_start = _kills
+	_wave_earned_at_start = economy.earned if economy else 0
 	wave_started.emit(n)
-	_toast("WAVE %d" % n, P.AMBER_GLOW)
+	_toast(wave_banner(n), P.AMBER_GLOW)
+
+# "WAVE 4  ·  LANCERS: AIM FOR THE CAP" when a new enemy type joins.
+func wave_banner(n: int) -> String:
+	var news := ""
+	if scuttler_every > 0 and n == scuttler_from_wave:
+		news = "SCUTTLERS: FAST AND LOW"
+	elif scientist_every > 0 and n == scientist_from_wave:
+		news = "SCIENTISTS: THE HEAD COMES OFF"
+	elif lancer_every > 0 and n == lancer_from_wave:
+		news = "LANCERS: THEY STAB THROUGH BOARDS"
+	elif group_size(n) > group_size(n - 1):
+		news = "THEY COME IN %s NOW" % {2: "PAIRS", 3: "THREES", 4: "FOURS"}.get(group_size(n), "GROUPS")
+	return "WAVE %d" % n + ("  ·  " + news if news != "" else "")
 
 static func wave_size(n: int) -> int:
 	return 4 + 2 * n
 
+# Average seconds per enemy (a group of g arrives every g x this).
 func wave_interval(n: int) -> float:
 	return maxf(5.0, spawn_interval + 1.0 - n)
 
-func _pick_window() -> Node3D:
+# Waves 1-3 arrive one at a time, 4-6 in pairs, 7-9 in threes, then fours.
+func group_size(n: int) -> int:
+	return clampi(1 + (n - 1) / 3, 1, max_group)
+
+func break_length(cleared: int) -> float:
+	return wave_break + minf(10.0, 2.0 * float(cleared - 1))
+
+# A random open window; never three in a row on one side, and (when there are
+# enough windows) not one this group has already used.
+func _pick_window(avoid: Array[String] = []) -> Node3D:
 	var windows := get_tree().get_nodes_in_group("windows")
-	var pick: Node3D = windows[randi() % windows.size()]
+	var fresh := windows.filter(func(w: Node): return not avoid.has(String(w.name)))
+	if fresh.is_empty():
+		fresh = windows
+	var pick: Node3D = fresh[randi() % fresh.size()]
+	if not avoid.is_empty():
+		_last_sides.append(pick.name)
+		if _last_sides.size() > 2:
+			_last_sides.pop_front()
+		return pick
 	if _last_sides.size() >= 2 and _last_sides[-1] == _last_sides[-2] and _last_sides[-1] == pick.name:
 		for w in windows:
 			if w.name != pick.name:
@@ -474,6 +536,50 @@ func _update_menu() -> void:
 		if o["enabled"]:
 			first = false
 		box.add_child(row)
+
+# QoL: say so when an order can't be made from anything you have, so the
+# player knows to hunt that colour (drops favour scarce kinds) or skip it.
+func _warn_missing(c: Node) -> void:
+	var missing := missing_kinds(c)
+	if not missing.is_empty():
+		_toast("NO %s MUSHROOMS FOR THIS ORDER" % " OR ".join(missing.map(func(k: String): return String(Economy.KIND_NAME[k]).to_upper())), P.BURNT_ORANGE)
+
+# Patty kinds an order still needs that are nowhere: not stored, not on the
+# grill (raw/cooking/ready), not in the warming tray, and no finished burger
+# of that recipe in hand or on the serving tray.
+func missing_kinds(c: Node) -> Array[String]:
+	var out: Array[String] = []
+	if c == null or not c.has_method("remaining_lines"):
+		return out
+	for line: Dictionary in c.remaining_lines():
+		var order: String = line.kind
+		var made := false
+		for b: Dictionary in player.burgers:
+			made = made or String(b.get("kind", "")) == order
+		if serving_tray:
+			for b: Dictionary in serving_tray.items:
+				made = made or (not b.is_empty() and String(b.get("kind", "")) == order)
+		if made:
+			continue
+		for kind: String in Recipes.patties(order):
+			if out.has(kind) or int(economy.stock[kind]) > 0:
+				continue
+			var cooking := false
+			for i in grill.slot_count():
+				cooking = cooking or (grill.kind_of(i) == kind and grill.state_of(i) != "" and grill.state_of(i) != "burnt")
+			if not cooking and not (tray and tray.has_kind(kind)):
+				out.append(kind)
+	return out
+
+# QoL: warn before the buns/toppings run out, and when they do.
+var _supply_warned := 99
+func _check_supplies() -> void:
+	var left: int = mini(economy.buns, economy.toppings)
+	if left == 0 and _supply_warned > 0:
+		_toast("OUT OF %s  ·  BUY SUPPLIES AT THE TERMINAL" % ("BUNS" if economy.buns <= 0 else "TOPPINGS"), P.BURNT_ORANGE)
+	elif left <= 3 and left > 0 and _supply_warned > 3:
+		_toast("%d %s LEFT  ·  BUY SUPPLIES SOON" % [left, "BUN" if left == 1 else "BUNS"], P.AMBER_GLOW)
+	_supply_warned = left if left <= 3 else 99
 
 func _toast(text: String, colour: Color) -> void:
 	if _hud.is_empty():

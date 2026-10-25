@@ -115,7 +115,9 @@ func spawn_customer(quantity: int=1) -> Node3D:
 		var kind: String=next_order if next_order!="" else Recipes.pick(e.served if e else 0)
 		for i in clampi(quantity,1,3):kinds.append(kind)
 	c.configure_order(kinds)
-	if automatic and wave>=3:c.patience+=Progression.patience_bonus(kinds,wave)
+	# extra patties buy extra time from the first wave (it used to start at wave 3,
+	# so an early two-burger order got no more time than a single)
+	if automatic:c.patience+=Progression.patience_bonus(kinds,wave)
 	c.patience *= patience_scale()
 	next_orders.clear()
 	c.vehicle = next_vehicle

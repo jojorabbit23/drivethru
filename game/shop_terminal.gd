@@ -92,7 +92,7 @@ func options(player: Node) -> Array:
 				back,
 			]
 		"serving":
-			return [_buy("Heated serving tray: 300s hot  $180",Economy.SERVING_HEATER_PRICE,"tray",buy_serving_heater.bind(player),not e.has_serving_heater,"Heated serving tray (installed)"),back]
+			return [_buy("Heated serving tray: 300s hot  $%d" % Economy.SERVING_HEATER_PRICE,Economy.SERVING_HEATER_PRICE,"tray",buy_serving_heater.bind(player),not e.has_serving_heater,"Heated serving tray (installed)"),back]
 		"upgrades":
 			var opts := []
 			var next: Array = e.next_grill()
