@@ -27,9 +27,11 @@ camera, not the gun; for the long guns' far fore-ends the shoulder swings
 down below the frame. Finger pose comes from one frame of the pack's own
 animation; the knife closes the trigger finger into a fist.
 
-- Fits (how a rig's hand sits in each old hand frame): long guns and blades by
-  ICP, `tools/fps_arms_fit_export.gd` then `python3 tools/fps_arms_fit.py`
-  (needs SciPy); handguns by `tools/fps_arms_gun_fit.gd`, from how the Pistol 43
+- Fits (how a rig's hand sits in each old hand frame): long guns and blades
+  start from the grip frame (knuckle line along the grip/fore-end, palm facing
+  it; blades from the old PSX hand's finger bones) and ICP refines:
+  `tools/fps_arms_fit_export.gd`, `tools/fps_arms_frames_export.gd`, then
+  `python3 tools/fps_arms_fit.py` (needs SciPy); handguns by `tools/fps_arms_gun_fit.gd`, from how the Pistol 43
   hand holds its own Glock (ICP alone turned the pistol fingers backwards).
   Paste the output into `FITS`. Close-ups: `tools/capture_fps_arms_close.gd`.
 - Test: `tools/fps_arms_test.gd` (hands within 1 cm of the grips through idle,

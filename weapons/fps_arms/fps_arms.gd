@@ -42,7 +42,7 @@ const RIGS := {
 # and an optional rig scale (long guns: the old hands were ~1.18x the AKS hands,
 # and the bigger arm keeps the slid shoulder below the frame).
 const FITS := {
-	# long guns and blades: tools/fps_arms_fit.py (trimmed ICP of the AKS hand onto each old hand)
+	# long guns and blades: tools/fps_arms_fit.py (grip-frame start, then trimmed ICP onto each old hand)
 	# handguns: tools/fps_arms_gun_fit.gd (the rig's own hand-on-Glock grip, scaled to our
 	# pistol; support hand = that grip mirrored and wrapped over the right fingers;
 	# per-gun nudges from the owner's playtest)
@@ -52,17 +52,17 @@ const FITS := {
 	"desert_eagle": {"rig": "pistol43", "r": [Vector3(0.0573, -0.0118, 0.0558), Vector3(-52.7, 132.4, -82.1)],
 		"l": [Vector3(-0.0505, -0.0734, 0.0492), Vector3(-49.6, -72.7, 5.8)], "scale": 1.30, "one_handed": true,
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": false},
-	"pump": {"r": [Vector3(0.0116, 0.0215, 0.0704), Vector3(2.2, -1.6, 164.4)],
-		"l": [Vector3(-0.0881, -0.0134, -0.0246), Vector3(-9.0, -175.6, 97.3)],
+	"pump": {"r": [Vector3(-0.0872, -0.0324, 0.0746), Vector3(-40.3, 12.3, -98.8)],
+		"l": [Vector3(-0.0746, -0.0784, -0.0051), Vector3(66.5, 176.8, 71.4)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-0.6, -1.4, 0.2), "fist": false, "scale": 1.25},
-	"crop_duster": {"r": [Vector3(0.0306, 0.0567, 0.0390), Vector3(2.3, -162.6, 143.7)],
-		"l": [Vector3(-0.1392, 0.0459, 0.0792), Vector3(-73.6, 49.0, -132.2)],
+	"crop_duster": {"r": [Vector3(0.1975, -0.0051, 0.0534), Vector3(-29.8, 161.9, -86.3)],
+		"l": [Vector3(0.0273, -0.0088, 0.0731), Vector3(63.6, 41.4, 135.3)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-0.6, -1.4, 0.2), "fist": false, "scale": 1.25},
-	"dagger": {"r": [Vector3(-0.0180, 0.0377, -0.0656), Vector3(-6.4, -76.7, -86.1)],
-		"l": [Vector3(-0.0758, 0.0886, -0.0120), Vector3(53.8, -126.5, -134.4)],
+	"dagger": {"r": [Vector3(-0.0041, -0.0097, 0.0029), Vector3(-19.4, -96.1, -32.3)],
+		"l": [Vector3(0.0321, 0.0087, -0.0025), Vector3(-29.6, 92.7, 31.7)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": true},
-	"knife": {"r": [Vector3(0.0789, 0.0963, 0.0779), Vector3(35.7, 20.5, 175.9)],
-		"l": [Vector3(-0.0758, 0.0886, -0.0120), Vector3(53.8, -126.5, -134.4)],
+	"knife": {"r": [Vector3(0.0432, -0.0072, -0.0063), Vector3(21.0, -96.9, -48.0)],
+		"l": [Vector3(0.0321, 0.0087, -0.0025), Vector3(-29.6, 92.7, 31.7)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": true},
 }
 

@@ -34,9 +34,16 @@ func run() -> void:
 	w.set_meta("purchased", true)
 	player.switch_weapon(player.weapons.find(w))
 	await wait(40)
-	var muzzle: Node3D = w.find_child("MuzzleTip", true, false)
-	var centre: Vector3 = w.find_child("Pivot", true, false).global_position if w.find_child("Pivot", true, false) else w.global_position
-	centre = centre.lerp(muzzle.global_position, 0.3) if muzzle else centre
+	# aim at the right hand (where the grip is); fall back to the weapon
+	var arms: Node = w.find_child("FpsArms", true, false)
+	var centre: Vector3 = w.global_position
+	if arms:
+		arms._solve()
+		centre = (arms.hand_global("r") as Transform3D).origin
+		if float(arms.left_weight) > 0.5:
+			centre = centre.lerp((arms.hand_global("l") as Transform3D).origin, 0.35)
+	elif w.find_child("MuzzleTip", true, false):
+		centre = (w.find_child("MuzzleTip", true, false) as Node3D).global_position
 	var eye := Camera3D.new()
 	eye.near = 0.01
 	eye.fov = 45
@@ -45,7 +52,7 @@ func run() -> void:
 	var views := [b * Vector3(1, 0.15, 0.1), b * Vector3(0, 1, 0.05), b * Vector3(-0.8, 0.3, -0.6), b * Vector3(0.2, -0.9, -0.4)]
 	var out := Image.create(1600, 1200, false, Image.FORMAT_RGBA8)
 	for i in views.size():
-		eye.global_position = centre + (views[i] as Vector3).normalized() * 0.5
+		eye.global_position = centre + (views[i] as Vector3).normalized() * 0.42
 		eye.look_at(centre, b.y if i != 1 else -b.z)
 		eye.current = true
 		await wait(3)
