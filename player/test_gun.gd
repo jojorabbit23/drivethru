@@ -11,6 +11,7 @@ const Hitscan = preload("res://core/hitscan.gd")
 const Sfx = preload("res://game/sfx.gd")
 const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
 @export var viewmodel_scene: PackedScene = preload("res://weapons/pistol/starter_pistol_viewmodel.tscn")
+@export var arms_fit := "pistol"   # weapons/fps_arms/fps_arms.gd FITS entry
 
 # Rest pose (camera space): low right, muzzle forward.
 @export var shot_sounds: Array[AudioStream] = [preload("res://weapons/pistol/audio/shot.wav")]
@@ -99,7 +100,7 @@ func _ready() -> void:
 	# shared AKS arms reach for the old hand sockets (weapons/fps_arms/fps_arms.gd)
 	var right: Node3D = _pivot.get_node("Model/GripSocket/RightHand")
 	var left: Node3D = _pivot.get_node("Model/SupportSocket/LeftHand")
-	_arms = FpsArms.attach(_pivot, right, left, "pistol", [right, left])
+	_arms = FpsArms.attach(_pivot, right, left, arms_fit, [right, left])
 	_flash = OmniLight3D.new()
 	_flash.light_color = Color("#F3A34D")
 	_flash.light_energy = 0.0

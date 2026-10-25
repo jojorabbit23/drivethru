@@ -44,9 +44,13 @@ const RIGS := {
 const FITS := {
 	# long guns and blades: tools/fps_arms_fit.py (trimmed ICP of the AKS hand onto each old hand)
 	# handguns: tools/fps_arms_gun_fit.gd (the rig's own hand-on-Glock grip, scaled to our
-	# pistol; support hand = that grip mirrored and wrapped over the right fingers)
-	"pistol": {"rig": "pistol43", "r": [Vector3(0.0518, -0.0065, 0.0436), Vector3(-52.7, 132.4, -82.1)],
-		"l": [Vector3(-0.0458, -0.0623, 0.0412), Vector3(-49.6, -72.7, 5.8)], "scale": 1.30, "one_handed": true,
+	# pistol; support hand = that grip mirrored and wrapped over the right fingers;
+	# per-gun nudges from the owner's playtest)
+	"pistol": {"rig": "pistol43", "r": [Vector3(0.0527, -0.0118, 0.0409), Vector3(-52.7, 132.4, -82.1)],
+		"l": [Vector3(-0.0479, -0.0585, 0.0453), Vector3(-49.6, -72.7, 5.8)], "scale": 1.30, "one_handed": true,
+		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": false},
+	"desert_eagle": {"rig": "pistol43", "r": [Vector3(0.0573, -0.0118, 0.0558), Vector3(-52.7, 132.4, -82.1)],
+		"l": [Vector3(-0.0505, -0.0734, 0.0492), Vector3(-49.6, -72.7, 5.8)], "scale": 1.30, "one_handed": true,
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": false},
 	"pump": {"r": [Vector3(0.0116, 0.0215, 0.0704), Vector3(2.2, -1.6, 164.4)],
 		"l": [Vector3(-0.0881, -0.0134, -0.0246), Vector3(-9.0, -175.6, 97.3)],
