@@ -23,6 +23,8 @@ func worst_error(arms: Node) -> float:
 	arms._solve()
 	var worst := 0.0
 	for side in ["r", "l"]:
+		if side == "l" and float(arms.left_weight) < 0.999:
+			continue   # one-handed rig: the left hand is easing in/out or resting off screen
 		var ref: Node3D = arms.right_ref if side == "r" else arms.left_ref
 		var off: Transform3D = arms.right_offset if side == "r" else arms.left_offset
 		var goal: Transform3D = ref.global_transform * off
@@ -88,9 +90,16 @@ func run() -> void:
 			w.mag = 0 if name != "pump" else 3
 		if w.has_method("reload"):
 			w.reload()
+		var peak_left := 0.0
 		for i in 40:
 			await wait(1)
 			worst = maxf(worst, worst_error(arms))
+			peak_left = maxf(peak_left, float(arms.left_weight))
+		if name in ["pistol", "desert_eagle"]:
+			check(peak_left > 0.99, "%s: one-handed, the left hand comes in for the reload (peak %.2f)" % [name, peak_left])
+			for i in 60:
+				await wait(1)
+			check(float(arms.left_weight) < 0.01, "%s: left hand rests off screen after the reload" % name)
 		check(worst < 0.01, "%s: hands stay on the grips through idle/fire/reload (worst %.4f m)" % [name, worst])
 		check(arms.reach_error["r"] < 0.005 and arms.reach_error["l"] < 0.005, "%s: both arms reach" % name)
 	# only the equipped weapon's arms show

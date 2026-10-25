@@ -11,10 +11,12 @@ Bike/rider visuals will be connected when the owner's models arrive. See
 
 ## First-person arms (all weapons)
 
-Every weapon (pistol, Desert Eagle, knife, dagger, Crop Duster, pump) now
-uses one shared pair of arms: the AKS-74U hands pack by Vlasov Daniil (CC BY
-4.0, see CREDITS), recoloured to the palette (teal gloves, burnt-orange
-sleeves, charcoal cuffs) and decimated to about a third of its triangles.
+Every weapon now uses shared rigged arms, recoloured to the palette (teal
+gloves, burnt-orange sleeves, charcoal cuffs) and decimated: the AKS-74U hands
+(knife, dagger, Crop Duster, pump) and the Pistol 43 hands (pistol, Desert
+Eagle), both by Vlasov Daniil (see CREDITS). The handguns fire one-handed, the
+way the Pistol 43 rig is authored; the left hand comes up only to change the
+magazine (`left_weight`, driven by the reload in `player/test_gun.gd`).
 
 How it works (`weapons/fps_arms/fps_arms.gd`): each weapon keeps all of its
 own animation and hands over two reference nodes, where its old right and
@@ -25,9 +27,11 @@ camera, not the gun; for the long guns' far fore-ends the shoulder swings
 down below the frame. Finger pose comes from one frame of the pack's own
 animation; the knife closes the trigger finger into a fist.
 
-- Fits (how the AKS hand sits in each old hand frame) were solved by ICP:
-  `tools/fps_arms_fit_export.gd` then `python3 tools/fps_arms_fit.py` (needs
-  SciPy). Paste its output into `FITS`.
+- Fits (how a rig's hand sits in each old hand frame): long guns and blades by
+  ICP, `tools/fps_arms_fit_export.gd` then `python3 tools/fps_arms_fit.py`
+  (needs SciPy); handguns by `tools/fps_arms_gun_fit.gd`, from how the Pistol 43
+  hand holds its own Glock (ICP alone turned the pistol fingers backwards).
+  Paste the output into `FITS`. Close-ups: `tools/capture_fps_arms_close.gd`.
 - Test: `tools/fps_arms_test.gd` (hands within 1 cm of the grips through idle,
   fire and reload on every weapon; old hands hidden; only the equipped arms show).
 - Renders: `tools/capture_fps_arms.gd` (`docs/previews/fps_arms_*.png`),

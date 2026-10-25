@@ -17,6 +17,7 @@ const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
 @export var slide_sound: AudioStream
 @export var shot_volume_db := -6.0
 var _slide_voice: AudioStreamPlayer
+var _arms: Node3D   # shared Pistol 43 arms: shoots one-handed, left hand in for reloads
 var _reload_slide_played := false
 var _shot_voices: Array[AudioStreamPlayer] = []
 var _shot_index := 0
@@ -98,7 +99,7 @@ func _ready() -> void:
 	# shared AKS arms reach for the old hand sockets (weapons/fps_arms/fps_arms.gd)
 	var right: Node3D = _pivot.get_node("Model/GripSocket/RightHand")
 	var left: Node3D = _pivot.get_node("Model/SupportSocket/LeftHand")
-	FpsArms.attach(_pivot, right, left, "pistol", [right, left])
+	_arms = FpsArms.attach(_pivot, right, left, "pistol", [right, left])
 	_flash = OmniLight3D.new()
 	_flash.light_color = Color("#F3A34D")
 	_flash.light_energy = 0.0
@@ -272,6 +273,8 @@ func _animate(delta: float) -> void:
 	# Match the magazine's extraction/insertion phases, then settle back onto the grip.
 	var magazine_travel: float = smoothstep(0.1, 0.275, progress) * (1.0 - smoothstep(0.4375, 0.70625, progress))
 	_support.position += Vector3(-0.025, -0.03, -0.01) * release + Vector3(0.0, -0.13, -0.03) * magazine_travel
+	if _arms:
+		_arms.left_weight = release
 	var pos := REST_POS
 	var rot := REST_ROT
 	# Bring the magazine well into view while the support hand changes the magazine.

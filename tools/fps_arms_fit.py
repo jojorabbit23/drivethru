@@ -17,7 +17,8 @@ from scipy.spatial.transform import Rotation
 
 PAIRS = {  # weapon: [(aks cloud, old cloud)] for right, left
     'pump': [('aks_r', 'pump_r'), ('aks_l', 'pump_l')],
-    'pistol': [('aks_r', 'pistol_r'), ('aks_l', 'pistol_l')],
+    # Pistol 43 rig, used at 1.7x (FITS "scale"): its hands are ~0.6x our pistols'
+    'pistol': [('aks_r_p43', 'pistol_r', 1.7), ('aks_l_p43', 'pistol_l', 1.7)],   # right hand: use fps_arms_gun_fit.gd
     'crop_duster': [('aks_r', 'crop_r'), ('aks_l', 'crop_l')],
     'knife': [('aks_r_fist', 'knife_r'), ('aks_l', 'knife_l')],
     'dagger': [('aks_r_fist', 'dagger_r'), ('aks_l', 'knife_l')],
@@ -89,8 +90,10 @@ def fit(aks, old):
 def main(d):
     for weapon, pairs in PAIRS.items():
         out = []
-        for side, (a, o) in zip('rl', pairs):
-            t, rot, err, ratio = fit(load(d, a), load(d, o))
+        for side, pair in zip('rl', pairs):
+            a, o = pair[0], pair[1]
+            scale = pair[2] if len(pair) > 2 else 1.0
+            t, rot, err, ratio = fit(load(d, a) * scale, load(d, o))
             out.append('"%s": [Vector3(%.4f, %.4f, %.4f), Vector3(%.1f, %.1f, %.1f)]' % (side, *t, *rot))
             print('# %s %s: rms %.4f m, old/new hand size %.2f' % (weapon, side, err, ratio))
         print('"%s": {%s}' % (weapon, ', '.join(out)))

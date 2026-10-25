@@ -42,7 +42,9 @@ func skinned(mi: MeshInstance3D, sk: Skeleton3D, bone_name: String, skip_native 
 			b = sk.find_bone(skin.get_bind_name(i))
 		bind_bone.append(b)
 		mats.append(sk.get_bone_global_pose(b) * skin.get_bind_pose(i))
-	var frame_inv := sk.get_bone_global_pose(bone).affine_inverse()
+	# metric hand frame: world space, scale removed (some rigs carry bone scale)
+	var frame: Transform3D = sk.global_transform * sk.get_bone_global_pose(bone)
+	var frame_inv := Transform3D(frame.basis.orthonormalized(), frame.origin).affine_inverse() * sk.global_transform
 	var out := PackedVector3Array()
 	for s in mi.mesh.get_surface_count():
 		var a := mi.mesh.surface_get_arrays(s)
@@ -73,16 +75,23 @@ func rigid(mi: MeshInstance3D) -> PackedVector3Array:
 	return out
 
 func run() -> void:
-	# the shared arms at their captured grip pose (open and fist)
-	for fist in [false, true]:
+	# the shared arms at their captured grip pose (AKS open and fist; Pistol 43)
+	for variant in [["aks", false, ""], ["aks", true, "_fist"], ["pistol43", false, "_p43"]]:
 		var arms: Node3D = FpsArms.new()
-		arms.fist = fist
+		arms.rig = variant[0]
+		arms.fist = variant[1]
 		root.add_child(arms)
 		await process_frame
 		var sk: Skeleton3D = arms.skeleton
 		for side in ["r", "l"]:
 			var bone_name: String = sk.get_bone_name(arms._arms[side]["hand"])
-			save("aks_%s%s" % [side, "_fist" if fist else ""], skinned(arms.mesh, sk, bone_name))
+			var pts := PackedVector3Array()
+			for mi in arms.meshes:
+				pts.append_array(skinned(mi, sk, bone_name))
+			save("aks_%s%s" % [side, variant[2]], pts)
+			var up: Vector3 = sk.global_transform * sk.get_bone_global_pose(arms._arms[side]["upper"]).origin
+			var hd: Vector3 = sk.global_transform * sk.get_bone_global_pose(arms._arms[side]["hand"]).origin
+			print("rig ", variant[0], " ", side, " shoulder ", up, " hand ", hd, " reach ", up.distance_to(hd))
 		arms.queue_free()
 	# rigid old hands
 	var pump: Node3D = load("res://weapons/shotgun/shotgun_model.tscn").instantiate()
