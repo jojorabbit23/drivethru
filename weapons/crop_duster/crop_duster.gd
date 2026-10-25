@@ -5,6 +5,7 @@ signal fired
 signal ammo_changed
 const P=preload("res://core/palette.gd")
 const Hitscan=preload("res://core/hitscan.gd")
+const FpsArms=preload("res://weapons/fps_arms/fps_arms.gd")
 const VIEWMODEL=preload("res://weapons/crop_duster/crop_duster_viewmodel.tscn")
 const SHOT_SOUND=preload("res://weapons/crop_duster/audio/shotgun_sound_04.wav")
 const SHELL_SOUND=preload("res://weapons/crop_duster/audio/shotgun_sound_13.wav")
@@ -113,6 +114,9 @@ func _ready() -> void:
   Sounds.sound("mechanism")
  _vapour=preload("res://weapons/crop_duster/muzzle_vapour.gd").new()
  add_child(_vapour)
+ # shared AKS arms reach for the PSX hands, which keep animating but are hidden
+ var right: Node3D=_arms.find_child("fp_pump_shotgun_hand_r",true,false)
+ FpsArms.attach(_pivot,right,_left_hand,"crop_duster",[_arms.find_child("fp_pump_shotgun",true,false),right,_left_hand,_left_forearm])
  visible=false
  _pose(0.0)
 func set_active(on: bool) -> void:

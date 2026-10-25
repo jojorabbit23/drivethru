@@ -168,3 +168,5 @@ BurgerItems.payment applies the accurate-flip bonus before freshness scaling.
 See docs/handover/UNDEAD_DELIVERY.md; run delivery_test.gd and capture_delivery.gd.
 
 Mushroom grinder: game/grinder_station.gd owns the deposit transaction at Codex's grinder (group mushroom_grinder; play_deposit is cosmetic only). Never create stock from the visual, and keep exactly one grinder model. Run tools/grinder_test.gd and tools/capture_grinder_station.gd.
+
+First-person arms: every weapon uses the shared AKS arms in weapons/fps_arms/ (fps_arms.gd; CC BY 4.0 credit in CREDITS.md). Weapons keep their own animation and old hand nodes; FpsArms.attach() hides the old hand meshes and IK-follows those nodes. Don't re-show or delete the old hand nodes: they are the IK targets. When a weapon's hand placement changes, re-solve FITS with tools/fps_arms_fit_export.gd + tools/fps_arms_fit.py. Run tools/fps_arms_test.gd and render tools/capture_fps_arms.gd.

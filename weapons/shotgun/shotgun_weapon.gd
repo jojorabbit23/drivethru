@@ -17,6 +17,7 @@ const Hitscan = preload("res://core/hitscan.gd")
 const Sfx = preload("res://game/sfx.gd")
 const Palette = preload("res://core/palette.gd")
 const MODEL := preload("res://weapons/shotgun/shotgun_model.tscn")
+const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
 
 signal hit(target: Node, headshot: bool, killed: bool)
 signal fired
@@ -107,6 +108,10 @@ func _ready() -> void:
 	_flash_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	muzzle.add_child(_flash_mesh)
 	_set_pose(REST_POS, REST_ROT)
+	# shared AKS arms reach for the old hand sockets (weapons/fps_arms/fps_arms.gd)
+	var right: Node3D = _pivot.get_node("GripSocket/RightHand")
+	var left: Node3D = _pivot.get_node("Pump/PumpSocket/LeftHand")
+	FpsArms.attach(_pivot, right, left, "pump", [right, left])
 	visible = active
 
 # a chunky 12 px pixel star for the muzzle flash

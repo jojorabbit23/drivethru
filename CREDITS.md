@@ -4,6 +4,8 @@
 
 PSX FPS Arms Free by heyheythere - https://heyheythere.itch.io/psx-fps-arms-free - CC BY 4.0
 
+First-person arms on every weapon: "Animated AKs-74u" by Vlasov Daniil (https://sketchfab.com/dan741vlasov) - https://sketchfab.com/3d-models/animated-aks-74u-34220aaa62e44b34b7d5ac30701f2b5f - CC BY 4.0. Modified for The Drive Thru: recoloured to the game palette, decimated (20,476 to 6,308 triangles), textures downscaled; the arms are re-posed in game by IK. File: weapons/fps_arms/source/aks74u_hands.glb.
+
 The source pack and its complete licence are kept in `addons/psx_fps_arms/`. Project adaptations: a palette atlas copy, orange sleeves, charcoal cuffs, teal fingerless gloves, dirty fingertips, left-wrist 4:20 watch, viewmodel materials and knife attachment. The original atlas and corrected knife rig remain unchanged.
 
 ## Project assets

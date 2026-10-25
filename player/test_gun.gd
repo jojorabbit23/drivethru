@@ -9,6 +9,7 @@ extends Node3D
 
 const Hitscan = preload("res://core/hitscan.gd")
 const Sfx = preload("res://game/sfx.gd")
+const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
 @export var viewmodel_scene: PackedScene = preload("res://weapons/pistol/starter_pistol_viewmodel.tscn")
 
 # Rest pose (camera space): low right, muzzle forward.
@@ -94,6 +95,10 @@ func _ready() -> void:
 	_support = _pivot.get_node("Model/SupportSocket")
 	_support_rest = _support.transform
 	_set_pose(REST_POS, REST_ROT)
+	# shared AKS arms reach for the old hand sockets (weapons/fps_arms/fps_arms.gd)
+	var right: Node3D = _pivot.get_node("Model/GripSocket/RightHand")
+	var left: Node3D = _pivot.get_node("Model/SupportSocket/LeftHand")
+	FpsArms.attach(_pivot, right, left, "pistol", [right, left])
 	_flash = OmniLight3D.new()
 	_flash.light_color = Color("#F3A34D")
 	_flash.light_energy = 0.0

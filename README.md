@@ -9,6 +9,33 @@ at both hatches. Quick boxing with every patty flipped at 40–60% adds a $2 tip
 Bike/rider visuals will be connected when the owner's models arrive. See
 [delivery integration notes](docs/handover/UNDEAD_DELIVERY.md).
 
+## First-person arms (all weapons)
+
+Every weapon (pistol, Desert Eagle, knife, dagger, Crop Duster, pump) now
+uses one shared pair of arms: the AKS-74U hands pack by Vlasov Daniil (CC BY
+4.0, see CREDITS), recoloured to the palette (teal gloves, burnt-orange
+sleeves, charcoal cuffs) and decimated to about a third of its triangles.
+
+How it works (`weapons/fps_arms/fps_arms.gd`): each weapon keeps all of its
+own animation and hands over two reference nodes, where its old right and
+left hands were. Every frame the arms reach for them with two-bone IK
+(elbow on a pole, hand matching the reference, forearm twist spread over the
+twist bones) and the old hand meshes are hidden. The arms hang from the
+camera, not the gun; for the long guns' far fore-ends the shoulder swings
+down below the frame. Finger pose comes from one frame of the pack's own
+animation; the knife closes the trigger finger into a fist.
+
+- Fits (how the AKS hand sits in each old hand frame) were solved by ICP:
+  `tools/fps_arms_fit_export.gd` then `python3 tools/fps_arms_fit.py` (needs
+  SciPy). Paste its output into `FITS`.
+- Test: `tools/fps_arms_test.gd` (hands within 1 cm of the grips through idle,
+  fire and reload on every weapon; old hands hidden; only the equipped arms show).
+- Renders: `tools/capture_fps_arms.gd` (`docs/previews/fps_arms_*.png`),
+  film `tools/film_fps_arms.gd` (`docs/video/fps_arms.mp4`).
+  `FPS_ARMS_OFF=1` shows the old hands only; `FPS_ARMS_SHOW_OLD=1` both.
+- Rebuilding the GLB from the Sketchfab download: `tools/fps_arms_source/`
+  (`process.py`; decimation by Godot's own simplifier in `decimate.gd`).
+
 ## Kitchen grinder
 
 The grinder on the kitchen sink counter is a second mushroom drop-off. Look at it

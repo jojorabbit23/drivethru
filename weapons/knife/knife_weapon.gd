@@ -25,6 +25,7 @@ const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
+const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
 
 @export var slash_damage := 40.0
 @export var stab_damage := 75.0
@@ -89,6 +90,21 @@ func _ready() -> void:
 	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
+	# shared AKS arms follow the PSX hand bones, whose meshes are hidden
+	var hands: Array[Node3D] = []
+	for bone in ["hand_r", "hand_l"]:
+		var follow := BoneAttachment3D.new()
+		follow.name = "FpsArms_" + bone
+		follow.bone_name = bone
+		_skeleton.add_child(follow)
+		hands.append(follow)
+	var old_hand: MeshInstance3D = _skeleton.get_node("RightHand")
+	var dagger := old_hand.mesh.resource_path.contains("dagger")   # its blade is baked into the hand mesh
+	var old: Array = [_skeleton.get_node("fp_arms_mesh"), _skeleton.get_node("LeftWatch")]
+	if not dagger:
+		old.append(old_hand)
+	if FpsArms.attach(_pivot, hands[0], hands[1], "dagger" if dagger else "knife", old) and dagger:
+		FpsArms.keep_region(old_hand, 4)
 	visible = active
 	if not InputMap.has_action("alt_fire"):
 		InputMap.add_action("alt_fire")
