@@ -115,7 +115,9 @@ def semantic_start(frames, weapon, side, aks_key):
 # come in from the right). knuckles: index->pinky down the grip; palm: palm ->
 # grip; centre: grip centre (tools: profile the gun mesh along its length).
 GRIPS = {
-    ('crop_duster', 'r'): {'knuckles': (0.0, -0.89, 0.45), 'palm': (-0.7, 0.0, -0.7),
+    # owner, after a look: roll the hand lightly round the grip so the fingers sit
+    # a little right of centre: palm turned ~15 deg from forward-left towards forward
+    ('crop_duster', 'r'): {'knuckles': (0.0, -0.89, 0.45), 'palm': (-0.47, 0.0, -0.88),
                            'centre': (0.122, -0.27, -0.33), 'reach': 0.02,
                            'scale': 1.25},   # FITS rig scale: the hand is that much bigger
 }
