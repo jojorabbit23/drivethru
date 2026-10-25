@@ -109,6 +109,37 @@ def semantic_start(frames, weapon, side, aks_key):
     return R0, h0, g0
 
 
+# Hands placed straight onto the weapon's own grip, in camera space at rest,
+# where the old hand was in the wrong place (owner: the sawn-off's right hand
+# held the trigger from the left; it should wrap the big grip at the back and
+# come in from the right). knuckles: index->pinky down the grip; palm: palm ->
+# grip; centre: grip centre (tools: profile the gun mesh along its length).
+GRIPS = {
+    ('crop_duster', 'r'): {'knuckles': (0.0, -0.89, 0.45), 'palm': (-0.7, 0.0, -0.7),
+                           'centre': (0.122, -0.27, -0.33), 'reach': 0.02,
+                           'scale': 1.25},   # FITS rig scale: the hand is that much bigger
+}
+
+
+def placed(frames, weapon, side, aks_key):
+    """Offset that lays the AKS grip frame on GRIPS[weapon, side] (no ICP)."""
+    g = GRIPS[(weapon, side)]
+    H, h0 = grip_frame(frames[aks_key][side])
+    h0 = h0 * g.get('scale', 1.0)
+    ref = np.array(frames[weapon][side]['ref_in_camera'])
+    rc = ref[:3].T; ro = ref[3]                      # ref axes (columns) and origin, camera space
+    k = np.array(g['knuckles'], float); k /= np.linalg.norm(k)
+    n = np.array(g['palm'], float); n = n - k * np.dot(n, k); n /= np.linalg.norm(n)
+    G_cam = np.stack([k, n, np.cross(k, n)], 1)
+    knuckles_cam = np.array(g['centre'], float) + n * g['reach']
+    G = rc.T @ G_cam                                  # into the ref frame
+    g0 = rc.T @ (knuckles_cam - ro)
+    R = G @ H.T
+    t = g0 - R @ h0
+    eul = Rotation.from_matrix(R).as_euler('YXZ', degrees=True)
+    return t, (eul[1], eul[0], eul[2])
+
+
 def angle_between(A, B):
     return math.degrees(Rotation.from_matrix(A @ B.T).magnitude())
 
@@ -148,6 +179,11 @@ def main(d):
         for side, pair in zip('rl', pairs):
             a, o = pair[0], pair[1]
             scale = pair[2] if len(pair) > 2 else 1.0
+            if (weapon, side) in GRIPS and weapon in frames:
+                t, rot = placed(frames, weapon, side, 'aks')
+                out.append('"%s": [Vector3(%.4f, %.4f, %.4f), Vector3(%.1f, %.1f, %.1f)]' % (side, *t, *rot))
+                print('# %s %s: placed on the weapon grip (GRIPS)' % (weapon, side))
+                continue
             start = None
             if weapon in frames and not a.endswith('_p43'):
                 start = semantic_start(frames, weapon, side, 'aks_fist' if a.endswith('_fist') else 'aks')
