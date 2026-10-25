@@ -52,7 +52,20 @@ func run() -> void:
 		var arms: Node = all[0]
 		var hidden := 0
 		for n in w.find_children("*", "Node3D", true, false):
-			if n.has_meta("replaced_by_fps_arms"):
+			if n.has_meta("fps_arms_kept_region"):
+				# the dagger: its blade is baked into the old hand mesh, so only that region stays
+				hidden += 1
+				var region: int = n.get_meta("fps_arms_kept_region")
+				var a: Array = (n as MeshInstance3D).mesh.surface_get_arrays(0)
+				var uv2: PackedVector2Array = a[Mesh.ARRAY_TEX_UV2]
+				var idx: PackedInt32Array = a[Mesh.ARRAY_INDEX]
+				var only := idx.size() > 0
+				for i in idx:
+					if int(floor(uv2[i].x + 0.5)) != region:
+						only = false
+						break
+				check(only, "%s: old %s keeps only its blade (%d tris)" % [name, n.name, idx.size() / 3])
+			elif n.has_meta("replaced_by_fps_arms"):
 				hidden += 1
 				var shown: bool = n.visible and (not (n is MeshInstance3D) or (n as MeshInstance3D).mesh != null)
 				check(not shown, "%s: old %s hidden" % [name, n.name])
