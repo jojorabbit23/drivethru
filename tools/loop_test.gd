@@ -350,6 +350,7 @@ func _run() -> void:
 	await wait(4.0)
 	if dc.state != "waiting":
 		dc.state = "waiting"
+	main.get_node("Reputation").value = 50.0   # base tips (earlier misses lowered it)
 	before = econ.cash
 	check(main.hatch.serve(player) and econ.cash - before == 50 + 6, "a double pays $50 (+$6 tip): got $%d" % (econ.cash - before))
 	await wait(0.2)

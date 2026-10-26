@@ -175,6 +175,8 @@ func _build_stations() -> void:
 	var m := shop.get_node_or_null("Markers")
 	if m:
 		hatch.set_lane((m.get_node("Customer_Lane_Start") as Node3D).global_position, (m.get_node("Customer_Stop") as Node3D).global_position, (m.get_node("Customer_Lane_End") as Node3D).global_position)
+	# orders side (Job A): reputation, serve streak and the order HUD
+	preload("res://game/reputation.gd").attach(self)
 
 func _station(script: Script, label: String, at: Vector3, yaw: float) -> Node3D:
 	var n := Node3D.new()

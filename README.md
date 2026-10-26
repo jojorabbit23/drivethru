@@ -435,3 +435,7 @@ can happen in any order, manually or through the serving tray. Each item keeps i
 own quality payment and cold penalty. Larger orders get some extra patience, while
 late-wave customers become less forgiving and arrival gaps shorten gradually.
 The full balancing curve and shared APIs are in docs/handover/MIXED_CUSTOMER_ORDERS.md.
+
+## Reputation and rush hour
+
+Service now matters to the fight. Reputation (bottom-left bar, starts DECENT) rises with completed and perfect orders and falls with missed cars, cold or burnt burgers. Higher tiers tip up to x1.5 and send cars more often; low tiers halve tips and thin out cars. Three orders in a row without a miss pays a streak bonus. From wave 5 a second car may queue behind the first (always on dinner-rush waves); its order shows as NEXT IN LINE, it moves up the moment the hatch is free, and time in line eats into its patience. Cars honk once and their bubble shakes with a quarter of their patience left. Details: docs/handover/ORDER_PRESSURE.md.
