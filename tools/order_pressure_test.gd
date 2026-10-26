@@ -55,7 +55,7 @@ func run() -> void:
 	var cash: int = main.economy.cash
 	serve_order(car)
 	check(main.economy.cash - cash == 36, "perfect Regular pays $30 + $6 tip at DECENT (%d)" % (main.economy.cash - cash))
-	check(is_equal_approx(rep.value, 54.0) and rep.streak == 1, "perfect order: +1 perfect +3 order, streak 1 (%.0f)" % rep.value)
+	check(is_equal_approx(rep.value, 55.0) and rep.streak == 1, "perfect order: +1 perfect +4 order, streak 1 (%.0f)" % rep.value)
 	await frames(2)
 
 	# --- a missed car costs reputation and the streak ---
@@ -66,10 +66,25 @@ func run() -> void:
 	car.patience = 1.0
 	await arrive(car)
 	await frames(90)
-	check(car.state == "leaving" and is_equal_approx(rep.value, 44.0) and rep.streak == 0, "missed car: -10 and the streak resets (%.0f)" % rep.value)
+	check(car.state == "leaving" and is_equal_approx(rep.value, 50.0) and rep.streak == 0, "missed car in the first waves: -5 and the streak resets (%.0f)" % rep.value)
 	check(hatch._next >= 18.0 * 0.5 and hatch._next <= 32.0, "next car after the usual gap at DECENT (%.1f s)" % hatch._next)
 	await frames(260)
 	hatch.car = null
+
+	# --- later misses cost the full 10; a new wave lifts a poor reputation back towards DECENT ---
+	main.wave = 4
+	hatch.customer_missed.emit()
+	check(is_equal_approx(rep.value, 40.0), "missed car from wave 4: -10 (%.0f)" % rep.value)
+	rep.value = 20.0
+	main.wave_started.emit(5)
+	check(is_equal_approx(rep.value, 26.0), "new wave: +6 towards DECENT (%.0f)" % rep.value)
+	rep.value = 37.0
+	main.wave_started.emit(6)
+	check(is_equal_approx(rep.value, 40.0), "...but never past DECENT's floor (%.0f)" % rep.value)
+	rep.value = 75.0
+	main.wave_started.emit(7)
+	check(is_equal_approx(rep.value, 75.0), "a good reputation isn't touched")
+	main.wave = 0
 
 	# --- tiers: GOOD tips x1.25, gaps shorter; TERRIBLE fewer cars ---
 	rep.value = 75.0
