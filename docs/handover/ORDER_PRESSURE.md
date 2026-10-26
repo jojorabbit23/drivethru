@@ -6,8 +6,9 @@ and later waves feel busier at the window as well as at the barricades.
 ## Reputation (`game/reputation.gd`)
 - 0-100, starts at 50. One node per game, a child of main (group `reputation`);
   `Reputation.attach(main)` is the one line main.gd calls, at the end of `_ready()`.
-- Changes: completed order +3, each perfect burger +1, cold -1, burnt salvage -2,
-  car missed -10, delivery cancelled -6.
+- Changes: completed order +4, each perfect burger +1, cold -1, burnt salvage -2,
+  car missed -10 (-5 in waves 1-3), delivery cancelled -6. Each wave start lifts a
+  reputation under 40 by up to 6 towards 40, so a bad stretch can't lock it at the bottom.
 - Tiers (floor, tip multiplier, car gap multiplier):
   LEGENDARY 90 (x1.5, x0.85) · GOOD 70 (x1.25, x0.92) · DECENT 40 (x1, x1) ·
   SHAKY 20 (x0.75, x1.15) · TERRIBLE 0 (x0.5, x1.3).
@@ -39,3 +40,13 @@ and later waves feel busier at the window as well as at the barricades.
 - `tools/order_pressure_test.gd` (29 checks).
 - `tools/capture_order_pressure.gd` → `docs/previews/order_pressure_{hud,queue,impatient}.png`.
 - `tools/loop_test.gd` pins reputation to 50 before its exact-payment check.
+
+## Balance run (tools/order_flow_sim.gd)
+Stand-in player who kills each enemy after N s and works one order at a time
+(`base + per_burger x extra burgers` seconds, half speed while enemies are alive):
+  godot --headless --path . --fixed-fps 60 --script res://tools/order_flow_sim.gd -- 15 8 16 8
+- Quick player (16 s + 8 s/extra, kills in 8 s): no misses until wave 14, reputation
+  LEGENDARY by wave 7; slack before patience runs out falls from ~20-25 s early to ~7-10 s
+  from wave 12, first real misses at 14-15 with rush-hour queues every wave.
+- Slow player (24 s + 10 s/extra, kills in 10 s): holds DECENT to about wave 8, then
+  falls to TERRIBLE from wave 9-10 as queues outpace it (fewer cars, half tips).

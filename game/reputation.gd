@@ -23,11 +23,17 @@ const TIERS := [
 	[20.0, "SHAKY", 0.75, 1.15],
 	[0.0, "TERRIBLE", 0.5, 1.3],
 ]
-const ORDER_DONE := 3.0        # a completed order
+const ORDER_DONE := 4.0        # a completed order
 const PER_PERFECT := 1.0       # each perfect burger in it
 const PER_COLD := -1.0         # each cold burger
 const PER_BURNT := -2.0        # each burnt salvage burger
 const MISSED := -10.0          # a car drove off unserved
+const MISSED_EARLY := -5.0     # ...in waves 1-3, while the player learns the kitchen
+const EARLY_WAVES := 3
+# Each new wave brings a new crowd: a reputation under DECENT climbs back this
+# far towards it, so one bad stretch can't lock the shop at half tips for good.
+const RECOVER_TO := 40.0
+const RECOVER_PER_WAVE := 6.0
 const DELIVERY_MISSED := -6.0  # a phone order cancelled
 const STREAK_EVERY := 3
 const STREAK_CASH := 10        # x (streak / STREAK_EVERY), capped
@@ -60,9 +66,11 @@ func _ready() -> void:
 	if hatch:
 		hatch.customer_served.connect(func(_c: int, _t: int): _on_burger(String(hatch.last_quality)))
 		hatch.order_completed.connect(func(_car: Node): _on_order_done())
-		hatch.customer_missed.connect(func(): _on_missed(MISSED))
+		hatch.customer_missed.connect(func(): _on_missed(MISSED_EARLY if int(main.get("wave")) <= EARLY_WAVES else MISSED))
 		hatch.customer_impatient.connect(func(_car: Node): _toast("CUSTOMER LOSING PATIENCE", P.BURNT_ORANGE))
 		hatch.customer_queued.connect(func(_car: Node): _toast("RUSH HOUR  ·  ANOTHER CAR IN LINE", P.AMBER_GLOW))
+	if main.has_signal("wave_started"):
+		main.wave_started.connect(func(_n: int): recover())
 	var delivery: Node = main.get("delivery")
 	if delivery:
 		delivery.customer_served.connect(func(_c: int, _t: int): _on_burger(String(delivery.last_quality)))
@@ -93,6 +101,10 @@ func add(delta: float) -> void:
 		tier_changed.emit(tier_name(), up)
 		_toast("REPUTATION %s  ·  TIPS x%s" % [tier_name(), str(tip_scale())], P.ELECTRIC_TEAL if up else P.BURNT_ORANGE)
 	changed.emit()
+
+func recover() -> void:
+	if value < RECOVER_TO:
+		add(minf(RECOVER_PER_WAVE, RECOVER_TO - value))
 
 func _on_burger(quality: String) -> void:
 	match quality:
