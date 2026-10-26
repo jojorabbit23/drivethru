@@ -199,11 +199,11 @@ func _build_props() -> void:
 	magazine = Node3D.new()
 	magazine.name = "MushroomMonthly"
 	pcam.add_child(magazine)
-	magazine.position = Vector3(-0.02, -0.27, -0.42)
-	magazine.rotation = Vector3(deg_to_rad(52), deg_to_rad(4), 0)
+	magazine.position = Vector3(-0.02, -0.16, -0.52)
+	magazine.rotation = Vector3(deg_to_rad(-22), deg_to_rad(4), deg_to_rad(-3))   # top tipped away, lying in the lap
 	_quad(magazine, Vector2(0.3, 0.39), Vector3.ZERO, P.WARM_CHALK)
 	_quad(magazine, Vector2(0.3, 0.07), Vector3(0, 0.16, 0.001), P.BURNT_ORANGE)
-	var title := _label(magazine, "MUSHROOM MONTHLY", Vector3(0, 0.16, 0.002), P.WARM_CHALK, 30)
+	var title := _label(magazine, "MUSHROOM MONTHLY", Vector3(0, 0.16, 0.002), P.WARM_CHALK, 22)
 	title.outline_size = 0
 	var big := Icons.sprite("mushroom_brown", 0.012)
 	big.position = Vector3(0, -0.01, 0.003)
@@ -289,6 +289,7 @@ func _quad(parent: Node3D, size: Vector2, at: Vector3, c: Color) -> MeshInstance
 	m.position = at
 	var mat := _mat(c)
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED   # print reads clearly in the dark office
 	m.material_override = mat
 	parent.add_child(m)
 	return m
@@ -475,6 +476,8 @@ func grill_scene() -> void:
 	await track(func() -> Vector3: return slot_at, secs(1.2), 0.2)
 	# more zombies stagger into view outside window A
 	var wa := window("A")
+	for i in 3:
+		wa.rip_board()
 	var crowd: Array = []
 	for i in 5:
 		var z: Node3D = main.spawn_zombie(wa)
@@ -543,6 +546,9 @@ func box_scene() -> void:
 
 # A short walk past the bodies to the hatch; the armoured truck; hand over.
 func hatch_scene() -> void:
+	for z in main.get_tree().get_nodes_in_group("zombies"):
+		if is_instance_valid(z) and not z.is_dead():
+			z.take_damage(10000.0, false, {})
 	beat("walk_to_hatch", "A short walk through the kitchen, bodies scattered, radio still playing.")
 	await walk([Vector3(0.6, 0.05, -2.5), Vector3(-1.2, 0.05, -2.6), Vector3(-3.0, 0.05, -3.75)], 2.0)
 	if is_instance_valid(truck):
