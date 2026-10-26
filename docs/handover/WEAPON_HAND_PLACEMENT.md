@@ -13,6 +13,10 @@ blade direction without deforming the authored skin. The alternate dagger is
 explicitly excluded. `KNIFE_WRIST_ROLL` in knife_weapon.gd controls this turn;
 no generated mesh or fit needs rebuilding for this rigid roll.
 
+The blade also has a separate 12-degree inward adjustment about the centre of
+its handle (`BLADE_GRIP_TILT`). Only KnifeSocket/GripOffset/Model is rotated at
+initialization; hand bones, IK targets and the accepted wrist pose stay unchanged.
+
 Both shotguns now use explicitly placed grip frames for both hands, solved at
 the runtime 1.25x rig size. The sawn-off rear hand sits higher and rolls slightly
 round its stock; the pump rear hand is fitted against the narrow grip rather than

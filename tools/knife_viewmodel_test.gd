@@ -19,6 +19,11 @@ func run() -> void:
  var skeleton: Skeleton3D = pivot.find_child("Skeleton3D",true,false)
  check(skeleton.get_bone_count() == 36, "corrected knife skeleton retained")
  check(pivot.find_children("*","CollisionObject3D",true,false).is_empty(), "viewmodel adds no gameplay colliders")
+ var blade: Node3D = (pivot.find_child("KnifeSocket",true,false) as Node3D).get_node("GripOffset/Model")
+ var original_blade: Node3D = load("res://weapons/knife/knife_model.tscn").instantiate()
+ var tilt: float = rad_to_deg(original_blade.basis.get_rotation_quaternion().angle_to(blade.basis.get_rotation_quaternion()))
+ check(blade.position.is_equal_approx(original_blade.position) and absf(tilt-12.0)<0.01,"blade tilts 12 degrees about its handle centre without moving the hand socket")
+ original_blade.free()
  var shadows_off := true
  for mesh: MeshInstance3D in pivot.find_children("*","MeshInstance3D",true,false):
   shadows_off = shadows_off and mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

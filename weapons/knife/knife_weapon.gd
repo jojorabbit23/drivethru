@@ -24,6 +24,7 @@ const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
 const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
 const KNIFE_WRIST_ROLL := -1.745329252 # owner: reverse the 100-degree turn, survival knife only
+const BLADE_GRIP_TILT := 0.2094395102 # 12-degree inward blade adjustment, hand stays in place
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
@@ -91,6 +92,13 @@ func _ready() -> void:
 	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
+	if viewmodel.resource_path.ends_with("/knife_viewmodel.tscn"):
+		var socket: Node3D = _pivot.find_child("KnifeSocket", true, false)
+		var blade: Node3D = socket.get_node("GripOffset/Model")
+		# Model origin is the centre of the handle. Rotate only this child;
+		# neither the hand bones nor their IK reference sockets are changed.
+		var axis: Vector3 = (blade.global_basis.inverse() * camera.global_basis.z).normalized()
+		blade.basis = blade.basis * Basis(axis, BLADE_GRIP_TILT)
 	# shared AKS arms follow the PSX hand bones, whose meshes are hidden
 	var hands: Array[Node3D] = []
 	for bone in ["hand_r", "hand_l"]:
