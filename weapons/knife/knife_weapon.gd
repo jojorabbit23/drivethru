@@ -23,7 +23,7 @@ const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
 # turn (tools/build_knife_viewmodel.gd reads both constants).
 const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
-const KNIFE_WRIST_ROLL := 1.745329252 # owner: 100 degrees towards the camera/right, survival knife only
+const KNIFE_WRIST_ROLL := -1.745329252 # owner: reverse the 100-degree turn, survival knife only
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")

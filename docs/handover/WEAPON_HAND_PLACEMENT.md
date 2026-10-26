@@ -6,8 +6,8 @@ damage and attack timings remain unchanged. The adjustment rotates the forearm's
 approach instead of moving the whole knife sideways or letting the wrist drift.
 Other weapon fits retain the default shoulder location.
 
-Owner follow-up: the survival knife grip rolls a further 100 degrees towards the
-camera/right about its own blade axis at the hand bone. A rigid presentation
+Owner follow-up: the survival knife grip rolls 100 degrees in the reverse
+direction (-100 degrees) about its own blade axis at the hand bone. A rigid presentation
 transform carries blade and fingers together, retaining the wrist location and
 blade direction without deforming the authored skin. The alternate dagger is
 explicitly excluded. `KNIFE_WRIST_ROLL` in knife_weapon.gd controls this turn;
