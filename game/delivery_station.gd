@@ -21,6 +21,7 @@ var prep_selected: bool=false
 func _ready() -> void:
 	_order_rng.randomize()
 	_next=8.0;gap_min=35.0;gap_max=55.0
+	allow_queue=false   # one phone ticket at a time
 	# Keep the hatch's interaction volume above all four tray-slot rays.
 	add_zone(Vector3(1.18,.85,.30),Vector3(0,1.80,.1))
 	# Counter and shutter stay physically closed until purchase; this is never a breach.
@@ -95,7 +96,7 @@ func spawn_customer(quantity: int=0) -> Node3D:
 		if not b.is_empty():BurgerItems.prepare(b);stocked.append(b.burger_id)
 	c.set_meta("prepared_ids",stocked)
 	c.left.connect(func(served: bool):
-		_next=randf_range(gap_min,gap_max);ring.stop()
+		_next=randf_range(gap_min,gap_max)*gap_scale();ring.stop()
 		if served:pickup_ready.emit(c)
 		else:customer_missed.emit())
 	_acknowledged=false;_ring_next=0.0

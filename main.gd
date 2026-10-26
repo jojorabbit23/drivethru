@@ -1,6 +1,7 @@
 # Entry scene: shop + player + waves + the burger loop (stations, economy) + HUD.
 extends Node3D
 
+const WaveScaling = preload("res://game/wave_scaling.gd")
 const SHAMBLER := preload("res://enemies/shambler/shambler.tscn")
 const SCUTTLER := preload("res://enemies/scuttler/scuttler.tscn")
 const LANCER := preload("res://enemies/lancer/lancer.tscn")
@@ -134,6 +135,9 @@ func _ready() -> void:
 	_update_status()
 	if auto_spawn:
 		_start_wave(1)
+	var breach_alert: CanvasLayer = preload("res://game/breach_alert.gd").new()
+	breach_alert.name = "BreachAlert"
+	add_child(breach_alert)
 
 # The vertical-slice stations, placed on the generated shop's furniture.
 func _build_stations() -> void:
@@ -175,6 +179,8 @@ func _build_stations() -> void:
 	var m := shop.get_node_or_null("Markers")
 	if m:
 		hatch.set_lane((m.get_node("Customer_Lane_Start") as Node3D).global_position, (m.get_node("Customer_Stop") as Node3D).global_position, (m.get_node("Customer_Lane_End") as Node3D).global_position)
+	# orders side (Job A): reputation, serve streak and the order HUD
+	preload("res://game/reputation.gd").attach(self)
 
 func _station(script: Script, label: String, at: Vector3, yaw: float) -> Node3D:
 	var n := Node3D.new()
@@ -186,9 +192,9 @@ func _station(script: Script, label: String, at: Vector3, yaw: float) -> Node3D:
 	return n
 
 # Waves (docs/GAME_DESIGN.md): wave n sends 4 + 2n enemies, one every
-# max(5, 12 - n) seconds (11 s in wave 1), on random lanes (never three in a
+# max(5, 12 - n) seconds (20% less on dinner rushes), on random lanes (never three in a
 # row on one side). When the last one of a wave is dead, a break of
-# wave_break seconds, then the next. Stops when the player dies.
+# wave_break plus recovery seconds, then the next. Stops when the player dies.
 func _physics_process(delta: float) -> void:
 	if not auto_spawn or player.is_dead():
 		return
@@ -222,16 +228,27 @@ func _spawn_next() -> void:
 	var n := _spawned + 1
 	var window := _pick_window(_group_windows)
 	_group_windows.append(window.name)
-	if lancer_every > 0 and wave >= lancer_from_wave and n % lancer_every == 0:
-		spawn_lancer(window)
-	elif scuttler_every > 0 and wave >= scuttler_from_wave and n % scuttler_every == 0:
-		spawn_scuttler(window)
-	elif scientist_every > 0 and wave >= scientist_from_wave and n % scientist_every == 0:
-		spawn_scientist(window)
-	elif n % 2 == 1:
-		spawn_hollowhead(window)
-	else:
-		spawn_zombie(window)
+	spawn_enemy(enemy_scene_for(wave, n), window, true)
+
+# One selector shared by spawning, tests and the flow report. Preserve the
+# original running rotation, then replace only some later Shambler slots.
+func enemy_scene_for(n: int, slot: int) -> PackedScene:
+	if lancer_every > 0 and n >= lancer_from_wave and slot % lancer_every == 0:
+		return LANCER
+	if scuttler_every > 0 and n >= scuttler_from_wave and slot % scuttler_every == 0:
+		return SCUTTLER
+	if scientist_every > 0 and n >= scientist_from_wave and slot % scientist_every == 0:
+		return SCIENTIST
+	if slot % 2 == 1:
+		return HOLLOWHEAD
+	var replacement: String = WaveScaling.replacement(n, slot)
+	if replacement == "lancer" and lancer_every > 0 and n >= lancer_from_wave:
+		return LANCER
+	if replacement == "scuttler" and scuttler_every > 0 and n >= scuttler_from_wave:
+		return SCUTTLER
+	if replacement == "scientist" and scientist_every > 0 and n >= scientist_from_wave:
+		return SCIENTIST
+	return SHAMBLER
 
 func _start_wave(n: int) -> void:
 	wave = n
@@ -246,6 +263,8 @@ func _start_wave(n: int) -> void:
 
 # "WAVE 4  ·  LANCERS: AIM FOR THE CAP" when a new enemy type joins.
 func wave_banner(n: int) -> String:
+	if is_rush_wave(n):
+		return "WAVE %d  ·  DINNER RUSH" % n
 	var news := ""
 	if scuttler_every > 0 and n == scuttler_from_wave:
 		news = "SCUTTLERS: FAST AND LOW"
@@ -262,14 +281,18 @@ static func wave_size(n: int) -> int:
 
 # Average seconds per enemy (a group of g arrives every g x this).
 func wave_interval(n: int) -> float:
-	return maxf(5.0, spawn_interval + 1.0 - n)
+	return maxf(5.0, spawn_interval + 1.0 - n) * (0.8 if is_rush_wave(n) else 1.0)
 
 # Waves 1-3 arrive one at a time, 4-6 in pairs, 7-9 in threes, then fours.
 func group_size(n: int) -> int:
 	return clampi(1 + (n - 1) / 3, 1, max_group)
 
 func break_length(cleared: int) -> float:
-	return wave_break + minf(10.0, 2.0 * float(cleared - 1))
+	return wave_break + minf(10.0, 2.0 * float(cleared - 1)) + (10.0 if is_rush_wave(cleared) else 0.0)
+
+# Public hook used by the independently developed order-pressure system.
+func is_rush_wave(n: int) -> bool:
+	return n > 0 and n % 5 == 0
 
 # A random open window; never three in a row on one side, and (when there are
 # enough windows) not one this group has already used.
@@ -315,7 +338,7 @@ func spawn_scientist(window: Node3D = null) -> Node:
 func spawn_hollowhead(window: Node3D = null) -> Node:
 	return spawn_enemy(HOLLOWHEAD, window)
 
-func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
+func spawn_enemy(scene: PackedScene, window: Node3D = null, scale_for_wave: bool = false) -> Node:
 	if get_tree().get_nodes_in_group("zombies").size() >= max_zombies:
 		return null
 	var windows := get_tree().get_nodes_in_group("windows")
@@ -324,6 +347,8 @@ func spawn_enemy(scene: PackedScene, window: Node3D = null) -> Node:
 	_spawned += 1
 	var z := scene.instantiate()
 	z.setup(window, player)
+	if scale_for_wave:
+		WaveScaling.apply(z, wave)
 	add_child(z)
 	var spawn: Vector3 = window.lane_spawn()
 	z.global_position = spawn + Vector3(randf_range(-0.6, 0.6), 0.05, 0).rotated(Vector3.UP, window.rotation.y)
