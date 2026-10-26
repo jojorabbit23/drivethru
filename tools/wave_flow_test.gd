@@ -15,18 +15,13 @@ func check(ok: bool, label: String) -> void:
 		failures += 1
 
 func kinds_in_wave(main: Node, n: int) -> Dictionary:
-	# what the rotation would spawn over a whole wave n (no scene spawning)
 	var out := {}
 	for i in main.wave_size(n):
-		var k: int = i + 1 + 40 * n
-		var t := "common"
-		if main.lancer_every > 0 and n >= main.lancer_from_wave and k % main.lancer_every == 0:
-			t = "lancer"
-		elif main.scuttler_every > 0 and n >= main.scuttler_from_wave and k % main.scuttler_every == 0:
-			t = "scuttler"
-		elif main.scientist_every > 0 and n >= main.scientist_from_wave and k % main.scientist_every == 0:
-			t = "scientist"
-		out[t] = int(out.get(t, 0)) + 1
+		var scene: PackedScene = main.enemy_scene_for(n, i + 1 + 40 * n)
+		var kind: String = scene.resource_path.get_slice("/", 3)
+		if scene == main.SHAMBLER or scene == main.HOLLOWHEAD:
+			kind = "common"
+		out[kind] = int(out.get(kind, 0)) + 1
 	return out
 
 func run() -> void:
@@ -43,7 +38,7 @@ func run() -> void:
 
 	# --- group sizes and pacing ---
 	check(main.group_size(1) == 1 and main.group_size(3) == 1 and main.group_size(4) == 2 and main.group_size(7) == 3 and main.group_size(10) == 4 and main.group_size(30) == 4, "waves 1-3 single file, 4-6 pairs, 7-9 threes, then fours")
-	check(main.break_length(1) == 20.0 and main.break_length(3) == 24.0 and main.break_length(20) == 30.0, "break grows 2 s a wave from 20 s to 30 s")
+	check(main.break_length(1) == 20.0 and main.break_length(3) == 24.0 and main.break_length(19) == 30.0, "break grows 2 s a wave from 20 s to 30 s")
 	# --- staged enemy types ---
 	var w1: Dictionary = kinds_in_wave(main, 1)
 	check(w1.keys() == ["common"], "wave 1 is Shamblers and Hollowheads only (%s)" % str(w1))
@@ -52,6 +47,58 @@ func run() -> void:
 	check(kinds_in_wave(main, 4).has("lancer"), "wave 4 adds Lancers")
 	check("SCUTTLERS" in main.wave_banner(2) and "SCIENTISTS" in main.wave_banner(3) and "LANCERS" in main.wave_banner(4), "each new type is announced")
 	check(main.wave_banner(1) == "WAVE 1" and "IN THREES" in main.wave_banner(7), "plain banner, and groups announced (%s)" % main.wave_banner(7))
+
+	# --- late pressure, bounded stats, exact early rotation ---
+	var scaling: Script = load("res://game/wave_scaling.gd")
+	check(scaling.health_multiplier(6) == 1.0 and is_equal_approx(scaling.health_multiplier(7), 1.04), "health scaling begins on wave 7")
+	check(is_equal_approx(scaling.health_multiplier(100), 1.6) and is_equal_approx(scaling.speed_multiplier(100), 1.25), "health and speed caps hold")
+	for n in range(1, 5):
+		for slot in range(1, 121):
+			var expected: PackedScene = main.HOLLOWHEAD if slot % 2 == 1 else main.SHAMBLER
+			if n >= 4 and slot % 5 == 0: expected = main.LANCER
+			elif n >= 2 and slot % 3 == 0: expected = main.SCUTTLER
+			elif n >= 3 and slot % 4 == 0: expected = main.SCIENTIST
+			if main.enemy_scene_for(n, slot) != expected: failures += 1
+	check(failures == 0, "waves 1-4 preserve all 120 rotation positions")
+	var early_common: int = 0
+	var late_common: int = 0
+	for slot in range(1, 121):
+		if main.enemy_scene_for(6, slot) == main.SHAMBLER: early_common += 1
+		if main.enemy_scene_for(15, slot) == main.SHAMBLER: late_common += 1
+	check(late_common < early_common, "later composition replaces Shamblers (%d -> %d / 120)" % [early_common, late_common])
+	var previous: int = 10000
+	for n in [6, 7, 10, 13]:
+		var count: int = 0
+		for slot in range(1, 481):
+			if main.enemy_scene_for(n, slot) == main.SHAMBLER: count += 1
+		check(count < previous, "Shambler share steps down at wave %d (%d / 480)" % [n, count])
+		previous = count
+	check(not main.is_rush_wave(0) and main.is_rush_wave(5) and main.is_rush_wave(15) and not main.is_rush_wave(14), "rush hook every fifth positive wave")
+	check(main.wave_interval(10) < main.wave_interval(9) and main.break_length(10) == main.break_length(9) + 10.0 and "DINNER RUSH" in main.wave_banner(5), "rush is denser, announced and followed by recovery")
+	main.wave = 15
+	var base: Node = main.spawn_zombie()
+	var hp: float = base.max_health
+	var speed: float = base.hunt_speed
+	main._spawn_next()
+	var scaled: Node = get_nodes_in_group("zombies")[-1]
+	# Pick a known Shambler slot to verify scaling before its _ready initializes health.
+	scaled.queue_free(); base.queue_free()
+	await process_frame
+	scaled = main.spawn_enemy(main.SHAMBLER, null, true)
+	check(is_equal_approx(scaled.health, hp * scaling.health_multiplier(15)) and is_equal_approx(scaled.hunt_speed, speed * scaling.speed_multiplier(15)), "spawn-time scaling initializes actual health and motion")
+	check(is_equal_approx(scaled.agent.max_speed, scaled.hunt_speed), "avoidance uses the scaled speed")
+	scaled.queue_free()
+	await process_frame
+	for scene: PackedScene in [main.SHAMBLER, main.HOLLOWHEAD, main.SCUTTLER, main.SCIENTIST, main.LANCER]:
+		var original: Node = scene.instantiate()
+		var expected_hp: float = original.max_health * scaling.health_multiplier(15)
+		var expected_speed: float = original.lane_speed * scaling.speed_multiplier(15)
+		original.free()
+		var z: Node = main.spawn_enemy(scene, null, true)
+		check(is_equal_approx(z.health, expected_hp) and is_equal_approx(z.lane_speed, expected_speed), "scaled stats initialize for %s" % scene.resource_path)
+		z.queue_free()
+		await process_frame
+	main.wave = 1
 
 	# --- a wave-4 group arrives together, from different windows ---
 	main.auto_spawn = true

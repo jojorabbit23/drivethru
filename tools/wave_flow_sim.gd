@@ -10,6 +10,7 @@ var t := 0.0
 var born := {}          # enemy instance id -> spawn time
 var log_lines: Array[String] = []
 var stuck_reported := {}
+var cleared: Array[int] = []
 
 func _initialize() -> void:
 	run.call_deferred()
@@ -30,7 +31,9 @@ func run() -> void:
 	player.set("max_health", 100000)
 	player.set("health", 100000)
 	main.wave_started.connect(func(n: int): say("%s  (size %d, groups of %d every %.0fs)" % [main.wave_banner(n), main.wave_size(n), main.group_size(n), main.wave_interval(n) * main.group_size(n)]))
-	main.wave_cleared.connect(func(n: int): say("WAVE %d CLEARED, break %.0fs" % [n, main.break_length(n)]))
+	main.wave_cleared.connect(func(n: int):
+		cleared.append(n)
+		say("WAVE %d CLEARED, break %.0fs" % [n, main.break_length(n)]))
 	var hatch: Node = main.hatch
 	hatch.customer_arrived.connect(func(c: Node): say("customer arrives: %s  patience %.0fs" % [c.ticket_text(" + ") if c.has_method("ticket_text") else c.order, c.patience]))
 	hatch.customer_missed.connect(func(): say("customer left unserved"))
@@ -52,7 +55,7 @@ func run() -> void:
 				spawns += 1
 				if "--spawns" in OS.get_cmdline_user_args():
 					say("  spawn %s at %s" % [String(z.get_script().resource_path.get_file().get_basename()), String(z.window.name)])
-			elif t - float(born[id]) >= kill_after and z.has_method("take_damage") and not z.get("dead"):
+			elif t - float(born[id]) >= kill_after and z.has_method("take_damage") and not z.is_dead():
 				z.take_damage(10000.0, true, {})
 			if t - float(born.get(id, t)) > kill_after + 6.0 and not stuck_reported.has(id):
 				stuck_reported[id] = true
@@ -61,4 +64,8 @@ func run() -> void:
 			say("TIMEOUT (40 min)")
 			break
 	say("done: %d spawns, max alive %d, %.0fs of spawning blocked by the cap, cash $%d, served %d" % [spawns, max_alive, capped_frames / 60.0, main.economy.cash, main.economy.served])
-	quit()
+	var expected: int = 0
+	for n in range(1, waves + 1): expected += main.wave_size(n)
+	var ok: bool = cleared.size() == waves and stuck_reported.is_empty() and spawns == expected and get_nodes_in_group("zombies").is_empty()
+	say("%s: %d/%d waves cleared, %d/%d spawns, %d stuck" % ["PASS" if ok else "FAIL", cleared.size(), waves, spawns, expected, stuck_reported.size()])
+	quit(0 if ok else 1)
