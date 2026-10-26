@@ -2,7 +2,8 @@
 # (vehicles/, built by tools/build_vehicles.gd) pulls up to the hatch with its cab
 # beside it,
 # honks, shows its order as a pixel burger in a speech bubble with a patience
-# bar, waits, and drives off - paid or not (a missed order costs nothing).
+# bar, waits (honking again with a quarter of its patience left), and drives
+# off - paid or not (a missed order costs reputation, game/reputation.gd).
 extends Node3D
 
 const Recipes = preload("res://game/recipes.gd")
@@ -14,6 +15,9 @@ const Station = preload("res://game/station.gd")
 
 signal arrived
 signal left(served: bool)
+signal impatient                 # a quarter of its patience left: honks and the bubble shakes
+
+const IMPATIENT_AT := 0.25       # fraction of patience left
 
 const DRIVE_IN := 5.0
 const DRIVE_OUT := 4.0
@@ -37,8 +41,13 @@ var order_lines: Array[Dictionary]=[]
 var _mixed_rows: Array[Dictionary]=[]
 var _mixed_back: Sprite3D
 var _quantity_label: Label3D
-var state := "arriving"     # arriving | waiting | leaving
+var state := "arriving"     # arriving | queued | waiting | leaving
 var waited := 0.0
+# Rush hour (game/customer_window.gd): a second car pulls up behind the one at
+# the hatch and waits in line ("queued") until it is moved up with advance_to().
+var hold_in_queue := false
+var queue_waited := 0.0
+var _warned := false
 var _t := 0.0
 var _from := Vector3.ZERO
 var _stop := Vector3.ZERO
@@ -119,6 +128,7 @@ func _build(colour: Color) -> void:
 	_add_bubble(Vector3(1.1, 2.15, 0.2))
 
 var _bubble_y := 2.15
+var _bubble_x := 0.0
 
 func _add_bubble(at: Vector3) -> void:
 	if not order_lines.is_empty():
@@ -127,6 +137,7 @@ func _add_bubble(at: Vector3) -> void:
 	_bubble = Node3D.new()
 	_bubble.position = at
 	_bubble_y = at.y
+	_bubble_x = at.x
 	add_child(_bubble)
 	var back := Icons.sprite("burger", 0.03)
 	back.texture = _bubble_texture(order)
@@ -225,7 +236,11 @@ func _process(delta: float) -> void:
 			var k := clampf(_t / DRIVE_IN, 0.0, 1.0)
 			position = _from.lerp(_stop, 1.0 - pow(1.0 - k, 2.5))
 			_roll(delta, 1.0 - k)
-			if k >= 1.0:
+			if k >= 1.0 and hold_in_queue:
+				state = "queued"
+				_t = 0.0
+				Sfx.play_at(self, "horn", global_position + Vector3(0, 1, 0), -8.0)
+			elif k >= 1.0:
 				state = "waiting"
 				_t = 0.0
 				_bubble.visible = true
@@ -240,8 +255,18 @@ func _process(delta: float) -> void:
 			bm.albedo_color = P.ELECTRIC_TEAL if left_frac > 0.66 else (P.AMBER_GLOW if left_frac > 0.33 else P.BURNT_ORANGE)
 			_bubble.position.y = _bubble_y + sin(_t * 3.0) * 0.03
 			_body.position.y = absf(sin(_t * 23.0)) * 0.012     # engine idling
+			if left_frac <= IMPATIENT_AT and not _warned:
+				_warned = true
+				Sfx.play_at(self, "horn", global_position + Vector3(0, 1, 0))
+				impatient.emit()
+			if _warned:   # shake the bubble and blink the bar: last call
+				_bubble.position.x = _bubble_x + sin(_t * 31.0) * 0.025
+				_bar.visible = fmod(_t, 0.5) < 0.35
 			if waited >= patience:
 				leave(false)
+		"queued":
+			queue_waited += delta
+			_body.position.y = absf(sin(_t * 23.0)) * 0.012
 		"leaving":
 			var k := clampf(_t / DRIVE_OUT, 0.0, 1.0)
 			position = _stop.lerp(_to, k * k)
@@ -272,12 +297,23 @@ func _roll(delta: float, speed: float) -> void:
 	for w in _wheels:
 		w.rotate_object_local(Vector3.UP, -delta * 12.0 * speed)
 
+# Move up from the queue spot to the hatch (`stop`: where the cab should be).
+func advance_to(stop: Vector3) -> void:
+	hold_in_queue = false
+	_from = position
+	_stop = stop - Vector3(CAB_FROM_CENTRE, 0, 0)
+	state = "arriving"
+	_t = 0.0
+
 func waited_fraction() -> float:
 	return clampf(waited / patience, 0.0, 1.0)
 
 func leave(served: bool) -> void:
 	if state == "leaving":
 		return
+	# from the queue spot it never reached the hatch: drive out from where it is
+	if state == "queued" or state == "arriving":
+		_stop = position
 	state = "leaving"
 	_t = 0.0
 	_bubble.visible = false
@@ -325,7 +361,7 @@ func record_delivery(kind: String,substitute: bool=false) -> bool:
 	refresh_order_quantity()
 	return true
 func _add_mixed_bubble(at: Vector3) -> void:
-	_bubble=Node3D.new();_bubble.position=at;_bubble_y=at.y;add_child(_bubble)
+	_bubble=Node3D.new();_bubble.position=at;_bubble_y=at.y;_bubble_x=at.x;add_child(_bubble)
 	var rows: int=order_lines.size()
 	var height: int=26 if rows==2 else 34
 	_mixed_back=Icons.sprite("burger",.035);_mixed_back.texture=_mixed_background(order_lines,height);_bubble.add_child(_mixed_back)
