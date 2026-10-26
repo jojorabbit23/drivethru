@@ -52,27 +52,34 @@ const FITS := {
 	"desert_eagle": {"rig": "pistol43", "r": [Vector3(0.0573, -0.0118, 0.0558), Vector3(-52.7, 132.4, -82.1)],
 		"l": [Vector3(-0.0505, -0.0734, 0.0492), Vector3(-49.6, -72.7, 5.8)], "scale": 1.30, "one_handed": true,
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": false},
-	"pump": {"r": [Vector3(-0.0872, -0.0324, 0.0746), Vector3(-40.3, 12.3, -98.8)],
-		"l": [Vector3(-0.0746, -0.0784, -0.0051), Vector3(66.5, 176.8, 71.4)],
+	"pump": {"r": [Vector3(-0.1158, -0.0418, 0.0251), Vector3(-33.9, -4.1, -83.6)],
+		"l": [Vector3(-0.1124, -0.0307, -0.0057), Vector3(64.5, -149.1, 115.3)],
+		"loading_l": [Vector3(-0.0746, -0.0784, -0.0051), Vector3(66.5, 176.8, 71.4)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-0.6, -1.4, 0.2), "fist": false, "scale": 1.25},
-	"crop_duster": {"r": [Vector3(0.1842, 0.0159, -0.0940), Vector3(-43.1, -152.1, -100.1)],
-		"l": [Vector3(0.0273, -0.0088, 0.0731), Vector3(63.6, 41.4, 135.3)],
+	"crop_duster": {"r": [Vector3(0.1885, 0.0321, -0.0778), Vector3(-44.9, -162.9, -94.4)],
+		"l": [Vector3(0.1032, -0.0424, -0.0264), Vector3(68.3, 41.4, 124.4)],
+		"loading_l": [Vector3(0.0273, -0.0088, 0.0731), Vector3(63.6, 41.4, 135.3)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-0.6, -1.4, 0.2), "fist": false, "scale": 1.25},
 	"dagger": {"r": [Vector3(-0.0041, -0.0097, 0.0029), Vector3(-19.4, -96.1, -32.3)],
 		"l": [Vector3(0.0321, 0.0087, -0.0025), Vector3(-29.6, 92.7, 31.7)],
 		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": true},
 	"knife": {"r": [Vector3(0.0432, -0.0072, -0.0063), Vector3(21.0, -96.9, -48.0)],
 		"l": [Vector3(0.0321, 0.0087, -0.0025), Vector3(-29.6, 92.7, 31.7)],
-		"pole_r": Vector3(1.0, -1.4, 0.6), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": true},
+		"pole_r": Vector3(1.6, -0.55, 0.3), "pole_l": Vector3(-1.0, -1.4, 0.6), "fist": true,
+		"shoulder_r": Vector3(0.24, -0.07, 0.02)},
 }
 
 var right_ref: Node3D
 var left_ref: Node3D
 var right_offset := Transform3D.IDENTITY
 var left_offset := Transform3D.IDENTITY
+var support_offset := Transform3D.IDENTITY
+var loading_offset := Transform3D.IDENTITY
+var loading_weight: float = 0.0
 var pole_r := Vector3(1, -1, 0.5)
 var pole_l := Vector3(-1, -1, 0.5)
 var fist := false
+var shoulder_r := Vector3.ZERO # per-weapon offset in camera space, preserving the hand socket
 var rig := "aks"
 var skeleton: Skeleton3D
 var mesh: MeshInstance3D                # the main arms mesh (tests/fitting)
@@ -108,9 +115,12 @@ static func attach(pivot: Node3D, right: Node3D, left: Node3D, fit_name: String,
 	arms.left_ref = left
 	arms.right_offset = fit_transform(fit["r"])
 	arms.left_offset = fit_transform(fit["l"])
+	arms.support_offset = arms.left_offset
+	arms.loading_offset = fit_transform(fit.get("loading_l", fit["l"]))
 	arms.pole_r = fit["pole_r"]
 	arms.pole_l = fit["pole_l"]
 	arms.fist = fit["fist"]
+	arms.shoulder_r = fit.get("shoulder_r", Vector3.ZERO)
 	arms.rig = fit.get("rig", "aks")
 	if fit.get("one_handed", false):
 		arms.left_weight = 0.0   # the weapon raises it (e.g. for a reload)
@@ -252,6 +262,7 @@ func _process(_delta: float) -> void:
 func _solve() -> void:
 	if skeleton == null:
 		return
+	left_offset = support_offset.interpolate_with(loading_offset, clampf(loading_weight, 0.0, 1.0))
 	var to_skel := skeleton.global_transform.affine_inverse()
 	if right_ref and is_instance_valid(right_ref):
 		_solve_arm("r", to_skel * (right_ref.global_transform * right_offset), pole_r)
@@ -282,6 +293,8 @@ func _solve_arm(side: String, target: Transform3D, pole_camera: Vector3) -> void
 	var hand: int = arm["hand"]
 	var parent_g: Transform3D = _global[skeleton.get_bone_parent(upper)]
 	var shoulder: Vector3 = (parent_g * _local[upper]).origin
+	if side == "r":
+		shoulder += skeleton.global_transform.basis.inverse() * (global_transform.basis * shoulder_r)
 	var l1: float = (_global[upper].basis * _local[fore].origin).length()
 	var l2: float = (_global[fore].basis * _local[hand].origin).length()
 	var goal := target.origin

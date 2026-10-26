@@ -10,6 +10,7 @@ func wait(n: int) -> void:
 	for i in n:
 		await process_frame
 func run() -> void:
+	Engine.max_fps = 30
 	root.size = Vector2i(800, 600)
 	var main: Node3D = load("res://main.tscn").instantiate()
 	main.set("auto_spawn", false)
@@ -34,6 +35,9 @@ func run() -> void:
 	w.set_meta("purchased", true)
 	player.switch_weapon(player.weapons.find(w))
 	await wait(40)
+	for child: Node in main.get_children():
+		if child is CanvasLayer:
+			child.hide()
 	# aim at the right hand (where the grip is); fall back to the weapon
 	var arms: Node = w.find_child("FpsArms", true, false)
 	var centre: Vector3 = w.global_position
@@ -41,23 +45,25 @@ func run() -> void:
 		arms._solve()
 		centre = (arms.hand_global("r") as Transform3D).origin
 		if float(arms.left_weight) > 0.5:
-			centre = centre.lerp((arms.hand_global("l") as Transform3D).origin, 0.35)
+			centre = centre.lerp((arms.hand_global("l") as Transform3D).origin, 0.5)
 	elif w.find_child("MuzzleTip", true, false):
 		centre = (w.find_child("MuzzleTip", true, false) as Node3D).global_position
 	var eye := Camera3D.new()
-	eye.near = 0.01
-	eye.fov = 45
+	eye.near = 0.001 # viewmodel shaders squeeze depth 10x
+	eye.fov = 55
 	main.add_child(eye)
 	var b := cam.global_basis
 	var views := [b * Vector3(1, 0.15, 0.1), b * Vector3(0, 1, 0.05), b * Vector3(-0.8, 0.3, -0.6), b * Vector3(0.2, -0.9, -0.4)]
 	var out := Image.create(1600, 1200, false, Image.FORMAT_RGBA8)
 	for i in views.size():
-		eye.global_position = centre + (views[i] as Vector3).normalized() * 0.42
+		eye.global_position = centre + (views[i] as Vector3).normalized() * 0.65
 		eye.look_at(centre, b.y if i != 1 else -b.z)
 		eye.current = true
 		await wait(3)
 		await RenderingServer.frame_post_draw
-		out.blit_rect(root.get_texture().get_image(), Rect2i(0, 0, 800, 600), Vector2i((i % 2) * 800, (i / 2) * 600))
+		var frame: Image = root.get_texture().get_image()
+		frame.convert(Image.FORMAT_RGBA8)
+		out.blit_rect(frame, Rect2i(0, 0, 800, 600), Vector2i((i % 2) * 800, (i / 2) * 600))
 	out.save_png("res://docs/previews/fps_arms_close_%s.png" % name)
 	print("saved close ", name)
 	quit()

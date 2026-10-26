@@ -30,6 +30,7 @@ func grab() -> Image:
 	report("frame")
 	await RenderingServer.frame_post_draw
 	var img := root.get_texture().get_image()
+	img.convert(Image.FORMAT_RGBA8) # Vulkan readbacks may be RGB8; contact sheets are RGBA8.
 	img.resize(640, 360, Image.INTERPOLATE_BILINEAR)
 	return img
 func tick(w: Node, n: int) -> void:

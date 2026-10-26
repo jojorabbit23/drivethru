@@ -334,6 +334,8 @@ func _pose(_delta: float) -> void:
  # A palm-space anchor keeps the grasp on the fore-end/shell as the wrist rotates.
  var support_basis: Basis=_gun.global_basis.orthonormalized()*(hinge.basis*rest.basis.inverse()).orthonormalized()*_support_basis_in_gun
  var loading_weight: float=smoothstep(0.35,1.15,reload_t)*(1.0-smoothstep(2.60,3.10,reload_t)) if state=="reload" else 0.0
+ var shared: Node=get_node_or_null("FpsArms")
+ if shared:shared.loading_weight=loading_weight
  # Finger ends point down into the chambers; the palm and sleeve stay above/left.
  var loading_basis: Basis=camera.global_basis*Basis.from_euler(Vector3(-PI/2,0.18,-0.30))*Basis(Vector3.UP,PI)
  _left_hand.global_basis=Basis(support_basis.get_rotation_quaternion().slerp(loading_basis.get_rotation_quaternion(),loading_weight))
