@@ -23,6 +23,7 @@ const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
 # turn (tools/build_knife_viewmodel.gd reads both constants).
 const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
+const KNIFE_WRIST_ROLL := 1.745329252 # owner: 100 degrees towards the camera/right, survival knife only
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
@@ -224,6 +225,22 @@ func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
 	_pivot.position = VIEW_OFFSET + (pos - REST_POS) * 0.45
 	_pivot.rotation_degrees = (rot_deg - REST_ROT) * Vector3(0.45, 0.45, 0.40)
 	_position_right_forearm()
+	if viewmodel.resource_path.ends_with("/knife_viewmodel.tscn"):
+		_roll_grip(KNIFE_WRIST_ROLL)
+
+func _roll_grip(angle: float) -> void:
+	# Rigid presentation roll: keep the wrist and blade axis planted, carrying
+	# the fingers and handle together without twisting their authored skin.
+	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
+	var grip_offset: Vector3 = FpsArms.FITS["knife"]["r"][0]
+	var wrist: Vector3 = _skeleton.to_global(hand * grip_offset)
+	var socket: Transform3D = _skeleton.get_bone_global_pose(_skeleton.find_bone("weapon_r"))
+	var axis: Vector3 = (_skeleton.global_basis * socket.basis.y).normalized()
+	var turn := Basis(axis, angle)
+	var pose: Transform3D = _pivot.global_transform
+	pose.origin = wrist + turn * (pose.origin - wrist)
+	pose.basis = turn * pose.basis
+	_pivot.global_transform = pose
 
 func _position_right_forearm() -> void:
 	# The forearm swings about the sculpted hand's own wrist (the top of the

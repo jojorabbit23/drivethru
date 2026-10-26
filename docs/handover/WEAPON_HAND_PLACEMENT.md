@@ -6,6 +6,13 @@ damage and attack timings remain unchanged. The adjustment rotates the forearm's
 approach instead of moving the whole knife sideways or letting the wrist drift.
 Other weapon fits retain the default shoulder location.
 
+Owner follow-up: the survival knife grip rolls a further 100 degrees towards the
+camera/right about its own blade axis at the hand bone. A rigid presentation
+transform carries blade and fingers together, retaining the wrist location and
+blade direction without deforming the authored skin. The alternate dagger is
+explicitly excluded. `KNIFE_WRIST_ROLL` in knife_weapon.gd controls this turn;
+no generated mesh or fit needs rebuilding for this rigid roll.
+
 Both shotguns now use explicitly placed grip frames for both hands, solved at
 the runtime 1.25x rig size. The sawn-off rear hand sits higher and rolls slightly
 round its stock; the pump rear hand is fitted against the narrow grip rather than
