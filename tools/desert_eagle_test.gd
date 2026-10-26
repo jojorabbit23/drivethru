@@ -39,13 +39,13 @@ func run() -> void:
  check(main.terminal.buy_eagle_ammo(player) and eagle.reserve==34 and starter.reserve==reserve and main.economy.cash==380,"Eagle ammo has separate reserve and price")
  main.terminal.page="weapons"
  var rows: Array=main.terminal.options(player)
- check(rows.size()==5 and "Desert Eagle rounds" in rows[3].label and rows[4].label=="Back","shop exposes Eagle ammo and back")
+ check(rows.size()==6 and "Desert Eagle rounds" in rows[3].label and "SMG" in rows[4].label and rows[5].label=="Back","shop exposes Eagle ammo, the SMG and back")
  player.open_menu(main.terminal,rows)
  var key:=InputEventKey.new()
- key.physical_keycode=KEY_5
+ key.physical_keycode=KEY_6
  key.pressed=true
  player._unhandled_input(key)
- check(main.terminal.page=="","key 5 reaches Back on five-row shop")
+ check(main.terminal.page=="","key 6 reaches Back on six-row shop")
  player.switch_weapon(0)
  check(player.current_weapon()==starter and not eagle.active,"original pistol can be re-equipped")
  main.free()

@@ -8,6 +8,7 @@
 extends "res://game/station.gd"
 
 const DesertEagle = preload("res://weapons/desert_eagle/desert_eagle.gd")
+const Smg = preload("res://weapons/smg/smg_weapon.gd")
 const Shotgun = preload("res://weapons/shotgun/shotgun_weapon.gd")
 
 signal bought(item: String)
@@ -83,6 +84,10 @@ func options(player: Node) -> Array:
 				opts.append(_buy("%d Desert Eagle rounds  $%d" % [Economy.EAGLE_AMMO_PACK, Economy.EAGLE_AMMO_PRICE], Economy.EAGLE_AMMO_PRICE,"ammo",buy_eagle_ammo.bind(player)))
 			else:
 				opts.append(_buy("Desert Eagle (60 damage)  $%d" % Economy.DESERT_EAGLE_PRICE,Economy.DESERT_EAGLE_PRICE,"ammo",buy_desert_eagle.bind(player)))
+			if player.has_weapon("SMG"):
+				opts.append(_buy("%d SMG rounds  $%d" % [Economy.SMG_AMMO_PACK, Economy.SMG_AMMO_PRICE], Economy.SMG_AMMO_PRICE, "ammo", buy_smg_ammo.bind(player)))
+			else:
+				opts.append(_buy("SMG (full auto, wheel to equip)  $%d" % Economy.SMG_PRICE, Economy.SMG_PRICE, "ammo", buy_smg.bind(player)))
 			opts.append(back)
 			return opts
 		"supplies":
@@ -139,6 +144,19 @@ func buy_desert_eagle(player: Node) -> bool:
 	eagle.name = "DesertEagle"
 	player.add_weapon(eagle)
 	return _done(player,"desert_eagle")
+
+func buy_smg(player: Node) -> bool:
+	if player.has_weapon("SMG") or not economy().spend(Economy.SMG_PRICE): return false
+	var smg: Node = Smg.new()
+	smg.name = "Smg"
+	player.add_weapon(smg)
+	return _done(player, "smg")
+
+func buy_smg_ammo(player: Node) -> bool:
+	var smg: Node = player.weapon_named("SMG")
+	if smg == null or not economy().spend(Economy.SMG_AMMO_PRICE): return false
+	smg.add_ammo(Economy.SMG_AMMO_PACK)
+	return _done(player, "smg_ammo")
 
 func buy_eagle_ammo(player: Node) -> bool:
 	var eagle: Node = player.weapon_named("DESERT EAGLE")

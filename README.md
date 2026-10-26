@@ -439,3 +439,7 @@ The full balancing curve and shared APIs are in docs/handover/MIXED_CUSTOMER_ORD
 ## Reputation and rush hour
 
 Service now matters to the fight. Reputation (bottom-left bar, starts DECENT) rises with completed and perfect orders and falls with missed cars, cold or burnt burgers. Higher tiers tip up to x1.5 and send cars more often; low tiers halve tips and thin out cars. Three orders in a row without a miss pays a streak bonus. From wave 5 a second car may queue behind the first (always on dinner-rush waves); its order shows as NEXT IN LINE, it moves up the moment the hatch is free, and time in line eats into its patience. Cars honk once and their bubble shakes with a quarter of their patience left. Details: docs/handover/ORDER_PRESSURE.md.
+
+## SMG
+
+The shop terminal's weapons page sells an SMG (AKS-74U) for $220: full auto (hold fire, 12 rounds a second), 22 damage a round, 30-round mag with 60 spare, and 30 more rounds for $18. A held burst kicks the view up and spreads a little after the first few rounds. It goes in the next weapon slot (mouse wheel). Its viewmodel is the whole recoloured AKS-74U rig, gun and arms, playing the rig's own draw, fire, tactical and empty reloads. Test: tools/smg_test.gd; capture: tools/capture_smg.gd.
