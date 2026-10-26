@@ -32,6 +32,9 @@ const DESERT_EAGLE_PRICE := 180
 const EAGLE_AMMO_PRICE := 20
 const EAGLE_AMMO_PACK := 14
 const SAWN_OFF_PRICE := 90
+const SMG_PRICE := 220          # full-auto AKS-74U, 30-round mag
+const SMG_AMMO_PRICE := 18
+const SMG_AMMO_PACK := 30
 const SHELL_PACK := 12         # docs/GAME_DESIGN.md: 12 shells = $30
 const SHELL_PRICE := 30
 # Kitchen upgrades (docs/COOKING_DESIGN.md "Kitchen Upgrades")

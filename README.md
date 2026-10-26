@@ -435,3 +435,7 @@ can happen in any order, manually or through the serving tray. Each item keeps i
 own quality payment and cold penalty. Larger orders get some extra patience, while
 late-wave customers become less forgiving and arrival gaps shorten gradually.
 The full balancing curve and shared APIs are in docs/handover/MIXED_CUSTOMER_ORDERS.md.
+
+## SMG
+
+The shop terminal's weapons page sells an SMG (AKS-74U) for $220: full auto (hold fire, 12 rounds a second), 22 damage a round, 30-round mag with 60 spare, and 30 more rounds for $18. A held burst kicks the view up and spreads a little after the first few rounds. It goes in the next weapon slot (mouse wheel). Its viewmodel is the whole recoloured AKS-74U rig, gun and arms, playing the rig's own draw, fire, tactical and empty reloads. Test: tools/smg_test.gd; capture: tools/capture_smg.gd.
