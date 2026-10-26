@@ -117,9 +117,17 @@ def semantic_start(frames, weapon, side, aks_key):
 GRIPS = {
     # owner, after a look: roll the hand lightly round the grip so the fingers sit
     # a little right of centre: palm turned ~15 deg from forward-left towards forward
-    ('crop_duster', 'r'): {'knuckles': (0.0, -0.89, 0.45), 'palm': (-0.47, 0.0, -0.88),
-                           'centre': (0.122, -0.27, -0.33), 'reach': 0.02,
+    ('crop_duster', 'r'): {'knuckles': (0.0, -0.89, 0.45), 'palm': (-0.35, 0.0, -0.94),
+                           'centre': (0.122, -0.245, -0.33), 'reach': 0.02,
                            'scale': 1.25},   # FITS rig scale: the hand is that much bigger
+    # Place the palm on the actual narrow rear grip, not the old oversized glove.
+    ('pump', 'r'): {'knuckles': (0.0, -0.94, 0.34), 'palm': (-0.15, 0.0, -0.99),
+                    'centre': (0.230, -0.194, -0.466), 'reach': 0.022, 'scale': 1.25},
+    # Support grips use the runtime 1.25x hands too: the old ICP clouds were 1x.
+    ('pump', 'l'): {'knuckles': (0.0, 0.0, 1.0), 'palm': (0.0, 1.0, 0.0),
+                    'centre': (0.206, -0.115, -0.869), 'reach': -0.030, 'scale': 1.25},
+    ('crop_duster', 'l'): {'knuckles': (0.0, 0.0, 1.0), 'palm': (0.0, 1.0, 0.0),
+                           'centre': (0.090, -0.180, -0.670), 'reach': -0.030, 'scale': 1.25},
 }
 
 

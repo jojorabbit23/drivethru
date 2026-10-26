@@ -318,6 +318,9 @@ func _animate(delta: float) -> void:
 		rot += Vector3(-3.0, 2.0, 8.0) * stroke
 	# loading: roll the gun to show the port, the left hand feeds a shell
 	var hand_off := Vector3.ZERO
+	var shared: Node = get_node_or_null("FpsArms")
+	if shared:
+		shared.loading_weight = sin(clampf(_shell_t / shell_time, 0.0, 1.0) * PI) if _loading else 0.0
 	if _loading:
 		var lk := clampf(_shell_t / shell_time, 0.0, 1.0)
 		var reach_k := sin(lk * PI)

@@ -23,6 +23,8 @@ const RIGHT_ELBOW_DIRECTION := Vector3(0.33, -0.18, 0.14)
 # turn (tools/build_knife_viewmodel.gd reads both constants).
 const GRIP_ROLL := -0.314159265
 const UPRIGHT_ANGLE := 0.261799388 # 15 degrees; rotate the complete grip about the wrist.
+const KNIFE_WRIST_ROLL := -1.745329252 # owner: reverse the 100-degree turn, survival knife only
+const BLADE_GRIP_TILT := 0.2094395102 # 12-degree inward blade adjustment, hand stays in place
 const STAB_CONTACT := 7.0 / 30.0
 const Hitscan = preload("res://core/hitscan.gd")
 const FpsArms = preload("res://weapons/fps_arms/fps_arms.gd")
@@ -90,6 +92,13 @@ func _ready() -> void:
 	_arms_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_sample_clip("kitchen_knife_idle", 0.0)
 	_set_pose(REST_POS, REST_ROT)
+	if viewmodel.resource_path.ends_with("/knife_viewmodel.tscn"):
+		var socket: Node3D = _pivot.find_child("KnifeSocket", true, false)
+		var blade: Node3D = socket.get_node("GripOffset/Model")
+		# Model origin is the centre of the handle. Rotate only this child;
+		# neither the hand bones nor their IK reference sockets are changed.
+		var axis: Vector3 = (blade.global_basis.inverse() * camera.global_basis.z).normalized()
+		blade.basis = blade.basis * Basis(axis, BLADE_GRIP_TILT)
 	# shared AKS arms follow the PSX hand bones, whose meshes are hidden
 	var hands: Array[Node3D] = []
 	for bone in ["hand_r", "hand_l"]:
@@ -224,6 +233,22 @@ func _set_pose(pos: Vector3, rot_deg: Vector3) -> void:
 	_pivot.position = VIEW_OFFSET + (pos - REST_POS) * 0.45
 	_pivot.rotation_degrees = (rot_deg - REST_ROT) * Vector3(0.45, 0.45, 0.40)
 	_position_right_forearm()
+	if viewmodel.resource_path.ends_with("/knife_viewmodel.tscn"):
+		_roll_grip(KNIFE_WRIST_ROLL)
+
+func _roll_grip(angle: float) -> void:
+	# Rigid presentation roll: keep the wrist and blade axis planted, carrying
+	# the fingers and handle together without twisting their authored skin.
+	var hand: Transform3D = _skeleton.get_bone_global_pose(_right_hand)
+	var grip_offset: Vector3 = FpsArms.FITS["knife"]["r"][0]
+	var wrist: Vector3 = _skeleton.to_global(hand * grip_offset)
+	var socket: Transform3D = _skeleton.get_bone_global_pose(_skeleton.find_bone("weapon_r"))
+	var axis: Vector3 = (_skeleton.global_basis * socket.basis.y).normalized()
+	var turn := Basis(axis, angle)
+	var pose: Transform3D = _pivot.global_transform
+	pose.origin = wrist + turn * (pose.origin - wrist)
+	pose.basis = turn * pose.basis
+	_pivot.global_transform = pose
 
 func _position_right_forearm() -> void:
 	# The forearm swings about the sculpted hand's own wrist (the top of the

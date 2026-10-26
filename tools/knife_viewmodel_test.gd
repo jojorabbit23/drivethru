@@ -19,6 +19,11 @@ func run() -> void:
  var skeleton: Skeleton3D = pivot.find_child("Skeleton3D",true,false)
  check(skeleton.get_bone_count() == 36, "corrected knife skeleton retained")
  check(pivot.find_children("*","CollisionObject3D",true,false).is_empty(), "viewmodel adds no gameplay colliders")
+ var blade: Node3D = (pivot.find_child("KnifeSocket",true,false) as Node3D).get_node("GripOffset/Model")
+ var original_blade: Node3D = load("res://weapons/knife/knife_model.tscn").instantiate()
+ var tilt: float = rad_to_deg(original_blade.basis.get_rotation_quaternion().angle_to(blade.basis.get_rotation_quaternion()))
+ check(blade.position.is_equal_approx(original_blade.position) and absf(tilt-12.0)<0.01,"blade tilts 12 degrees about its handle centre without moving the hand socket")
+ original_blade.free()
  var shadows_off := true
  for mesh: MeshInstance3D in pivot.find_children("*","MeshInstance3D",true,false):
   shadows_off = shadows_off and mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -62,16 +67,28 @@ func run() -> void:
  knife.call("_sample_clip","kitchen_knife_idle",0.0)
  knife.call("_set_pose",knife.REST_POS,knife.REST_ROT)
  var camera: Camera3D = player.get_node("Head/Camera3D")
- var elbow_eye: Vector3 = camera.to_local(skeleton.to_global(skeleton.get_bone_global_pose(arm_index).origin))
- var hand_eye: Vector3 = camera.to_local(skeleton.to_global(skeleton.get_bone_global_pose(hand_index).origin))
- check(elbow_eye.x > hand_eye.x + 0.10 and elbow_eye.x < hand_eye.x + 0.25,"resting forearm enters from the right at a moderated angle")
+ var shared: Node = knife.get_node("FpsArms")
+ shared._solve()
+ var shared_sk: Skeleton3D = shared.skeleton
+ var elbow_eye: Vector3 = camera.to_local(shared_sk.to_global(shared_sk.get_bone_global_pose(shared._arms.r.fore).origin))
+ var hand_eye: Vector3 = camera.to_local(shared.hand_global("r").origin)
+ check(elbow_eye.x > hand_eye.x + 0.08,"visible resting forearm enters from screen-right")
+ pivot.transform = Transform3D(Basis.IDENTITY,knife.VIEW_OFFSET)
  knife.call("_sample_clip","kitchen_knife_idle",0.0)
- var up_axis: Vector3 = (skeleton.global_basis.inverse() * camera.global_basis.y).normalized()
- var direction_before: Vector3 = skeleton.get_bone_global_pose(socket_index).basis.y
+ var up_axis: Vector3 = camera.global_basis.y
+ var direction_before: Vector3 = (skeleton.global_basis * skeleton.get_bone_global_pose(socket_index).basis.y).normalized()
  knife.call("_set_pose",knife.REST_POS,knife.REST_ROT)
- var direction_after: Vector3 = skeleton.get_bone_global_pose(socket_index).basis.y
+ var direction_after: Vector3 = (skeleton.global_basis * skeleton.get_bone_global_pose(socket_index).basis.y).normalized()
  # Our -Z knife tip is the socket's -Y axis after the rest-axis correction.
  check((-direction_after).dot(up_axis) > (-direction_before).dot(up_axis) + 0.1,"resting knife is visibly more upright")
+ var rolled: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(hand_index)
+ var grip_offset: Vector3 = knife.FpsArms.FITS["knife"]["r"][0]
+ knife._roll_grip(-knife.KNIFE_WRIST_ROLL)
+ var neutral: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(hand_index)
+ var neutral_axis: Vector3 = (skeleton.global_basis * skeleton.get_bone_global_pose(socket_index).basis.y).normalized()
+ check((rolled*grip_offset).distance_to(neutral*grip_offset)<0.0001 and absf(rad_to_deg(neutral.basis.get_rotation_quaternion().angle_to(rolled.basis.get_rotation_quaternion()))-100.0)<0.01,"100-degree grip roll keeps the visible shared wrist planted")
+ check(neutral_axis.dot(direction_after)>0.9999,"grip roll keeps the blade pointing along its original axis")
+ knife._roll_grip(knife.KNIFE_WRIST_ROLL)
  var right_hand: MeshInstance3D = pivot.find_child("RightHand",true,false)
  var right_ok: bool = right_hand != null and right_hand.skin != null and right_hand.skin.get_bind_count() == 2
  var psx_right_faces := 0
@@ -85,6 +102,9 @@ func run() -> void:
  # alternative viewmodel: the sculpt's own dagger in its own hand (slot 3)
  var dagger_weapon: Node3D = player.get_node("Head/Camera3D/Dagger")
  var dagger_pivot: Node3D = dagger_weapon.get("_pivot")
+ dagger_weapon._sample_clip("kitchen_knife_idle",0.0)
+ dagger_weapon._set_pose(dagger_weapon.REST_POS,dagger_weapon.REST_ROT)
+ check(dagger_pivot.basis.is_equal_approx(Basis.IDENTITY),"alternative dagger is excluded from the new wrist roll")
  var dagger_hand: MeshInstance3D = dagger_pivot.find_child("RightHand",true,false)
  var native := false
  for k: Vector2 in (dagger_hand.mesh.surface_get_arrays(0)[Mesh.ARRAY_TEX_UV2] as PackedVector2Array):

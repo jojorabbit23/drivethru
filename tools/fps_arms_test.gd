@@ -77,6 +77,12 @@ func run() -> void:
 		await wait(30)
 		check(arms.is_visible_in_tree(), "%s: arms visible when equipped" % name)
 		var worst := worst_error(arms)
+		if name == "knife":
+			var sk: Skeleton3D = arms.skeleton
+			var fore: int = arms._arms.r.fore
+			var elbow: Vector3 = cam.to_local(sk.global_transform * sk.get_bone_global_pose(fore).origin)
+			var wrist: Vector3 = cam.to_local(arms.hand_global("r").origin)
+			check(elbow.x > wrist.x + 0.08, "knife: forearm approaches the wrist from screen-right")
 		if w.has_method("shoot"):
 			w.shoot()
 		elif w.has_method("fire"):
@@ -91,7 +97,8 @@ func run() -> void:
 		if w.has_method("reload"):
 			w.reload()
 		var peak_left := 0.0
-		for i in 40:
+		var reload_frames: int = 240 if name == "crop_duster" else (120 if name == "pump" else 40)
+		for i in reload_frames:
 			await wait(1)
 			worst = maxf(worst, worst_error(arms))
 			peak_left = maxf(peak_left, float(arms.left_weight))
