@@ -103,8 +103,16 @@ func run() -> void:
 
 	# --- rush hour: chance by wave ---
 	check(hatch.queue_chance(1) == 0.0 and hatch.queue_chance(4) == 0.0, "no queue before wave 5")
-	check(is_equal_approx(hatch.queue_chance(5), 0.3) and is_equal_approx(hatch.queue_chance(8), 0.6) and is_equal_approx(hatch.queue_chance(20), 0.8), "queue chance 30% at wave 5, rising to 80%")
-	check(main.has_method("is_rush_wave") or hatch.queue_chance(10) == 0.8, "dinner-rush hook is optional until the waves side adds it")
+	# (waves 6, 8 and 21 are never dinner-rush waves; 5 may be)
+	check(is_equal_approx(hatch.queue_chance(6), 0.4) and is_equal_approx(hatch.queue_chance(8), 0.6) and is_equal_approx(hatch.queue_chance(21), 0.8), "queue chance rises 10% a wave from wave 5, to 80%")
+	if main.has_method("is_rush_wave"):
+		var all_rush := true
+		for n in range(1, 30):
+			if main.is_rush_wave(n):
+				all_rush = all_rush and hatch.queue_chance(n) == 1.0
+		check(all_rush, "dinner-rush waves always send a second car")
+	else:
+		check(is_equal_approx(hatch.queue_chance(5), 0.3), "without the dinner-rush hook, wave 5 is 30%")
 	check(main.delivery.allow_queue == false, "the delivery hatch never queues")
 
 	# --- a second car queues, then moves up with no gap; time in line costs patience ---
